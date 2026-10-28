@@ -1,3 +1,9 @@
-// ShopEase Core Package
-// Contains shared domain models, repository contracts and utilities used across the ShopEase ecosystem.
-library;
+// Constants
+export 'constants/order_status.dart';
+
+// Models
+export 'models/customer_address_model.dart';
+export 'models/order_item_model.dart';
+export 'models/order_model.dart';
+export 'models/product_model.dart';
+export 'models/user_model.dart';

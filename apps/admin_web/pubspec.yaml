@@ -10,6 +10,8 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
+  shopease_core:
+    path: ../../packages/shopease_core
 
 dev_dependencies:
   flutter_test:
