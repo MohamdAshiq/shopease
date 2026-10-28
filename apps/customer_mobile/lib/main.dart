@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:shopease_core/shopease_core.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const CustomerApp());
 }
 
@@ -12,13 +14,7 @@ class CustomerApp extends StatelessWidget {
     return MaterialApp(
       title: 'ShopEase',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.deepPurple,
-          brightness: Brightness.light,
-        ),
-        useMaterial3: true,
-      ),
+      theme: AppTheme.light,
       home: const CustomerHomeScreen(),
     );
   }
