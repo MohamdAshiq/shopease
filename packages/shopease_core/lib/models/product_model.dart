@@ -10,6 +10,7 @@ class ProductModel extends Equatable {
     required this.stock,
     required this.category,
     this.imageUrls = const [],
+    this.sizes = const [],
     this.isAvailable = true,
     this.createdAt,
     this.updatedAt,
@@ -22,6 +23,7 @@ class ProductModel extends Equatable {
   final int stock;
   final String category;
   final List<String> imageUrls;
+  final List<String> sizes;
   final bool isAvailable;
   final DateTime? createdAt;
   final DateTime? updatedAt;
@@ -40,6 +42,7 @@ class ProductModel extends Equatable {
     int? stock,
     String? category,
     List<String>? imageUrls,
+    List<String>? sizes,
     bool? isAvailable,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -52,6 +55,7 @@ class ProductModel extends Equatable {
       stock: stock ?? this.stock,
       category: category ?? this.category,
       imageUrls: imageUrls ?? this.imageUrls,
+      sizes: sizes ?? this.sizes,
       isAvailable: isAvailable ?? this.isAvailable,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -67,6 +71,7 @@ class ProductModel extends Equatable {
       'stock': stock,
       'category': category,
       'imageUrls': imageUrls,
+      'sizes': sizes,
       'isAvailable': isAvailable,
       'createdAt': createdAt?.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
@@ -98,6 +103,9 @@ class ProductModel extends Equatable {
               ?.map((e) => e.toString())
               .toList() ??
           const [],
+      sizes:
+          (map['sizes'] as List<dynamic>?)?.map((e) => e.toString()).toList() ??
+          const [],
       isAvailable: map['isAvailable'] as bool? ?? true,
       createdAt: parseDate(map['createdAt']),
       updatedAt: parseDate(map['updatedAt']),
@@ -113,6 +121,7 @@ class ProductModel extends Equatable {
     stock,
     category,
     imageUrls,
+    sizes,
     isAvailable,
     createdAt,
     updatedAt,
@@ -131,6 +140,7 @@ final List<ProductModel> mockProducts = [
     imageUrls: const [
       'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80',
     ],
+    sizes: const [],
     isAvailable: true,
     createdAt: DateTime(2026, 1, 15),
   ),
@@ -144,6 +154,7 @@ final List<ProductModel> mockProducts = [
     imageUrls: const [
       'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=80',
     ],
+    sizes: const ['7', '8', '9', '10', '11'],
     isAvailable: true,
     createdAt: DateTime(2026, 1, 20),
   ),
@@ -157,6 +168,7 @@ final List<ProductModel> mockProducts = [
     imageUrls: const [
       'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80',
     ],
+    sizes: const [],
     isAvailable: true,
     createdAt: DateTime(2026, 2, 5),
   ),
@@ -170,6 +182,7 @@ final List<ProductModel> mockProducts = [
     imageUrls: const [
       'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=800&q=80',
     ],
+    sizes: const [],
     isAvailable: true,
     createdAt: DateTime(2026, 2, 10),
   ),
@@ -178,25 +191,27 @@ final List<ProductModel> mockProducts = [
     title: 'Heritage Canvas Travel Backpack',
     description: 'Durable water-resistant waxed canvas with padded laptop compartment (up to 16 inch) and quick-access magnetic closures.',
     price: 89.95,
-    stock: 8,
-    category: 'Fashion',
+    stock: 15,
+    category: 'Accessories',
     imageUrls: const [
       'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&q=80',
     ],
+    sizes: const [],
     isAvailable: true,
-    createdAt: DateTime(2026, 2, 18),
+    createdAt: DateTime(2026, 2, 15),
   ),
   ProductModel(
     id: 'prod_006',
-    title: 'Ceramic Pour-Over Coffee Dripper Set',
-    description: 'Handcrafted heat-retaining ceramic coffee maker with borosilicate glass server and reusable stainless steel filter.',
-    price: 45.00,
+    title: 'Smart Fitness Tracker Band',
+    description: 'Continuous heart-rate monitoring with SpO2 sensor, sleep analytics, and 14-day battery life with 5ATM water resistance.',
+    price: 59.99,
     stock: 0,
-    category: 'Home & Kitchen',
+    category: 'Electronics',
     imageUrls: const [
-      'https://images.unsplash.com/photo-1517668808822-9ebb02ae2a0e?w=800&q=80',
+      'https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=800&q=80',
     ],
+    sizes: const [],
     isAvailable: false,
-    createdAt: DateTime(2026, 2, 22),
+    createdAt: DateTime(2026, 2, 18),
   ),
 ];

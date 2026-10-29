@@ -67,23 +67,26 @@ class _CardThumbnail extends StatelessWidget {
             ),
           ),
           child: Center(
-            child: Image.network(
-              product.primaryImageUrl,
-              fit: BoxFit.contain,
-              loadingBuilder: (context, child, progress) {
-                if (progress == null) return child;
-                return const Center(
-                  child: SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
-                );
-              },
-              errorBuilder: (context, error, stackTrace) => const Icon(
-                IconsaxPlusLinear.image,
-                color: AppColors.textHint,
-                size: AppSizes.iconLg,
+            child: Hero(
+              tag: 'product_image_${product.id}',
+              child: Image.network(
+                product.primaryImageUrl,
+                fit: BoxFit.contain,
+                loadingBuilder: (context, child, progress) {
+                  if (progress == null) return child;
+                  return const Center(
+                    child: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) => const Icon(
+                  IconsaxPlusLinear.image,
+                  color: AppColors.textHint,
+                  size: AppSizes.iconLg,
+                ),
               ),
             ),
           ),

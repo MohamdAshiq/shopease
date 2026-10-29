@@ -1,3 +1,6 @@
+// Core packages
+export 'package:equatable/equatable.dart';
+
 // Constants
 export 'constants/order_status.dart';
 
