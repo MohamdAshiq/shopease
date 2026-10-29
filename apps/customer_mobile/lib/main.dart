@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shopease_core/shopease_core.dart';
 
-import 'features/home/views/home_nav_screen.dart';
+import 'app/routing/app_router.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,11 +13,11 @@ class CustomerApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'ShopEase',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
-      home: const HomeNavScreen(),
+      routerConfig: appRouter,
     );
   }
 }

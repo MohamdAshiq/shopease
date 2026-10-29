@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shopease_core/shopease_core.dart';
 
-import '../../product/views/product_detail_screen.dart';
+import '../../../app/routing/route_constants.dart';
 import '../widgets/home_header_curved.dart';
 import '../widgets/product_card_vertical.dart';
 import '../widgets/promo_banner_slider.dart';
@@ -86,11 +86,10 @@ class HomeScreen extends StatelessWidget {
                   return ProductCardVertical(
                     product: product,
                     onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              ProductDetailScreen(product: product),
-                        ),
+                      context.pushNamed(
+                        RouteNames.productDetail,
+                        pathParameters: {'id': product.id},
+                        extra: product,
                       );
                     },
                     onAddToCart: () {},

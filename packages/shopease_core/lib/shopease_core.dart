@@ -1,5 +1,7 @@
 // Core packages
 export 'package:equatable/equatable.dart';
+export 'package:go_router/go_router.dart';
+export 'package:iconsax_plus/iconsax_plus.dart';
 
 // Constants
 export 'constants/order_status.dart';

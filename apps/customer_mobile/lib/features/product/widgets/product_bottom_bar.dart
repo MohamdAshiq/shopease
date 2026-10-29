@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:shopease_core/shopease_core.dart';
 
 import '../cubits/product_detail_cubit.dart';

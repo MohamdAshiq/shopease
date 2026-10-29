@@ -4,7 +4,7 @@ import 'package:customer_mobile/main.dart';
 void main() {
   testWidgets('Customer app renders home screen', (WidgetTester tester) async {
     await tester.pumpWidget(const CustomerApp());
-    expect(find.text('ShopEase'), findsOneWidget);
-    expect(find.text('Welcome to ShopEase'), findsOneWidget);
+    await tester.pump();
+    expect(find.text('Popular Products'), findsOneWidget);
   });
 }
