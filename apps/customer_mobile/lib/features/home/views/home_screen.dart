@@ -23,7 +23,10 @@ class HomeScreen extends StatelessWidget {
               cartItemCount: 2,
               onCartTap: () {},
               onSearchTap: () {},
-              onCategoryTap: (category) {},
+              onCategoryTap: (category) => context.go(
+                RoutePaths.storeWithCategory(category),
+                extra: category,
+              ),
             ),
 
             const SizedBox(height: AppSizes.md),
@@ -77,9 +80,9 @@ class HomeScreen extends StatelessWidget {
                 itemCount: mockProducts.length,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
-                  crossAxisSpacing: AppSizes.md,
+                  crossAxisSpacing: AppSizes.sm + 4,
                   mainAxisSpacing: AppSizes.md,
-                  childAspectRatio: 0.72,
+                  childAspectRatio: 0.73,
                 ),
                 itemBuilder: (context, index) {
                   final product = mockProducts[index];

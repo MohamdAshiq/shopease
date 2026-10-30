@@ -4,6 +4,7 @@ export 'package:go_router/go_router.dart';
 export 'package:iconsax_plus/iconsax_plus.dart';
 
 // Constants
+export 'constants/app_categories.dart';
 export 'constants/order_status.dart';
 
 // Models

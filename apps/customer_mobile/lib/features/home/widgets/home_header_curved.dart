@@ -22,15 +22,6 @@ class HomeHeaderCurved extends StatelessWidget {
   final String userName;
   final bool isGuest;
 
-  static const List<_CategoryData> _categories = [
-    _CategoryData(label: 'All', icon: IconsaxPlusLinear.category),
-    _CategoryData(label: 'Electronics', icon: IconsaxPlusLinear.headphone),
-    _CategoryData(label: 'Fashion', icon: IconsaxPlusLinear.tag),
-    _CategoryData(label: 'Watches', icon: IconsaxPlusLinear.watch),
-    _CategoryData(label: 'Gaming', icon: IconsaxPlusLinear.game),
-    _CategoryData(label: 'Home & Kitchen', icon: IconsaxPlusLinear.coffee),
-  ];
-
   @override
   Widget build(BuildContext context) {
     const bottomRadius = Radius.circular(AppSizes.radiusXl + AppSizes.sm);
@@ -84,7 +75,7 @@ class HomeHeaderCurved extends StatelessWidget {
                     const SizedBox(height: AppSizes.lg),
 
                     _HeaderCategoriesList(
-                      categories: _categories,
+                      categories: AppCategories.items,
                       onCategoryTap: onCategoryTap,
                     ),
                   ],
@@ -238,7 +229,7 @@ class _HeaderSearchBar extends StatelessWidget {
 class _HeaderCategoriesList extends StatelessWidget {
   const _HeaderCategoriesList({required this.categories, this.onCategoryTap});
 
-  final List<_CategoryData> categories;
+  final List<CategoryItem> categories;
   final ValueChanged<String>? onCategoryTap;
 
   @override
@@ -260,10 +251,10 @@ class _HeaderCategoriesList extends StatelessWidget {
             separatorBuilder: (context, index) =>
                 const SizedBox(width: AppSizes.md),
             itemBuilder: (context, index) {
-              final cat = categories[index];
+              final category = categories[index];
 
               return GestureDetector(
-                onTap: () => onCategoryTap?.call(cat.label),
+                onTap: () => onCategoryTap?.call(category.name),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -282,14 +273,14 @@ class _HeaderCategoriesList extends StatelessWidget {
                         ],
                       ),
                       child: Icon(
-                        cat.icon,
+                        category.icon,
                         size: AppSizes.iconMd - 2,
                         color: AppColors.primary,
                       ),
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      cat.label,
+                      category.name,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: AppTextStyles.bodySmall.copyWith(
@@ -307,11 +298,4 @@ class _HeaderCategoriesList extends StatelessWidget {
       ],
     );
   }
-}
-
-class _CategoryData {
-  const _CategoryData({required this.label, required this.icon});
-
-  final String label;
-  final IconData icon;
 }

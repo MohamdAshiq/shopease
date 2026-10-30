@@ -8,6 +8,8 @@ abstract final class RoutePaths {
 
   // Helper method for path-based navigation
   static String productDetailOf(String id) => '/product/$id';
+  static String storeWithCategory(String category) =>
+      Uri(path: store, queryParameters: {'category': category}).toString();
 }
 
 // App Route Names
