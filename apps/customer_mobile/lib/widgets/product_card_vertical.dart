@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shopease_core/shopease_core.dart';
 
+import '../app/routing/route_constants.dart';
+
 // Single product card
 class ProductCardVertical extends StatelessWidget {
   const ProductCardVertical({
@@ -14,10 +16,22 @@ class ProductCardVertical extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onAddToCart;
 
+  void _handleTap(BuildContext context) {
+    if (onTap != null) {
+      onTap!();
+      return;
+    }
+    context.pushNamed(
+      RouteNames.productDetail,
+      pathParameters: {'id': product.id},
+      extra: product,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onTap,
+      onTap: () => _handleTap(context),
       borderRadius: BorderRadius.circular(AppSizes.radiusMd),
       child: Container(
         decoration: BoxDecoration(
@@ -243,7 +257,7 @@ class _CardDetails extends StatelessWidget {
                   textBaseline: TextBaseline.alphabetic,
                   children: [
                     Text(
-                      '₹${product.price.toStringAsFixed(0)}',
+                      product.price.inr,
                       style: AppTextStyles.priceMedium.copyWith(
                         fontSize: 16,
                         fontWeight: FontWeight.w800,
@@ -252,7 +266,7 @@ class _CardDetails extends StatelessWidget {
                     const SizedBox(width: AppSizes.xs + 2),
                     Flexible(
                       child: Text(
-                        '₹${originalPrice.toStringAsFixed(0)}',
+                        originalPrice.inr,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: AppTextStyles.bodySmall.copyWith(

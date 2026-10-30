@@ -4,11 +4,11 @@ import 'package:shopease_core/shopease_core.dart';
 
 import '../../../widgets/app_search_bar.dart';
 import '../cubits/store_cubit.dart';
+import '../widgets/store_app_bar.dart';
 import '../widgets/store_category_chips.dart';
 import '../widgets/store_empty_state.dart';
 import '../widgets/store_product_grid.dart';
 import '../widgets/store_results_bar.dart';
-import '../widgets/store_sort_sheet.dart';
 
 // Store Screen
 class StoreScreen extends StatelessWidget {
@@ -51,33 +51,7 @@ class _StoreScreenViewState extends State<_StoreScreenView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
-      appBar: AppBar(
-        title: Text(
-          'Store',
-          style: AppTextStyles.h2.copyWith(fontWeight: FontWeight.w700),
-        ),
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        centerTitle: false,
-        actions: [
-          IconButton(
-            icon: const Icon(
-              IconsaxPlusLinear.setting_4,
-              color: AppColors.textPrimary,
-            ),
-            tooltip: 'Sort Options',
-            onPressed: () {
-              final cubit = context.read<StoreCubit>();
-              StoreSortSheet.show(
-                context,
-                currentSort: cubit.state.selectedSort,
-                onSortSelected: cubit.selectSort,
-              );
-            },
-          ),
-          const SizedBox(width: AppSizes.xs),
-        ],
-      ),
+      appBar: const StoreAppBar(),
       body: Column(
         children: [
           // Search Bar

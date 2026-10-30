@@ -6,6 +6,7 @@ import '../../features/home/views/home_screen.dart';
 import '../../features/product/views/product_detail_screen.dart';
 import '../../features/search/views/search_screen.dart';
 import '../../features/store/views/store_screen.dart';
+import '../../widgets/placeholder_screen.dart';
 import 'route_constants.dart';
 
 export 'route_constants.dart';

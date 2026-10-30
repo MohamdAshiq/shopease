@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:shopease_core/shopease_core.dart';
 
 import '../../../app/routing/route_constants.dart';
+import '../../../widgets/product_grid.dart';
 import '../widgets/home_header_curved.dart';
-import '../widgets/product_card_vertical.dart';
 import '../widgets/promo_banner_slider.dart';
 
 // Customer Home Screen
@@ -73,31 +73,11 @@ class HomeScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSizes.screenPadding,
               ),
-              child: GridView.builder(
-                padding: EdgeInsets.zero,
+              child: ProductGrid(
+                products: mockProducts,
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                itemCount: mockProducts.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: AppSizes.sm + 4,
-                  mainAxisSpacing: AppSizes.md,
-                  childAspectRatio: 0.73,
-                ),
-                itemBuilder: (context, index) {
-                  final product = mockProducts[index];
-                  return ProductCardVertical(
-                    product: product,
-                    onTap: () {
-                      context.pushNamed(
-                        RouteNames.productDetail,
-                        pathParameters: {'id': product.id},
-                        extra: product,
-                      );
-                    },
-                    onAddToCart: () {},
-                  );
-                },
+                padding: EdgeInsets.zero,
               ),
             ),
 

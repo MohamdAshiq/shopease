@@ -124,7 +124,7 @@ class _ProductTitlePriceHeader extends StatelessWidget {
           textBaseline: TextBaseline.alphabetic,
           children: [
             Text(
-              '₹${product.price.toStringAsFixed(0)}',
+              product.price.inr,
               style: AppTextStyles.priceLarge.copyWith(
                 fontSize: 24,
                 fontWeight: FontWeight.w800,
@@ -132,7 +132,7 @@ class _ProductTitlePriceHeader extends StatelessWidget {
             ),
             const SizedBox(width: AppSizes.sm),
             Text(
-              '₹${originalPrice.toStringAsFixed(0)}',
+              originalPrice.inr,
               style: AppTextStyles.bodyLarge.copyWith(
                 color: AppColors.textHint,
                 decoration: TextDecoration.lineThrough,

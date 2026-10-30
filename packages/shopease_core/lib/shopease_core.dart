@@ -24,3 +24,6 @@ export 'theme/app_colors.dart';
 export 'theme/app_sizes.dart';
 export 'theme/app_text_styles.dart';
 export 'theme/app_theme.dart';
+
+// Utils
+export 'utils/currency_formatter.dart';

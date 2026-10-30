@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shopease_core/shopease_core.dart';
 
 import '../../../app/routing/route_constants.dart';
-import '../../home/widgets/product_card_vertical.dart';
+import '../../../widgets/product_grid.dart';
 
 // Search Result Grid
 class SearchResultsGrid extends StatelessWidget {
@@ -55,34 +55,15 @@ class SearchResultsGrid extends StatelessWidget {
           ),
         ),
         Expanded(
-          child: GridView.builder(
+          child: ProductGrid(
+            products: products,
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            padding: const EdgeInsets.fromLTRB(
-              AppSizes.screenPadding,
-              AppSizes.xs,
-              AppSizes.screenPadding,
-              AppSizes.xxl,
-            ),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: AppSizes.sm + 4,
-              mainAxisSpacing: AppSizes.md,
-              childAspectRatio: 0.73,
-            ),
-            itemCount: products.length,
-            itemBuilder: (context, index) {
-              final product = products[index];
-              return ProductCardVertical(
-                product: product,
-                onTap: () {
-                  onProductTap?.call();
-                  context.pushNamed(
-                    RouteNames.productDetail,
-                    pathParameters: {'id': product.id},
-                    extra: product,
-                  );
-                },
-                onAddToCart: () {},
+            onProductTap: (product) {
+              onProductTap?.call();
+              context.pushNamed(
+                RouteNames.productDetail,
+                pathParameters: {'id': product.id},
+                extra: product,
               );
             },
           ),

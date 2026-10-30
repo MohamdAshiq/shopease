@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopease_core/shopease_core.dart';
 
+import '../../../widgets/app_button.dart';
 import '../cubits/product_detail_cubit.dart';
 
 // Sticky bottom action bar
@@ -87,45 +88,15 @@ class ProductBottomBar extends StatelessWidget {
 
               // Add to Cart Button
               Expanded(
-                child: SizedBox(
-                  height: AppSizes.buttonHeight,
-                  child: ElevatedButton(
-                    onPressed: product.isInStock
-                        ? () => onAddToCart(state.quantity)
-                        : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          IconsaxPlusBold.bag_2,
-                          size: 18,
-                          color: Colors.white,
-                        ),
-                        const SizedBox(width: AppSizes.sm),
-                        Flexible(
-                          child: Text(
-                            product.isInStock
-                                ? 'Add to Cart • ₹${totalPrice.toStringAsFixed(0)}'
-                                : 'Out of Stock',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: AppTextStyles.labelLarge.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                child: AppButton(
+                  onPressed: product.isInStock
+                      ? () => onAddToCart(state.quantity)
+                      : null,
+                  icon: IconsaxPlusBold.bag_2,
+                  label: product.isInStock
+                      ? 'Add to Cart • ${totalPrice.inr}'
+                      : 'Out of Stock',
+                  isFullWidth: true,
                 ),
               ),
             ],
