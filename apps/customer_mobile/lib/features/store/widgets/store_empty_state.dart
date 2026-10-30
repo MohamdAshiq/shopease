@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shopease_core/shopease_core.dart';
 
+import '../../../widgets/app_button.dart';
+
 // Empty state view
 class StoreEmptyState extends StatelessWidget {
   const StoreEmptyState({
@@ -48,30 +50,12 @@ class StoreEmptyState extends StatelessWidget {
               ),
             ),
             const SizedBox(height: AppSizes.lg),
-            ElevatedButton.icon(
+
+            // Reset Button
+            AppButton.compact(
               onPressed: onReset,
-              icon: const Icon(Icons.refresh_rounded, size: 17),
-              label: Text(
-                'Reset All Filters',
-                style: AppTextStyles.labelMedium.copyWith(
-                  fontSize: 13.5,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                elevation: 0,
-                minimumSize: const Size(0, 40),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSizes.md + 4,
-                  vertical: AppSizes.sm + 2,
-                ),
-              ),
+              icon: Icons.refresh_rounded,
+              label: 'Reset All Filters',
             ),
           ],
         ),

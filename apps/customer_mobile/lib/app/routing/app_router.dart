@@ -4,6 +4,7 @@ import 'package:shopease_core/shopease_core.dart';
 import '../../features/home/views/customer_shell.dart';
 import '../../features/home/views/home_screen.dart';
 import '../../features/product/views/product_detail_screen.dart';
+import '../../features/search/views/search_screen.dart';
 import '../../features/store/views/store_screen.dart';
 import 'route_constants.dart';
 
@@ -81,6 +82,14 @@ final GoRouter appRouter = GoRouter(
           ],
         ),
       ],
+    ),
+
+    // Search Screen
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: RoutePaths.search,
+      name: RouteNames.search,
+      builder: (context, state) => const SearchScreen(),
     ),
 
     // Product Detail Route

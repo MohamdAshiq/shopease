@@ -22,7 +22,7 @@ class HomeScreen extends StatelessWidget {
             HomeHeaderCurved(
               cartItemCount: 2,
               onCartTap: () {},
-              onSearchTap: () {},
+              onSearchTap: () => context.pushNamed(RouteNames.search),
               onCategoryTap: (category) => context.go(
                 RoutePaths.storeWithCategory(category),
                 extra: category,

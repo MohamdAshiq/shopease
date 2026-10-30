@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopease_core/shopease_core.dart';
 
+import '../../../widgets/app_search_bar.dart';
 import '../cubits/store_cubit.dart';
 import '../widgets/store_category_chips.dart';
 import '../widgets/store_empty_state.dart';
 import '../widgets/store_product_grid.dart';
 import '../widgets/store_results_bar.dart';
-import '../widgets/store_search_bar.dart';
 import '../widgets/store_sort_sheet.dart';
 
 // Store Screen
@@ -89,7 +89,7 @@ class _StoreScreenViewState extends State<_StoreScreenView> {
               AppSizes.screenPadding,
               AppSizes.sm,
             ),
-            child: StoreSearchBar(
+            child: AppSearchBar(
               controller: _searchController,
               onChanged: (query) {
                 context.read<StoreCubit>().updateSearchQuery(query);

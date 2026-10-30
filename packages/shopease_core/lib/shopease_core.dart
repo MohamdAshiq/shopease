@@ -2,6 +2,8 @@
 export 'package:equatable/equatable.dart';
 export 'package:go_router/go_router.dart';
 export 'package:iconsax_plus/iconsax_plus.dart';
+export 'package:lottie/lottie.dart';
+export 'package:shared_preferences/shared_preferences.dart';
 
 // Constants
 export 'constants/app_categories.dart';
@@ -13,6 +15,9 @@ export 'models/order_item_model.dart';
 export 'models/order_model.dart';
 export 'models/product_model.dart';
 export 'models/user_model.dart';
+
+// Services
+export 'services/search_history_service.dart';
 
 // Theme
 export 'theme/app_colors.dart';

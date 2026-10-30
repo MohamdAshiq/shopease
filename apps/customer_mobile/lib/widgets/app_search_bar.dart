@@ -1,27 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:shopease_core/shopease_core.dart';
 
-// Search bar for product catalog
-class StoreSearchBar extends StatelessWidget {
-  const StoreSearchBar({
+// App Search Bar
+class AppSearchBar extends StatelessWidget {
+  const AppSearchBar({
     super.key,
     required this.controller,
-    required this.onChanged,
-    required this.onClear,
+    this.focusNode,
+    this.autofocus = false,
+    this.hintText = 'Search products or categories...',
+    this.onChanged,
+    this.onSubmitted,
+    this.onClear,
   });
 
   final TextEditingController controller;
-  final ValueChanged<String> onChanged;
-  final VoidCallback onClear;
+  final FocusNode? focusNode;
+  final bool autofocus;
+  final String hintText;
+  final ValueChanged<String>? onChanged;
+  final ValueChanged<String>? onSubmitted;
+  final VoidCallback? onClear;
 
   @override
   Widget build(BuildContext context) {
     return TextField(
       controller: controller,
+      focusNode: focusNode,
+      autofocus: autofocus,
+      textInputAction: TextInputAction.search,
       onChanged: onChanged,
+      onSubmitted: onSubmitted,
       style: AppTextStyles.bodyMedium,
       decoration: InputDecoration(
-        hintText: 'Search products or categories...',
+        hintText: hintText,
         hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textHint),
         prefixIcon: const Icon(
           IconsaxPlusLinear.search_normal_1,
@@ -35,6 +47,7 @@ class StoreSearchBar extends StatelessWidget {
             return IconButton(
               icon: const Icon(Icons.close_rounded, size: 18),
               onPressed: onClear,
+              tooltip: 'Clear',
             );
           },
         ),
