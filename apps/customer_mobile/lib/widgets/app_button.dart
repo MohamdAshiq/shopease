@@ -15,6 +15,7 @@ class AppButton extends StatelessWidget {
     this.isFullWidth = false,
     this.isLoading = false,
     this.isOutlined = false,
+    this.isDestructive = false,
   });
 
   const AppButton.compact({
@@ -25,6 +26,7 @@ class AppButton extends StatelessWidget {
     this.isFullWidth = false,
     this.isLoading = false,
     this.isOutlined = false,
+    this.isDestructive = false,
   }) : size = AppButtonSize.compact;
 
   final String label;
@@ -34,6 +36,7 @@ class AppButton extends StatelessWidget {
   final bool isFullWidth;
   final bool isLoading;
   final bool isOutlined;
+  final bool isDestructive;
 
   @override
   Widget build(BuildContext context) {
@@ -41,16 +44,19 @@ class AppButton extends StatelessWidget {
     final double height = isCompact ? 40.0 : AppSizes.buttonHeight;
     final double iconSize = isCompact ? 17.0 : 18.0;
     final padding = isCompact
-        ? const EdgeInsets.symmetric(horizontal: 20, vertical: 10)
+        ? const EdgeInsets.symmetric(
+            horizontal: AppSizes.md + AppSizes.xs,
+            vertical: AppSizes.sm + 2,
+          )
         : const EdgeInsets.symmetric(
             horizontal: AppSizes.lg,
             vertical: AppSizes.sm + 2,
           );
-    final contentColor = isOutlined ? AppColors.primary : Colors.white;
+    final activeColor = isDestructive ? AppColors.error : AppColors.primary;
+    final contentColor = isOutlined ? activeColor : Colors.white;
 
     final textStyle = isCompact
         ? AppTextStyles.labelMedium.copyWith(
-            fontSize: 13.5,
             fontWeight: FontWeight.w600,
             color: contentColor,
           )
@@ -86,11 +92,20 @@ class AppButton extends StatelessWidget {
     final button = ElevatedButton(
       onPressed: isLoading ? null : onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: isOutlined ? Colors.transparent : AppColors.primary,
+        backgroundColor: isOutlined
+            ? (isDestructive
+                  ? AppColors.error.withValues(alpha: 0.04)
+                  : Colors.transparent)
+            : activeColor,
         foregroundColor: contentColor,
         elevation: 0,
         side: isOutlined
-            ? const BorderSide(color: AppColors.primary, width: 1.2)
+            ? BorderSide(
+                color: isDestructive
+                    ? AppColors.error.withValues(alpha: 0.45)
+                    : AppColors.primary,
+                width: 1.2,
+              )
             : null,
         minimumSize: Size(isFullWidth ? double.infinity : 0.0, height),
         padding: padding,

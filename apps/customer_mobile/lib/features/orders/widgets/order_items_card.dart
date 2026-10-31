@@ -26,61 +26,58 @@ class OrderItemsCard extends StatelessWidget {
             icon: IconsaxPlusBold.bag_2,
             title: 'Items in this Order (${order.totalItemCount})',
           ),
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: order.items.length,
-            separatorBuilder: (context, index) => const Padding(
-              padding: EdgeInsets.symmetric(vertical: AppSizes.sm + 2),
-              child: Divider(height: 1, color: AppColors.divider),
+          for (int index = 0; index < order.items.length; index++) ...[
+            if (index > 0)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: AppSizes.sm + 2),
+                child: Divider(height: 1, color: AppColors.divider),
+              ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+                  child: SizedBox(
+                    width: 50,
+                    height: 50,
+                    child: AppNetworkImage(
+                      imageUrl: order.items[index].imageUrl,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSizes.sm + 4),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        order.items[index].title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: AppSizes.xs),
+                      Text(
+                        'Qty: ${order.items[index].quantity}  •  ${order.items[index].price.inr}',
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: AppSizes.sm),
+                Text(
+                  order.items[index].totalPrice.inr,
+                  style: AppTextStyles.labelLarge.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
             ),
-            itemBuilder: (context, index) {
-              final item = order.items[index];
-              return Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-                    child: SizedBox(
-                      width: 50,
-                      height: 50,
-                      child: AppNetworkImage(imageUrl: item.imageUrl),
-                    ),
-                  ),
-                  const SizedBox(width: AppSizes.sm + 4),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          item.title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: AppTextStyles.bodyMedium.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(height: AppSizes.xs),
-                        Text(
-                          'Qty: ${item.quantity}  •  ${item.price.inr}',
-                          style: AppTextStyles.bodySmall.copyWith(
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: AppSizes.sm),
-                  Text(
-                    item.totalPrice.inr,
-                    style: AppTextStyles.labelLarge.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
+          ],
         ],
       ),
     );

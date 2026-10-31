@@ -170,35 +170,7 @@ class _CardDetails extends StatelessWidget {
           ),
         ),
 
-        const SizedBox(height: AppSizes.xs),
-
-        // Rating Row
-        Row(
-          children: [
-            const Icon(
-              Icons.star_rounded,
-              size: AppSizes.iconSm - 2,
-              color: AppColors.starRating,
-            ),
-            const SizedBox(width: AppSizes.xs),
-            Text(
-              '4.8',
-              style: AppTextStyles.labelSmall.copyWith(
-                fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(width: AppSizes.xs + 2),
-            Text(
-              '(120+)',
-              style: AppTextStyles.labelSmall.copyWith(
-                color: AppColors.textHint,
-              ),
-            ),
-          ],
-        ),
-
-        const SizedBox(height: AppSizes.xs),
+        const SizedBox(height: AppSizes.sm),
 
         // Price & Dynamic Cart Action Button
         Row(

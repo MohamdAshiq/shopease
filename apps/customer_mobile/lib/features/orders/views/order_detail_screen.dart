@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopease_core/shopease_core.dart';
 
@@ -106,6 +107,7 @@ class OrderDetailScreen extends StatelessWidget {
                   if (canCancel) ...[
                     AppButton(
                       onPressed: () {
+                        HapticFeedback.lightImpact();
                         CancelOrderDialog.show(
                           context,
                           onConfirmCancel: () {
@@ -119,6 +121,7 @@ class OrderDetailScreen extends StatelessWidget {
                       },
                       label: 'Cancel Order',
                       isOutlined: true,
+                      isDestructive: true,
                       icon: IconsaxPlusLinear.close_circle,
                       isFullWidth: true,
                     ),

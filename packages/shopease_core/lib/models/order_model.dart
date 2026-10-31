@@ -222,7 +222,7 @@ final List<OrderModel> mockOrders = [
     customerId: 'usr_cust_001',
     customerName: 'Alex Morgan',
     customerEmail: 'customer@shopease.com',
-    customerPhone: '+1 555-0199',
+    customerPhone: '+91 98765 43210',
     items: const [
       OrderItemModel(
         productId: 'prod_001',
@@ -246,7 +246,7 @@ final List<OrderModel> mockOrders = [
       postalCode: '97477',
       country: 'USA',
       recipientName: 'Alex Morgan',
-      phone: '+1 555-0199',
+      phone: '+91 98765 43210',
     ),
     subtotal: 478.99,
     deliveryFee: 15.00,
@@ -273,7 +273,7 @@ final List<OrderModel> mockOrders = [
     customerId: 'usr_cust_001',
     customerName: 'Alex Morgan',
     customerEmail: 'customer@shopease.com',
-    customerPhone: '+1 555-0199',
+    customerPhone: '+91 98765 43210',
     items: const [
       OrderItemModel(
         productId: 'prod_002',
@@ -290,7 +290,7 @@ final List<OrderModel> mockOrders = [
       postalCode: '97477',
       country: 'USA',
       recipientName: 'Alex Morgan',
-      phone: '+1 555-0199',
+      phone: '+91 98765 43210',
     ),
     subtotal: 149.99,
     deliveryFee: 10.00,

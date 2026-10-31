@@ -5,6 +5,7 @@ import 'package:shopease_core/shopease_core.dart';
 import 'app/routing/app_router.dart';
 import 'features/cart/cubits/cart_cubit.dart';
 import 'features/orders/cubits/order_cubit.dart';
+import 'features/profile/cubits/profile_cubit.dart';
 import 'features/wishlist/cubits/wishlist_cubit.dart';
 
 void main() {
@@ -22,6 +23,7 @@ class CustomerApp extends StatelessWidget {
         BlocProvider(create: (context) => CartCubit()),
         BlocProvider(create: (context) => OrderCubit()),
         BlocProvider(create: (context) => WishlistCubit()),
+        BlocProvider(create: (context) => ProfileCubit()),
       ],
       child: MaterialApp.router(
         title: 'ShopEase',

@@ -75,100 +75,90 @@ class OrderTimeline extends StatelessWidget {
               ),
             ),
           ] else ...[
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: _stages.length,
-              itemBuilder: (context, index) {
-                final stage = _stages[index];
-                final isPassed = currentStatusIndex >= index;
-                final isCurrent = currentStatusIndex == index;
-                final isLast = index == _stages.length - 1;
-
-                final historyItem = order.statusHistory
-                    .where((h) => h.status.toLowerCase() == stage.name)
-                    .firstOrNull;
-
-                return IntrinsicHeight(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Indicator column with line
-                      Column(
-                        children: [
-                          Container(
-                            width: 18,
-                            height: 18,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: isPassed
-                                  ? (isCurrent
-                                        ? AppColors.primary
-                                        : AppColors.success)
-                                  : AppColors.divider,
-                            ),
-                            child: Icon(
-                              isPassed ? Icons.check : Icons.circle,
-                              size: isPassed ? 11 : 6,
-                              color: isPassed
-                                  ? Colors.white
-                                  : AppColors.textSecondary,
-                            ),
-                          ),
-                          if (!isLast)
-                            Expanded(
-                              child: Container(
-                                width: 2,
-                                color: isPassed && currentStatusIndex > index
-                                    ? AppColors.success
-                                    : AppColors.divider,
-                              ),
-                            ),
-                        ],
-                      ),
-                      const SizedBox(width: AppSizes.md),
-
-                      // Status Description Column
-                      Expanded(
-                        child: Padding(
-                          padding: EdgeInsets.only(
-                            bottom: isLast ? 0 : AppSizes.lg,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                stage.timelineTitle,
-                                style: AppTextStyles.labelMedium.copyWith(
-                                  fontWeight: isCurrent
-                                      ? FontWeight.w700
-                                      : (isPassed
-                                            ? FontWeight.w600
-                                            : FontWeight.w400),
-                                  color: isPassed
-                                      ? AppColors.textPrimary
-                                      : AppColors.textSecondary,
-                                ),
-                              ),
-                              if (historyItem != null) ...[
-                                const SizedBox(height: AppSizes.xs),
-                                Text(
-                                  historyItem.timestamp.formattedDateTime,
-                                  style: AppTextStyles.bodySmall.copyWith(
-                                    color: AppColors.textSecondary,
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
+            for (int index = 0; index < _stages.length; index++)
+              _buildTimelineStage(index, currentStatusIndex),
           ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTimelineStage(int index, int currentStatusIndex) {
+    final stage = _stages[index];
+    final isPassed = currentStatusIndex >= index;
+    final isCurrent = currentStatusIndex == index;
+    final isLast = index == _stages.length - 1;
+
+    final historyItem = order.statusHistory
+        .where((h) => h.status.toLowerCase() == stage.name)
+        .firstOrNull;
+
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Indicator column with line
+          Column(
+            children: [
+              Container(
+                width: 18,
+                height: 18,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isPassed
+                      ? (isCurrent ? AppColors.primary : AppColors.success)
+                      : AppColors.divider,
+                ),
+                child: Icon(
+                  isPassed ? Icons.check : Icons.circle,
+                  size: isPassed ? 11 : 6,
+                  color: isPassed ? Colors.white : AppColors.textSecondary,
+                ),
+              ),
+              if (!isLast)
+                Expanded(
+                  child: Container(
+                    width: 2,
+                    color: isPassed && currentStatusIndex > index
+                        ? AppColors.success
+                        : AppColors.divider,
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(width: AppSizes.md),
+
+          // Status Description Column
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(bottom: isLast ? 0 : AppSizes.lg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    stage.timelineTitle,
+                    style: AppTextStyles.labelMedium.copyWith(
+                      fontWeight: isCurrent
+                          ? FontWeight.w700
+                          : (isPassed ? FontWeight.w600 : FontWeight.w400),
+                      color: isPassed
+                          ? AppColors.textPrimary
+                          : AppColors.textSecondary,
+                    ),
+                  ),
+                  if (historyItem != null) ...[
+                    const SizedBox(height: AppSizes.xs),
+                    Text(
+                      historyItem.timestamp.formattedDateTime,
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );

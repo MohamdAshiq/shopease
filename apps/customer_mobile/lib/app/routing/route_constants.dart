@@ -4,6 +4,8 @@ abstract final class RoutePaths {
   static const store = '/store';
   static const wishlist = '/wishlist';
   static const profile = '/profile';
+  static const orders = '/orders';
+  static const addresses = '/addresses';
   static const search = '/search';
   static const cart = '/cart';
   static const checkout = '/checkout';
@@ -24,6 +26,8 @@ abstract final class RouteNames {
   static const store = 'store';
   static const wishlist = 'wishlist';
   static const profile = 'profile';
+  static const orders = 'orders';
+  static const addresses = 'addresses';
   static const search = 'search';
   static const cart = 'cart';
   static const checkout = 'checkout';

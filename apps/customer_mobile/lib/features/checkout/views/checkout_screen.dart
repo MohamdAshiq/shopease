@@ -8,9 +8,10 @@ import '../../../widgets/app_button.dart';
 import '../../../widgets/app_top_bar.dart';
 import '../../cart/cubits/cart_cubit.dart';
 import '../../orders/cubits/order_cubit.dart';
+import '../../profile/cubits/profile_cubit.dart';
 import '../cubits/checkout_cubit.dart';
 import '../cubits/checkout_state.dart';
-import '../widgets/address_edit_sheet.dart';
+import '../widgets/address_selection_sheet.dart';
 import '../widgets/checkout_address_card.dart';
 import '../widgets/checkout_bill_card.dart';
 import '../widgets/checkout_items_summary.dart';
@@ -22,8 +23,9 @@ class CheckoutScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final defaultAddress = context.read<ProfileCubit>().state.defaultAddress;
     return BlocProvider(
-      create: (context) => CheckoutCubit(),
+      create: (context) => CheckoutCubit(initialAddress: defaultAddress),
       child: const _CheckoutView(),
     );
   }
@@ -84,13 +86,13 @@ class _CheckoutView extends StatelessWidget {
                       CheckoutAddressCard(
                         address: state.address,
                         onChangeAddress: () async {
-                          final updatedAddress =
-                              await AddressEditBottomSheet.show(
-                                context,
-                                initialAddress: state.address,
-                              );
-                          if (updatedAddress != null) {
-                            checkoutCubit.updateAddress(updatedAddress);
+                          HapticFeedback.lightImpact();
+                          final selected = await AddressSelectionSheet.show(
+                            context,
+                            selectedAddress: state.address,
+                          );
+                          if (selected != null) {
+                            checkoutCubit.updateAddress(selected);
                           }
                         },
                       ),

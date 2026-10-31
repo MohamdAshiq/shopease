@@ -34,6 +34,7 @@ class OrderHeaderCard extends StatelessWidget {
               const SizedBox(height: 2),
               InkWell(
                 onTap: () {
+                  HapticFeedback.lightImpact();
                   Clipboard.setData(ClipboardData(text: order.id));
                   AppSnackBar.show(context, message: 'Order ID copied');
                 },

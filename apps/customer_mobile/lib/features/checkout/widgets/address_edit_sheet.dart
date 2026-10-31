@@ -1,24 +1,53 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shopease_core/shopease_core.dart';
 
 import '../../../widgets/app_button.dart';
+import '../../../widgets/app_text_field.dart';
 
-// Edit Address Bottom Sheet
+class AddressEditResult {
+  const AddressEditResult({required this.address, this.isDefault = false});
+
+  final CustomerAddressModel address;
+  final bool isDefault;
+}
+
+// Edit or Add Address Bottom Sheet
 class AddressEditBottomSheet extends StatefulWidget {
-  const AddressEditBottomSheet({super.key, required this.initialAddress});
+  const AddressEditBottomSheet({
+    super.key,
+    this.initialAddress,
+    this.isDefault = false,
+    this.showDefaultToggle = true,
+    this.title,
+    this.submitButtonLabel,
+  });
 
-  final CustomerAddressModel initialAddress;
+  final CustomerAddressModel? initialAddress;
+  final bool isDefault;
+  final bool showDefaultToggle;
+  final String? title;
+  final String? submitButtonLabel;
 
-  static Future<CustomerAddressModel?> show(
+  static Future<AddressEditResult?> show(
     BuildContext context, {
-    required CustomerAddressModel initialAddress,
+    CustomerAddressModel? initialAddress,
+    bool isDefault = false,
+    bool showDefaultToggle = true,
+    String? title,
+    String? submitButtonLabel,
   }) {
-    return showModalBottomSheet<CustomerAddressModel>(
+    return showModalBottomSheet<AddressEditResult>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) =>
-          AddressEditBottomSheet(initialAddress: initialAddress),
+      builder: (context) => AddressEditBottomSheet(
+        initialAddress: initialAddress,
+        isDefault: isDefault,
+        showDefaultToggle: showDefaultToggle,
+        title: title,
+        submitButtonLabel: submitButtonLabel,
+      ),
     );
   }
 
@@ -28,6 +57,9 @@ class AddressEditBottomSheet extends StatefulWidget {
 
 class _AddressEditBottomSheetState extends State<AddressEditBottomSheet> {
   final _formKey = GlobalKey<FormState>();
+
+  late String _selectedTag;
+  late bool _isDefault;
 
   late final TextEditingController _nameController;
   late final TextEditingController _phoneController;
@@ -43,22 +75,35 @@ class _AddressEditBottomSheetState extends State<AddressEditBottomSheet> {
   late final FocusNode _stateFocus;
   late final FocusNode _postalFocus;
 
+  static const List<(String, IconData)> _tags = [
+    ('Home', IconsaxPlusLinear.home),
+    ('Work', IconsaxPlusLinear.briefcase),
+    ('Other', IconsaxPlusLinear.location),
+  ];
+
   @override
   void initState() {
     super.initState();
+    _selectedTag = widget.initialAddress?.label ?? 'Home';
+    _isDefault = widget.isDefault;
+
     _nameController = TextEditingController(
-      text: widget.initialAddress.recipientName ?? '',
+      text: widget.initialAddress?.recipientName ?? '',
     );
     _phoneController = TextEditingController(
-      text: widget.initialAddress.phone ?? '',
+      text: widget.initialAddress?.phone ?? '',
     );
     _streetController = TextEditingController(
-      text: widget.initialAddress.street,
+      text: widget.initialAddress?.street ?? '',
     );
-    _cityController = TextEditingController(text: widget.initialAddress.city);
-    _stateController = TextEditingController(text: widget.initialAddress.state);
+    _cityController = TextEditingController(
+      text: widget.initialAddress?.city ?? '',
+    );
+    _stateController = TextEditingController(
+      text: widget.initialAddress?.state ?? '',
+    );
     _postalController = TextEditingController(
-      text: widget.initialAddress.postalCode,
+      text: widget.initialAddress?.postalCode ?? '',
     );
 
     _nameFocus = FocusNode();
@@ -89,25 +134,39 @@ class _AddressEditBottomSheetState extends State<AddressEditBottomSheet> {
 
   void _onSave() {
     if (!_formKey.currentState!.validate()) return;
+    HapticFeedback.lightImpact();
 
-    final updated = widget.initialAddress.copyWith(
-      recipientName: _nameController.text.trim(),
-      phone: _phoneController.text.trim(),
-      street: _streetController.text.trim(),
-      city: _cityController.text.trim(),
-      state: _stateController.text.trim(),
-      postalCode: _postalController.text.trim(),
-      country: widget.initialAddress.country.isNotEmpty
-          ? widget.initialAddress.country
-          : 'India',
-    );
+    final address = widget.initialAddress != null
+        ? widget.initialAddress!.copyWith(
+            recipientName: _nameController.text.trim(),
+            phone: _phoneController.text.trim(),
+            street: _streetController.text.trim(),
+            city: _cityController.text.trim(),
+            state: _stateController.text.trim(),
+            postalCode: _postalController.text.trim(),
+            label: _selectedTag,
+          )
+        : CustomerAddressModel(
+            recipientName: _nameController.text.trim(),
+            phone: _phoneController.text.trim(),
+            street: _streetController.text.trim(),
+            city: _cityController.text.trim(),
+            state: _stateController.text.trim(),
+            postalCode: _postalController.text.trim(),
+            country: 'India',
+            label: _selectedTag,
+          );
 
-    Navigator.of(context).pop(updated);
+    Navigator.of(context)
+        .pop(AddressEditResult(address: address, isDefault: _isDefault));
   }
 
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    final isEditing = widget.initialAddress != null;
+    final defaultTitle = isEditing ? 'Edit Address' : 'Add New Address';
+    final defaultButtonLabel = isEditing ? 'Save Changes' : 'Save Address';
 
     return Container(
       padding: EdgeInsets.fromLTRB(
@@ -135,10 +194,10 @@ class _AddressEditBottomSheetState extends State<AddressEditBottomSheet> {
                 Center(
                   child: Container(
                     width: 36,
-                    height: 4,
+                    height: AppSizes.xs,
                     decoration: BoxDecoration(
                       color: AppColors.divider,
-                      borderRadius: BorderRadius.circular(2),
+                      borderRadius: BorderRadius.circular(AppSizes.xs / 2),
                     ),
                   ),
                 ),
@@ -149,93 +208,235 @@ class _AddressEditBottomSheetState extends State<AddressEditBottomSheet> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Delivery Address',
+                      widget.title ?? defaultTitle,
                       style: AppTextStyles.h3.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close_rounded, size: 20),
+                      icon: const Icon(
+                        Icons.close_rounded,
+                        size: AppSizes.iconSm + AppSizes.xs,
+                      ),
                       color: AppColors.textSecondary,
                       visualDensity: VisualDensity.compact,
-                      onPressed: () => Navigator.of(context).pop(),
+                      onPressed: () {
+                        HapticFeedback.lightImpact();
+                        Navigator.of(context).pop();
+                      },
                     ),
                   ],
                 ),
-                const SizedBox(height: AppSizes.sm),
+                const SizedBox(height: AppSizes.md),
 
-                _AddressTextField(
+                // Address Type / Tag Chips
+                Text(
+                  'Address Type',
+                  style: AppTextStyles.labelSmall.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: AppSizes.xs + 2),
+                Row(
+                  children: [
+                    for (final (tag, icon) in _tags) ...[
+                      ChoiceChip(
+                        label: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              icon,
+                              size: AppSizes.iconSm - 2,
+                              color: _selectedTag == tag
+                                  ? Colors.white
+                                  : AppColors.textSecondary,
+                            ),
+                            const SizedBox(width: AppSizes.xs + 2),
+                            Text(tag),
+                          ],
+                        ),
+                        selected: _selectedTag == tag,
+                        selectedColor: AppColors.primary,
+                        backgroundColor: AppColors.surface,
+                        showCheckmark: false,
+                        labelStyle: AppTextStyles.labelSmall.copyWith(
+                          color: _selectedTag == tag
+                              ? Colors.white
+                              : AppColors.textPrimary,
+                          fontWeight: _selectedTag == tag
+                              ? FontWeight.w700
+                              : FontWeight.w500,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            AppSizes.radiusSm,
+                          ),
+                          side: BorderSide(
+                            color: _selectedTag == tag
+                                ? AppColors.primary
+                                : AppColors.divider,
+                          ),
+                        ),
+                        onSelected: (selected) {
+                          if (selected) {
+                            HapticFeedback.lightImpact();
+                            setState(() => _selectedTag = tag);
+                          }
+                        },
+                      ),
+                      const SizedBox(width: AppSizes.sm),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: AppSizes.md),
+
+                // Full Name
+                AppTextField(
                   controller: _nameController,
                   focusNode: _nameFocus,
                   textInputAction: TextInputAction.next,
                   onFieldSubmitted: (_) => _phoneFocus.requestFocus(),
                   label: 'Full Name',
-                  icon: IconsaxPlusLinear.user,
+                  hintText: 'e.g. Alex Morgan',
+                  prefixIcon: IconsaxPlusLinear.user,
+                  validator: (v) =>
+                      v == null || v.trim().isEmpty ? 'Required' : null,
                 ),
                 const SizedBox(height: AppSizes.sm),
 
-                _AddressTextField(
+                // Phone Number
+                AppTextField(
                   controller: _phoneController,
                   focusNode: _phoneFocus,
                   textInputAction: TextInputAction.next,
                   onFieldSubmitted: (_) => _streetFocus.requestFocus(),
                   label: 'Phone Number',
-                  icon: IconsaxPlusLinear.call,
+                  hintText: 'e.g. +91 98765 43210',
+                  prefixIcon: IconsaxPlusLinear.call,
                   keyboardType: TextInputType.phone,
+                  validator: (v) =>
+                      v == null || v.trim().isEmpty ? 'Required' : null,
                 ),
                 const SizedBox(height: AppSizes.sm),
 
-                _AddressTextField(
+                // Street
+                AppTextField(
                   controller: _streetController,
                   focusNode: _streetFocus,
                   textInputAction: TextInputAction.next,
                   onFieldSubmitted: (_) => _cityFocus.requestFocus(),
-                  label: 'Street / Flat / Building No.',
-                  icon: IconsaxPlusLinear.location,
+                  label: 'Street / Flat / House No.',
+                  hintText: 'e.g. Flat 402, Lotus Residency, MG Road',
+                  prefixIcon: IconsaxPlusLinear.location,
+                  validator: (v) =>
+                      v == null || v.trim().isEmpty ? 'Required' : null,
                 ),
                 const SizedBox(height: AppSizes.sm),
 
+                // City & State
                 Row(
                   children: [
                     Expanded(
-                      child: _AddressTextField(
+                      child: AppTextField(
                         controller: _cityController,
                         focusNode: _cityFocus,
                         textInputAction: TextInputAction.next,
                         onFieldSubmitted: (_) => _stateFocus.requestFocus(),
                         label: 'City',
-                        icon: IconsaxPlusLinear.buildings,
+                        hintText: 'e.g. Bengaluru',
+                        prefixIcon: IconsaxPlusLinear.buildings,
+                        validator: (v) =>
+                            v == null || v.trim().isEmpty ? 'Required' : null,
                       ),
                     ),
                     const SizedBox(width: AppSizes.sm),
                     Expanded(
-                      child: _AddressTextField(
+                      child: AppTextField(
                         controller: _stateController,
                         focusNode: _stateFocus,
                         textInputAction: TextInputAction.next,
                         onFieldSubmitted: (_) => _postalFocus.requestFocus(),
                         label: 'State',
-                        icon: IconsaxPlusLinear.map_1,
+                        hintText: 'e.g. Karnataka',
+                        prefixIcon: IconsaxPlusLinear.map_1,
+                        validator: (v) =>
+                            v == null || v.trim().isEmpty ? 'Required' : null,
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: AppSizes.sm),
 
-                _AddressTextField(
+                // PIN Code
+                AppTextField(
                   controller: _postalController,
                   focusNode: _postalFocus,
                   textInputAction: TextInputAction.done,
                   onFieldSubmitted: (_) => _onSave(),
                   label: 'PIN Code',
-                  icon: IconsaxPlusLinear.code,
+                  hintText: 'e.g. 560001',
+                  prefixIcon: IconsaxPlusLinear.code,
                   keyboardType: TextInputType.number,
+                  validator: (v) =>
+                      v == null || v.trim().isEmpty ? 'Required' : null,
                 ),
-                const SizedBox(height: AppSizes.md + 4),
+
+                // Default Address toggle switch
+                if (widget.showDefaultToggle) ...[
+                  const SizedBox(height: AppSizes.md),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSizes.md,
+                      vertical: AppSizes.xs,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+                      border: Border.all(
+                        color: AppColors.divider.withValues(alpha: 0.8),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Set as default address',
+                                style: AppTextStyles.bodyMedium.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: AppSizes.xs / 2),
+                              Text(
+                                'Primary address for checkout delivery',
+                                style: AppTextStyles.labelSmall.copyWith(
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Switch.adaptive(
+                          value: _isDefault,
+                          activeThumbColor: AppColors.primary,
+                          onChanged: (val) {
+                            HapticFeedback.lightImpact();
+                            setState(() => _isDefault = val);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+                const SizedBox(height: AppSizes.lg),
 
                 AppButton(
                   onPressed: _onSave,
-                  label: 'Deliver to this Address',
+                  label: widget.submitButtonLabel ?? defaultButtonLabel,
                   icon: IconsaxPlusBold.tick_circle,
                   isFullWidth: true,
                 ),
@@ -244,52 +445,6 @@ class _AddressEditBottomSheetState extends State<AddressEditBottomSheet> {
           ),
         ),
       ),
-    );
-  }
-}
-
-// Reusable text field for address inputs
-class _AddressTextField extends StatelessWidget {
-  const _AddressTextField({
-    required this.controller,
-    required this.label,
-    required this.icon,
-    this.focusNode,
-    this.textInputAction = TextInputAction.next,
-    this.onFieldSubmitted,
-    this.keyboardType,
-  });
-
-  final TextEditingController controller;
-  final String label;
-  final IconData icon;
-  final FocusNode? focusNode;
-  final TextInputAction textInputAction;
-  final ValueChanged<String>? onFieldSubmitted;
-  final TextInputType? keyboardType;
-
-  @override
-  Widget build(BuildContext context) {
-    return TextFormField(
-      controller: controller,
-      focusNode: focusNode,
-      textInputAction: textInputAction,
-      onFieldSubmitted: onFieldSubmitted,
-      keyboardType: keyboardType,
-      style: AppTextStyles.bodyMedium,
-      decoration: InputDecoration(
-        isDense: true,
-        labelText: label,
-        labelStyle: AppTextStyles.bodySmall.copyWith(
-          color: AppColors.textSecondary,
-        ),
-        prefixIcon: Icon(icon, size: 18, color: AppColors.textSecondary),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: AppSizes.sm,
-          vertical: AppSizes.sm + 2,
-        ),
-      ),
-      validator: (v) => v == null || v.trim().isEmpty ? 'Required' : null,
     );
   }
 }

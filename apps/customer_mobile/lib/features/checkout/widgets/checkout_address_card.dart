@@ -48,15 +48,39 @@ class CheckoutAddressCard extends StatelessWidget {
             ),
           ),
 
-          // Recipient Info
+          // Recipient Info & Tag Pill
           if (address.recipientName?.isNotEmpty == true) ...[
-            Text(
-              address.recipientName!,
-              style: AppTextStyles.labelLarge.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
+            Row(
+              children: [
+                Text(
+                  address.recipientName!,
+                  style: AppTextStyles.labelLarge.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                if (address.label?.isNotEmpty == true) ...[
+                  const SizedBox(width: AppSizes.sm),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSizes.sm - 1,
+                      vertical: AppSizes.xs / 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(AppSizes.xs),
+                    ),
+                    child: Text(
+                      address.label!,
+                      style: AppTextStyles.labelSmall.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
             ),
-            const SizedBox(height: AppSizes.sm),
+            const SizedBox(height: AppSizes.xs + 2),
           ],
 
           // Formatted address line
