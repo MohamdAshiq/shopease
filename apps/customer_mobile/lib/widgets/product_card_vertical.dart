@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopease_core/shopease_core.dart';
 
 import '../app/routing/route_constants.dart';
 import '../features/cart/utils/cart_action_helper.dart';
+import '../features/wishlist/cubits/wishlist_cubit.dart';
+import '../features/wishlist/cubits/wishlist_state.dart';
 import 'app_circle_button.dart';
 import 'app_network_image.dart';
 import 'discount_badge.dart';
@@ -147,11 +150,34 @@ class _CardThumbnail extends StatelessWidget {
         Positioned(
           top: AppSizes.xs,
           right: AppSizes.xs,
-          child: const AppCircleButton(
-            icon: IconsaxPlusLinear.heart,
-            iconSize: AppSizes.iconSm,
-            padding: EdgeInsets.all(6),
-            hasShadow: true,
+          child: BlocBuilder<WishlistCubit, WishlistState>(
+            buildWhen: (previous, current) =>
+                previous.isFavorite(product.id) !=
+                current.isFavorite(product.id),
+            builder: (context, state) {
+              final isFavorite = state.isFavorite(product.id);
+              return AppCircleButton(
+                icon: isFavorite
+                    ? IconsaxPlusBold.heart
+                    : IconsaxPlusLinear.heart,
+                iconSize: AppSizes.iconSm,
+                iconColor: isFavorite ? AppColors.error : AppColors.textPrimary,
+                padding: const EdgeInsets.all(6),
+                hasShadow: true,
+                onTap: () {
+                  final added = context.read<WishlistCubit>().toggleWishlist(
+                    product,
+                  );
+                  AppSnackBar.show(
+                    context,
+                    message: added
+                        ? 'Added "${product.title}" to wishlist'
+                        : 'Removed "${product.title}" from wishlist',
+                    duration: const Duration(milliseconds: 1500),
+                  );
+                },
+              );
+            },
           ),
         ),
       ],

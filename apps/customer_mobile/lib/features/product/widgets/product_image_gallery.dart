@@ -4,6 +4,8 @@ import 'package:shopease_core/shopease_core.dart';
 
 import '../../../widgets/app_circle_button.dart';
 import '../../../widgets/app_network_image.dart';
+import '../../wishlist/cubits/wishlist_cubit.dart';
+import '../../wishlist/cubits/wishlist_state.dart';
 import '../cubits/product_detail_cubit.dart';
 
 // Product Image Gallery Widget
@@ -94,23 +96,34 @@ class ProductImageGallery extends StatelessWidget {
                     const SizedBox(width: AppSizes.sm),
 
                     // Wishlist Button
-                    BlocBuilder<ProductDetailCubit, ProductDetailState>(
+                    BlocBuilder<WishlistCubit, WishlistState>(
                       buildWhen: (previous, current) =>
-                          previous.isFavorite != current.isFavorite,
+                          previous.isFavorite(product.id) !=
+                          current.isFavorite(product.id),
                       builder: (context, state) {
+                        final isFavorite = state.isFavorite(product.id);
                         return AppCircleButton(
-                          icon: state.isFavorite
+                          icon: isFavorite
                               ? IconsaxPlusBold.heart
                               : IconsaxPlusLinear.heart,
                           elevation: 2,
                           padding: const EdgeInsets.all(AppSizes.sm + 2),
                           iconSize: AppSizes.iconMd - 2,
-                          iconColor: state.isFavorite
+                          iconColor: isFavorite
                               ? AppColors.error
                               : AppColors.textPrimary,
-                          onTap: () => context
-                              .read<ProductDetailCubit>()
-                              .toggleFavorite(),
+                          onTap: () {
+                            final added = context
+                                .read<WishlistCubit>()
+                                .toggleWishlist(product);
+                            AppSnackBar.show(
+                              context,
+                              message: added
+                                  ? 'Added "${product.title}" to wishlist'
+                                  : 'Removed "${product.title}" from wishlist',
+                              duration: const Duration(milliseconds: 1500),
+                            );
+                          },
                         );
                       },
                     ),

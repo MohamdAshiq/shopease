@@ -10,6 +10,7 @@ import '../../features/orders/views/order_detail_screen.dart';
 import '../../features/product/views/product_detail_screen.dart';
 import '../../features/search/views/search_screen.dart';
 import '../../features/store/views/store_screen.dart';
+import '../../features/wishlist/views/wishlist_screen.dart';
 import '../../widgets/placeholder_screen.dart';
 import 'route_constants.dart';
 
@@ -65,10 +66,7 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               path: RoutePaths.wishlist,
               name: RouteNames.wishlist,
-              builder: (context, state) => const PlaceholderScreen(
-                title: 'Wishlist',
-                icon: IconsaxPlusLinear.heart,
-              ),
+              builder: (context, state) => const WishlistScreen(),
             ),
           ],
         ),
