@@ -14,6 +14,7 @@ class AppButton extends StatelessWidget {
     this.size = AppButtonSize.regular,
     this.isFullWidth = false,
     this.isLoading = false,
+    this.isOutlined = false,
   });
 
   const AppButton.compact({
@@ -23,6 +24,7 @@ class AppButton extends StatelessWidget {
     this.icon,
     this.isFullWidth = false,
     this.isLoading = false,
+    this.isOutlined = false,
   }) : size = AppButtonSize.compact;
 
   final String label;
@@ -31,6 +33,7 @@ class AppButton extends StatelessWidget {
   final AppButtonSize size;
   final bool isFullWidth;
   final bool isLoading;
+  final bool isOutlined;
 
   @override
   Widget build(BuildContext context) {
@@ -43,15 +46,17 @@ class AppButton extends StatelessWidget {
             horizontal: AppSizes.lg,
             vertical: AppSizes.sm + 2,
           );
+    final contentColor = isOutlined ? AppColors.primary : Colors.white;
+
     final textStyle = isCompact
         ? AppTextStyles.labelMedium.copyWith(
             fontSize: 13.5,
             fontWeight: FontWeight.w600,
-            color: Colors.white,
+            color: contentColor,
           )
         : AppTextStyles.labelLarge.copyWith(
             fontWeight: FontWeight.w600,
-            color: Colors.white,
+            color: contentColor,
           );
 
     Widget content;
@@ -59,9 +64,9 @@ class AppButton extends StatelessWidget {
       content = SizedBox(
         width: iconSize + 2.0,
         height: iconSize + 2.0,
-        child: const CircularProgressIndicator(
+        child: CircularProgressIndicator(
           strokeWidth: 2,
-          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+          valueColor: AlwaysStoppedAnimation<Color>(contentColor),
         ),
       );
     } else if (icon != null) {
@@ -69,7 +74,7 @@ class AppButton extends StatelessWidget {
         mainAxisSize: isFullWidth ? MainAxisSize.max : MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: iconSize, color: Colors.white),
+          Icon(icon, size: iconSize, color: contentColor),
           const SizedBox(width: AppSizes.sm),
           Text(label, style: textStyle),
         ],
@@ -81,9 +86,12 @@ class AppButton extends StatelessWidget {
     final button = ElevatedButton(
       onPressed: isLoading ? null : onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        backgroundColor: isOutlined ? Colors.transparent : AppColors.primary,
+        foregroundColor: contentColor,
         elevation: 0,
+        side: isOutlined
+            ? const BorderSide(color: AppColors.primary, width: 1.2)
+            : null,
         minimumSize: Size(isFullWidth ? double.infinity : 0.0, height),
         padding: padding,
         shape: RoundedRectangleBorder(

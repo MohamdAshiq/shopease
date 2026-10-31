@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:shopease_core/shopease_core.dart';
 
 import '../../features/cart/views/cart_screen.dart';
+import '../../features/checkout/views/checkout_screen.dart';
+import '../../features/checkout/views/order_success_screen.dart';
 import '../../features/home/views/customer_shell.dart';
 import '../../features/home/views/home_screen.dart';
+import '../../features/orders/views/order_detail_screen.dart';
 import '../../features/product/views/product_detail_screen.dart';
 import '../../features/search/views/search_screen.dart';
 import '../../features/store/views/store_screen.dart';
@@ -100,6 +103,37 @@ final GoRouter appRouter = GoRouter(
       path: RoutePaths.cart,
       name: RouteNames.cart,
       builder: (context, state) => const CartScreen(),
+    ),
+
+    // Checkout Screen
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: RoutePaths.checkout,
+      name: RouteNames.checkout,
+      builder: (context, state) => const CheckoutScreen(),
+    ),
+
+    // Order Success Screen
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: RoutePaths.orderSuccess,
+      name: RouteNames.orderSuccess,
+      builder: (context, state) {
+        final order = state.extra as OrderModel? ?? mockOrders.first;
+        return OrderSuccessScreen(order: order);
+      },
+    ),
+
+    // Order Tracking & Detail Route
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: RoutePaths.orderDetail,
+      name: RouteNames.orderDetail,
+      builder: (context, state) {
+        final orderId = state.pathParameters['id'] ?? '';
+        final initialOrder = state.extra as OrderModel?;
+        return OrderDetailScreen(orderId: orderId, initialOrder: initialOrder);
+      },
     ),
 
     // Product Detail Route

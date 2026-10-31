@@ -95,7 +95,10 @@ class CartScreen extends StatelessWidget {
                   },
                 ),
           bottomNavigationBar: state.isNotEmpty
-              ? CartBottomBar(state: state, onCheckout: () {})
+              ? CartBottomBar(
+                  state: state,
+                  onCheckout: () => context.push(RoutePaths.checkout),
+                )
               : null,
         );
       },

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shopease_core/shopease_core.dart';
 
+import '../../../widgets/app_top_bar.dart';
+
 // AppBar for Cart Screen
 class CartAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CartAppBar({super.key, required this.itemCount, required this.onClear});
@@ -13,13 +15,8 @@ class CartAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      title: Text(
-        itemCount > 0 ? 'My Cart ($itemCount)' : 'My Cart',
-        style: AppTextStyles.h2.copyWith(fontWeight: FontWeight.w700),
-      ),
-      backgroundColor: AppColors.background,
-      elevation: 0,
+    return AppTopBar(
+      title: itemCount > 0 ? 'My Cart ($itemCount)' : 'My Cart',
       centerTitle: false,
       actions: [
         if (itemCount > 0)

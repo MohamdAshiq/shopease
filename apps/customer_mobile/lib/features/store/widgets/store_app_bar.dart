@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopease_core/shopease_core.dart';
 
+import '../../../widgets/app_top_bar.dart';
 import '../cubits/store_cubit.dart';
 import 'store_sort_sheet.dart';
 
@@ -14,13 +15,9 @@ class StoreAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      title: Text(
-        'Store',
-        style: AppTextStyles.h2.copyWith(fontWeight: FontWeight.w700),
-      ),
-      backgroundColor: AppColors.background,
-      elevation: 0,
+    return AppTopBar(
+      title: 'Store',
+      showBack: false,
       centerTitle: false,
       actions: [
         IconButton(

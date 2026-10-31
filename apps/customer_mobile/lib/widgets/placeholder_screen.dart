@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shopease_core/shopease_core.dart';
 
+import 'app_top_bar.dart';
+
 // Placeholder screen
 class PlaceholderScreen extends StatelessWidget {
   const PlaceholderScreen({super.key, required this.title, required this.icon});
@@ -12,12 +14,7 @@ class PlaceholderScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
-      appBar: AppBar(
-        title: Text(title, style: AppTextStyles.h3),
-        centerTitle: true,
-        backgroundColor: AppColors.background,
-        elevation: 0,
-      ),
+      appBar: AppTopBar(title: title, showBack: false),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

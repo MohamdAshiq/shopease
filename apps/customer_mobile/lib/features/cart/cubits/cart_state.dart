@@ -20,6 +20,8 @@ class CartState extends Equatable {
   double get deliveryFee =>
       isEmpty || subtotal >= freeDeliveryThreshold ? 0.0 : standardDeliveryFee;
 
+  bool get isFreeDelivery => deliveryFee == 0.0 && isNotEmpty;
+
   double get total => subtotal + deliveryFee;
 
   // Total original price

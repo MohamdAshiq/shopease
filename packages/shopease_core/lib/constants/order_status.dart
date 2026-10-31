@@ -1,3 +1,7 @@
+import 'package:flutter/material.dart';
+
+import '../theme/app_colors.dart';
+
 // Order fulfillment statuses
 enum OrderStatus {
   pending,
@@ -20,6 +24,37 @@ enum OrderStatus {
         return 'Delivered';
       case OrderStatus.cancelled:
         return 'Cancelled';
+    }
+  }
+
+  // Title for order tracking stepper
+  String get timelineTitle {
+    switch (this) {
+      case OrderStatus.pending:
+        return 'Order Placed';
+      case OrderStatus.processing:
+        return 'Processing & Packed';
+      case OrderStatus.shipped:
+        return 'Shipped';
+      case OrderStatus.delivered:
+        return 'Delivered';
+      case OrderStatus.cancelled:
+        return 'Order Cancelled';
+    }
+  }
+
+  // Status Colors
+  Color get statusColor {
+    switch (this) {
+      case OrderStatus.pending:
+        return AppColors.warning;
+      case OrderStatus.processing:
+      case OrderStatus.shipped:
+        return AppColors.primary;
+      case OrderStatus.delivered:
+        return AppColors.success;
+      case OrderStatus.cancelled:
+        return AppColors.error;
     }
   }
 
