@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shopease_core/shopease_core.dart';
 
+import '../../features/cart/views/cart_screen.dart';
 import '../../features/home/views/customer_shell.dart';
 import '../../features/home/views/home_screen.dart';
 import '../../features/product/views/product_detail_screen.dart';
@@ -93,6 +94,14 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) => const SearchScreen(),
     ),
 
+    // Cart Screen
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: RoutePaths.cart,
+      name: RouteNames.cart,
+      builder: (context, state) => const CartScreen(),
+    ),
+
     // Product Detail Route
     GoRoute(
       parentNavigatorKey: _rootNavigatorKey,
@@ -106,7 +115,8 @@ final GoRouter appRouter = GoRouter(
               (p) => p.id == id,
               orElse: () => mockProducts.first,
             );
-        return ProductDetailScreen(product: product);
+        final initialSize = state.uri.queryParameters['size'];
+        return ProductDetailScreen(product: product, initialSize: initialSize);
       },
     ),
   ],

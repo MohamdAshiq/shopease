@@ -35,6 +35,8 @@ abstract final class AppColors {
   // E-commerce specific indicators
   static const Color starRating = Color(0xFFFFB800);
   static const Color discountBadge = Color(0xFFE11D48);
+  static const Color discountBadgeBackground = Color(0xFFFDE047);
+  static const Color discountBadgeText = Color(0xFF854D0E);
   static const Color inStock = Color(0xFF10B981);
   static const Color outOfStock = Color(0xFF9CA3AF);
   static const Color cartBadge = Color(0xFFFF6B35);

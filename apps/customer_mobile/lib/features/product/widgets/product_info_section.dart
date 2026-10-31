@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopease_core/shopease_core.dart';
 
+import '../../../widgets/discount_badge.dart';
 import '../cubits/product_detail_cubit.dart';
 
 // Product Info Section in Product Details Page
@@ -51,8 +52,6 @@ class _ProductTitlePriceHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final originalPrice = product.price * 1.25;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -132,29 +131,19 @@ class _ProductTitlePriceHeader extends StatelessWidget {
             ),
             const SizedBox(width: AppSizes.sm),
             Text(
-              originalPrice.inr,
+              product.originalPrice.inr,
               style: AppTextStyles.bodyLarge.copyWith(
                 color: AppColors.textHint,
                 decoration: TextDecoration.lineThrough,
               ),
             ),
             const SizedBox(width: AppSizes.sm),
-            Container(
+            DiscountBadge(
+              percentage: product.discountPercentage,
+              fontSize: 10,
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSizes.sm,
                 vertical: 3,
-              ),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFDE047),
-                borderRadius: BorderRadius.circular(AppSizes.radiusSm),
-              ),
-              child: const Text(
-                '20% OFF',
-                style: TextStyle(
-                  color: Color(0xFF854D0E),
-                  fontSize: 10,
-                  fontWeight: FontWeight.w800,
-                ),
               ),
             ),
           ],

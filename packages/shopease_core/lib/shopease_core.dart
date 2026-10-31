@@ -10,6 +10,7 @@ export 'constants/app_categories.dart';
 export 'constants/order_status.dart';
 
 // Models
+export 'models/cart_item_model.dart';
 export 'models/customer_address_model.dart';
 export 'models/order_item_model.dart';
 export 'models/order_model.dart';
@@ -17,6 +18,7 @@ export 'models/product_model.dart';
 export 'models/user_model.dart';
 
 // Services
+export 'services/cart_storage_service.dart';
 export 'services/search_history_service.dart';
 
 // Theme
@@ -26,4 +28,5 @@ export 'theme/app_text_styles.dart';
 export 'theme/app_theme.dart';
 
 // Utils
+export 'utils/app_snackbar.dart';
 export 'utils/currency_formatter.dart';

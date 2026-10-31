@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopease_core/shopease_core.dart';
 
 import '../../../widgets/app_button.dart';
+import '../../../widgets/app_quantity_stepper.dart';
 import '../cubits/product_detail_cubit.dart';
 
 // Sticky bottom action bar
@@ -10,11 +12,15 @@ class ProductBottomBar extends StatelessWidget {
   const ProductBottomBar({
     super.key,
     required this.product,
+    required this.isInCart,
     required this.onAddToCart,
+    required this.onGoToCart,
   });
 
   final ProductModel product;
+  final bool isInCart;
   final ValueChanged<int> onAddToCart;
+  final VoidCallback onGoToCart;
 
   @override
   Widget build(BuildContext context) {
@@ -45,88 +51,51 @@ class ProductBottomBar extends StatelessWidget {
 
           return Row(
             children: [
-              // Quantity Selector Widget
-              Container(
-                height: AppSizes.buttonHeight,
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                decoration: BoxDecoration(
-                  color: AppColors.scaffoldBackground,
-                  borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-                  border: Border.all(color: AppColors.border, width: 1),
+              if (isInCart) ...[
+                // Go To Cart Button
+                Expanded(
+                  child: AppButton(
+                    onPressed: () {
+                      HapticFeedback.lightImpact();
+                      onGoToCart();
+                    },
+                    icon: IconsaxPlusBold.arrow_right_3,
+                    label: 'Go to Cart',
+                    isFullWidth: true,
+                  ),
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _StepperButton(
-                      icon: IconsaxPlusLinear.minus,
-                      onTap: state.quantity > 1
-                          ? cubit.decrementQuantity
-                          : null,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSizes.sm + 2,
-                      ),
-                      child: Text(
-                        '${state.quantity}',
-                        style: AppTextStyles.labelLarge.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                    _StepperButton(
-                      icon: IconsaxPlusLinear.add,
-                      onTap: state.quantity < product.stock
-                          ? () => cubit.incrementQuantity(product.stock)
-                          : null,
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(width: AppSizes.md),
-
-              // Add to Cart Button
-              Expanded(
-                child: AppButton(
-                  onPressed: product.isInStock
-                      ? () => onAddToCart(state.quantity)
+              ] else ...[
+                // Quantity Selector Widget
+                AppQuantityStepper(
+                  quantity: state.quantity,
+                  onDecrement: state.quantity > 1
+                      ? cubit.decrementQuantity
                       : null,
-                  icon: IconsaxPlusBold.bag_2,
-                  label: product.isInStock
-                      ? 'Add to Cart • ${totalPrice.inr}'
-                      : 'Out of Stock',
-                  isFullWidth: true,
+                  onIncrement: state.quantity < product.stock
+                      ? () => cubit.incrementQuantity(product.stock)
+                      : null,
                 ),
-              ),
+
+                const SizedBox(width: AppSizes.md),
+
+                // Add to Cart Button
+                Expanded(
+                  child: AppButton(
+                    onPressed: () {
+                      HapticFeedback.lightImpact();
+                      onAddToCart(state.quantity);
+                    },
+                    icon: IconsaxPlusBold.bag_2,
+                    label: product.isInStock
+                        ? 'Add to Cart • ${totalPrice.inr}'
+                        : 'Out of Stock',
+                    isFullWidth: true,
+                  ),
+                ),
+              ],
             ],
           );
         },
-      ),
-    );
-  }
-}
-
-class _StepperButton extends StatelessWidget {
-  const _StepperButton({required this.icon, this.onTap});
-
-  final IconData icon;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final isEnabled = onTap != null;
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSizes.radiusSm),
-      child: Padding(
-        padding: const EdgeInsets.all(AppSizes.xs + 2),
-        child: Icon(
-          icon,
-          size: 16,
-          color: isEnabled ? AppColors.textPrimary : AppColors.textHint,
-        ),
       ),
     );
   }

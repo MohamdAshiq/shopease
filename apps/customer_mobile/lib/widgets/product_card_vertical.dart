@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:shopease_core/shopease_core.dart';
 
 import '../app/routing/route_constants.dart';
+import '../features/cart/utils/cart_action_helper.dart';
+import 'app_circle_button.dart';
+import 'app_network_image.dart';
+import 'discount_badge.dart';
+import 'quick_size_bottom_sheet.dart';
 
 // Single product card
 class ProductCardVertical extends StatelessWidget {
@@ -28,6 +33,20 @@ class ProductCardVertical extends StatelessWidget {
     );
   }
 
+  void _handleAddToCart(BuildContext context) {
+    if (onAddToCart != null) {
+      onAddToCart!();
+      return;
+    }
+
+    if (product.sizes.isNotEmpty) {
+      QuickSizeBottomSheet.show(context, product: product);
+      return;
+    }
+
+    CartActionHelper.addToCart(context, product: product);
+  }
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -50,7 +69,10 @@ class ProductCardVertical extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _CardThumbnail(product: product),
-            _CardDetails(product: product, onAddToCart: onAddToCart),
+            _CardDetails(
+              product: product,
+              onAddToCart: () => _handleAddToCart(context),
+            ),
           ],
         ),
       ),
@@ -82,24 +104,9 @@ class _CardThumbnail extends StatelessWidget {
           child: Center(
             child: Hero(
               tag: 'product_image_${product.id}',
-              child: Image.network(
-                product.primaryImageUrl,
-                fit: BoxFit.contain,
-                loadingBuilder: (context, child, progress) {
-                  if (progress == null) return child;
-                  return const Center(
-                    child: SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
-                  );
-                },
-                errorBuilder: (context, error, stackTrace) => const Icon(
-                  IconsaxPlusLinear.image,
-                  color: AppColors.textHint,
-                  size: AppSizes.iconLg,
-                ),
+              child: AppNetworkImage(
+                imageUrl: product.primaryImageUrl,
+                iconSize: AppSizes.iconLg,
               ),
             ),
           ),
@@ -133,45 +140,18 @@ class _CardThumbnail extends StatelessWidget {
         Positioned(
           top: AppSizes.sm,
           left: AppSizes.sm,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFDE047),
-              borderRadius: BorderRadius.circular(AppSizes.radiusSm),
-            ),
-            child: const Text(
-              '20% OFF',
-              style: TextStyle(
-                color: Color(0xFF854D0E),
-                fontSize: 9,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ),
+          child: DiscountBadge(percentage: product.discountPercentage),
         ),
 
         // Wishlist badge
         Positioned(
           top: AppSizes.xs,
           right: AppSizes.xs,
-          child: Container(
-            padding: const EdgeInsets.all(6),
-            decoration: const BoxDecoration(
-              color: AppColors.background,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.shadow,
-                  blurRadius: 4,
-                  offset: Offset(0, 2),
-                ),
-              ],
-            ),
-            child: const Icon(
-              IconsaxPlusLinear.heart,
-              size: AppSizes.iconSm,
-              color: AppColors.textPrimary,
-            ),
+          child: const AppCircleButton(
+            icon: IconsaxPlusLinear.heart,
+            iconSize: AppSizes.iconSm,
+            padding: EdgeInsets.all(6),
+            hasShadow: true,
           ),
         ),
       ],
@@ -188,8 +168,6 @@ class _CardDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final originalPrice = product.price * 1.25;
-
     return Padding(
       padding: const EdgeInsets.all(AppSizes.sm),
       child: Column(
@@ -266,7 +244,7 @@ class _CardDetails extends StatelessWidget {
                     const SizedBox(width: AppSizes.xs + 2),
                     Flexible(
                       child: Text(
-                        originalPrice.inr,
+                        product.originalPrice.inr,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: AppTextStyles.bodySmall.copyWith(
@@ -282,7 +260,7 @@ class _CardDetails extends StatelessWidget {
 
               // Add to cart button
               InkWell(
-                onTap: product.isInStock ? onAddToCart : null,
+                onTap: onAddToCart,
                 borderRadius: BorderRadius.circular(AppSizes.radiusSm),
                 child: Container(
                   padding: const EdgeInsets.all(AppSizes.xs + 2),

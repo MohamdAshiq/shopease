@@ -121,6 +121,16 @@ abstract final class AppTheme {
         thickness: 1,
         space: 0,
       ),
+
+      // SnackBar theme
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: AppColors.primary,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+        ),
+        actionTextColor: Colors.white,
+      ),
     );
   }
 }

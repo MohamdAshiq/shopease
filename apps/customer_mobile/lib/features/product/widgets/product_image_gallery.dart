@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopease_core/shopease_core.dart';
 
+import '../../../widgets/app_circle_button.dart';
+import '../../../widgets/app_network_image.dart';
 import '../cubits/product_detail_cubit.dart';
 
 // Product Image Gallery Widget
@@ -46,24 +48,10 @@ class ProductImageGallery extends StatelessWidget {
                   ),
                   child: Hero(
                     tag: 'product_image_${product.id}',
-                    child: Image.network(
-                      activeUrl,
-                      fit: BoxFit.contain,
-                      loadingBuilder: (context, child, progress) {
-                        if (progress == null) return child;
-                        return const Center(
-                          child: SizedBox(
-                            width: 28,
-                            height: 28,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          ),
-                        );
-                      },
-                      errorBuilder: (context, error, stackTrace) => const Icon(
-                        IconsaxPlusLinear.image,
-                        size: 64,
-                        color: AppColors.textHint,
-                      ),
+                    child: AppNetworkImage(
+                      imageUrl: activeUrl,
+                      iconSize: 64,
+                      indicatorSize: 28,
                     ),
                   ),
                 ),
@@ -83,8 +71,11 @@ class ProductImageGallery extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 // Back Button
-                _CircleIconButton(
+                AppCircleButton(
                   icon: Icons.arrow_back_rounded,
+                  elevation: 2,
+                  padding: const EdgeInsets.all(AppSizes.sm + 2),
+                  iconSize: AppSizes.iconMd - 2,
                   onTap: () => context.pop(),
                 ),
 
@@ -92,7 +83,13 @@ class ProductImageGallery extends StatelessWidget {
                 Row(
                   children: [
                     // Share Button
-                    _CircleIconButton(icon: Icons.share_rounded, onTap: () {}),
+                    AppCircleButton(
+                      icon: Icons.share_rounded,
+                      elevation: 2,
+                      padding: const EdgeInsets.all(AppSizes.sm + 2),
+                      iconSize: AppSizes.iconMd - 2,
+                      onTap: () {},
+                    ),
 
                     const SizedBox(width: AppSizes.sm),
 
@@ -101,10 +98,13 @@ class ProductImageGallery extends StatelessWidget {
                       buildWhen: (previous, current) =>
                           previous.isFavorite != current.isFavorite,
                       builder: (context, state) {
-                        return _CircleIconButton(
+                        return AppCircleButton(
                           icon: state.isFavorite
                               ? IconsaxPlusBold.heart
                               : IconsaxPlusLinear.heart,
+                          elevation: 2,
+                          padding: const EdgeInsets.all(AppSizes.sm + 2),
+                          iconSize: AppSizes.iconMd - 2,
                           iconColor: state.isFavorite
                               ? AppColors.error
                               : AppColors.textPrimary,
@@ -121,37 +121,6 @@ class ProductImageGallery extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-// Circular floating icon button
-class _CircleIconButton extends StatelessWidget {
-  const _CircleIconButton({
-    required this.icon,
-    required this.onTap,
-    this.iconColor = AppColors.textPrimary,
-  });
-
-  final IconData icon;
-  final VoidCallback onTap;
-  final Color iconColor;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: AppColors.background,
-      shape: const CircleBorder(),
-      elevation: 2,
-      shadowColor: AppColors.shadow,
-      child: InkWell(
-        onTap: onTap,
-        customBorder: const CircleBorder(),
-        child: Padding(
-          padding: const EdgeInsets.all(AppSizes.sm + 2),
-          child: Icon(icon, size: AppSizes.iconMd - 2, color: iconColor),
-        ),
-      ),
     );
   }
 }

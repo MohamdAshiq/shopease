@@ -34,6 +34,14 @@ class ProductModel extends Equatable {
   // Main thumbnail image
   String get primaryImageUrl => imageUrls.isNotEmpty ? imageUrls.first : '';
 
+  // Original price before discount (mocked at 25% markup)
+  double get originalPrice => price * 1.25;
+
+  // Percentage discount
+  int get discountPercentage => originalPrice > price
+      ? (((originalPrice - price) / originalPrice) * 100).round()
+      : 0;
+
   ProductModel copyWith({
     String? id,
     String? title,

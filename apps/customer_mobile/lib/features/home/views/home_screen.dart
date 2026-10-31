@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopease_core/shopease_core.dart';
 
 import '../../../app/routing/route_constants.dart';
 import '../../../widgets/product_grid.dart';
+import '../../cart/cubits/cart_cubit.dart';
 import '../widgets/home_header_curved.dart';
 import '../widgets/promo_banner_slider.dart';
 
@@ -12,6 +14,10 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cartItemCount = context.select<CartCubit, int>(
+      (cubit) => cubit.state.totalItemCount,
+    );
+
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
       body: SingleChildScrollView(
@@ -20,8 +26,8 @@ class HomeScreen extends StatelessWidget {
           children: [
             // Top curved header
             HomeHeaderCurved(
-              cartItemCount: 2,
-              onCartTap: () {},
+              cartItemCount: cartItemCount,
+              onCartTap: () => context.pushNamed(RouteNames.cart),
               onSearchTap: () => context.pushNamed(RouteNames.search),
               onCategoryTap: (category) => context.go(
                 RoutePaths.storeWithCategory(category),

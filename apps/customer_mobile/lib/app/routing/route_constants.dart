@@ -5,6 +5,7 @@ abstract final class RoutePaths {
   static const wishlist = '/wishlist';
   static const profile = '/profile';
   static const search = '/search';
+  static const cart = '/cart';
   static const productDetail = '/product/:id';
 
   // Helper method for path-based navigation
@@ -20,5 +21,6 @@ abstract final class RouteNames {
   static const wishlist = 'wishlist';
   static const profile = 'profile';
   static const search = 'search';
+  static const cart = 'cart';
   static const productDetail = 'productDetail';
 }

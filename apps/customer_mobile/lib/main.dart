@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopease_core/shopease_core.dart';
 
 import 'app/routing/app_router.dart';
+import 'features/cart/cubits/cart_cubit.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,11 +15,14 @@ class CustomerApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'ShopEase',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.light,
-      routerConfig: appRouter,
+    return BlocProvider(
+      create: (context) => CartCubit(),
+      child: MaterialApp.router(
+        title: 'ShopEase',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.light,
+        routerConfig: appRouter,
+      ),
     );
   }
 }
