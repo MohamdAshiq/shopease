@@ -10,17 +10,37 @@ class ProfileCubit extends Cubit<ProfileState> {
     List<CustomerAddressModel>? initialAddresses,
   }) : super(
          ProfileState(
-           user: initialUser ?? mockCustomer,
-           addresses: initialAddresses ?? ProfileState.defaultStarterAddresses,
+           user: initialUser,
+           addresses:
+               initialAddresses ??
+               (initialUser != null
+                   ? ProfileState.defaultStarterAddresses
+                   : const []),
          ),
        );
 
+  // Set active user on login or signout
+  void setUser(UserModel? user) {
+    emit(
+      state.copyWith(
+        user: user,
+        clearUser: user == null,
+        addresses: user != null
+            ? (state.addresses.isNotEmpty
+                  ? state.addresses
+                  : ProfileState.defaultStarterAddresses)
+            : const [],
+      ),
+    );
+  }
+
   // Update profile basic info
   void updateProfile({String? displayName, String? email, String? phone}) {
-    final updatedUser = state.user.copyWith(
-      displayName: displayName ?? state.user.displayName,
-      email: email ?? state.user.email,
-      phone: phone ?? state.user.phone,
+    if (state.user == null) return;
+    final updatedUser = state.user!.copyWith(
+      displayName: displayName ?? state.user!.displayName,
+      email: email ?? state.user!.email,
+      phone: phone ?? state.user!.phone,
     );
     emit(state.copyWith(user: updatedUser));
   }

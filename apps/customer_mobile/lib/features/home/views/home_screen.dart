@@ -4,6 +4,7 @@ import 'package:shopease_core/shopease_core.dart';
 
 import '../../../app/routing/route_constants.dart';
 import '../../../widgets/product_grid.dart';
+import '../../auth/cubits/auth_cubit.dart';
 import '../../cart/cubits/cart_cubit.dart';
 import '../widgets/home_header_curved.dart';
 import '../widgets/promo_banner_slider.dart';
@@ -14,6 +15,10 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authState = context.watch<AuthCubit>().state;
+    final userName = authState.user?.displayName ?? 'Shopper';
+    final isGuest = authState.isGuest;
+
     final cartItemCount = context.select<CartCubit, int>(
       (cubit) => cubit.state.totalItemCount,
     );
@@ -27,6 +32,8 @@ class HomeScreen extends StatelessWidget {
             // Top curved header
             HomeHeaderCurved(
               cartItemCount: cartItemCount,
+              userName: userName,
+              isGuest: isGuest,
               onCartTap: () => context.pushNamed(RouteNames.cart),
               onSearchTap: () => context.pushNamed(RouteNames.search),
               onCategoryTap: (category) => context.go(

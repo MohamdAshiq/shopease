@@ -1,0 +1,181 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shopease_core/shopease_core.dart';
+
+import '../../../../app/routing/route_constants.dart';
+import '../../../../widgets/app_button.dart';
+import '../cubits/auth_cubit.dart';
+import '../cubits/auth_state.dart';
+import 'auth_or_divider.dart';
+import 'google_sign_in_button.dart';
+
+// Modal Bottom Sheet prompting guests to authenticate
+class AuthPromptSheet extends StatelessWidget {
+  const AuthPromptSheet({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    required this.redirectPath,
+    this.icon = IconsaxPlusBold.bag_2,
+    this.onAuthenticated,
+  });
+
+  final String title;
+  final String subtitle;
+  final String redirectPath;
+  final IconData icon;
+  final VoidCallback? onAuthenticated;
+
+  static Future<bool?> show(
+    BuildContext context, {
+    required String title,
+    required String subtitle,
+    required String redirectPath,
+    IconData icon = IconsaxPlusBold.bag_2,
+    VoidCallback? onAuthenticated,
+  }) {
+    HapticFeedback.lightImpact();
+    return showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => AuthPromptSheet(
+        title: title,
+        subtitle: subtitle,
+        redirectPath: redirectPath,
+        icon: icon,
+        onAuthenticated: onAuthenticated,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocConsumer<AuthCubit, AuthState>(
+      listener: (context, state) {
+        if (state.isAuthenticated) {
+          Navigator.of(context).pop(true);
+          onAuthenticated?.call();
+        } else if (state.hasError && state.errorMessage != null) {
+          AppSnackBar.showError(context, state.errorMessage!);
+        }
+      },
+      builder: (context, state) {
+        return Container(
+          padding: const EdgeInsets.fromLTRB(
+            AppSizes.screenPadding,
+            AppSizes.sm + 4,
+            AppSizes.screenPadding,
+            AppSizes.xl,
+          ),
+          decoration: const BoxDecoration(
+            color: AppColors.background,
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(AppSizes.radiusXl),
+            ),
+          ),
+          child: SafeArea(
+            top: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Top handle
+                Container(
+                  width: 36,
+                  height: AppSizes.xs,
+                  decoration: BoxDecoration(
+                    color: AppColors.divider,
+                    borderRadius: BorderRadius.circular(AppSizes.xs / 2),
+                  ),
+                ),
+                const SizedBox(height: AppSizes.lg),
+
+                // Icon circle
+                Container(
+                  width: 72,
+                  height: 72,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  alignment: Alignment.center,
+                  child: Icon(icon, color: AppColors.primary, size: 36),
+                ),
+                const SizedBox(height: AppSizes.md),
+
+                // Title
+                Text(
+                  title,
+                  style: AppTextStyles.h2.copyWith(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSizes.sm),
+
+                // Subtitle
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: AppSizes.md),
+                  child: Text(
+                    subtitle,
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.textSecondary,
+                      fontSize: 12.5,
+                      height: 1.35,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                const SizedBox(height: AppSizes.xl),
+
+                // Continue with Google Button
+                const GoogleSignInButton(),
+                const SizedBox(height: AppSizes.md),
+
+                // OR Divider
+                const AuthOrDivider(),
+                const SizedBox(height: AppSizes.md),
+
+                // Sign In with Email
+                AppButton(
+                  label: 'Sign In with Email',
+                  isFullWidth: true,
+                  height: AppSizes.inputHeight,
+                  borderRadius: AppSizes.radiusMd,
+                  onPressed: state.isLoading
+                      ? null
+                      : () {
+                          Navigator.of(context).pop(false);
+                          context.pushNamed(
+                            RouteNames.login,
+                            queryParameters: {'redirect': redirectPath},
+                          );
+                        },
+                ),
+                const SizedBox(height: AppSizes.sm),
+
+                // Maybe Later
+                TextButton(
+                  onPressed: state.isLoading
+                      ? null
+                      : () => Navigator.of(context).pop(false),
+                  child: Text(
+                    'Maybe Later',
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.textSecondary,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}

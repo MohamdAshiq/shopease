@@ -4,6 +4,7 @@ import 'package:shopease_core/shopease_core.dart';
 
 import '../../../app/routing/route_constants.dart';
 import '../../../widgets/app_top_bar.dart';
+import '../../auth/widgets/auth_prompt_sheet.dart';
 import '../cubits/profile_cubit.dart';
 import '../widgets/help_support_dialog.dart';
 import '../widgets/profile_header_card.dart';
@@ -17,10 +18,9 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final notificationsEnabled = context
-        .watch<ProfileCubit>()
-        .state
-        .notificationsEnabled;
+    final profileState = context.watch<ProfileCubit>().state;
+    final notificationsEnabled = profileState.notificationsEnabled;
+    final isAuthenticated = profileState.isAuthenticated;
 
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
@@ -34,7 +34,7 @@ class ProfileScreen extends StatelessWidget {
         ),
         child: Column(
           children: [
-            // User Header Card
+            // Profile Header Card
             const ProfileHeaderCard(),
             const SizedBox(height: AppSizes.md),
 
@@ -45,14 +45,44 @@ class ProfileScreen extends StatelessWidget {
                 ProfileMenuTile(
                   icon: IconsaxPlusLinear.bag_2,
                   title: 'My Orders',
-                  onTap: () => context.push(RoutePaths.orders),
+                  onTap: () {
+                    if (isAuthenticated) {
+                      context.push(RoutePaths.orders);
+                    } else {
+                      AuthPromptSheet.show(
+                        context,
+                        title: 'Sign In to View Orders',
+                        subtitle: 'Sign in or create an account to track deliveries, view invoices, and reorder items.',
+                        redirectPath: RoutePaths.orders,
+                        icon: IconsaxPlusBold.bag_2,
+                        onAuthenticated: () {
+                          context.push(RoutePaths.orders);
+                        },
+                      );
+                    }
+                  },
                 ),
 
                 // Shipping Addresses
                 ProfileMenuTile(
                   icon: IconsaxPlusLinear.location,
                   title: 'Shipping Addresses',
-                  onTap: () => context.push(RoutePaths.addresses),
+                  onTap: () {
+                    if (isAuthenticated) {
+                      context.push(RoutePaths.addresses);
+                    } else {
+                      AuthPromptSheet.show(
+                        context,
+                        title: 'Sign In for Addresses',
+                        subtitle: 'Sign in to access, add, and manage your saved delivery addresses.',
+                        redirectPath: RoutePaths.addresses,
+                        icon: IconsaxPlusBold.location,
+                        onAuthenticated: () {
+                          context.push(RoutePaths.addresses);
+                        },
+                      );
+                    }
+                  },
                 ),
 
                 // Push Notifications
@@ -86,13 +116,14 @@ class ProfileScreen extends StatelessWidget {
                   onTap: () => HelpSupportDialog.show(context),
                 ),
 
-                // Sign Out
-                ProfileMenuTile(
-                  icon: IconsaxPlusLinear.logout,
-                  title: 'Sign Out',
-                  isDestructive: true,
-                  onTap: () => SignOutDialog.show(context),
-                ),
+                // Sign Out Tile
+                if (isAuthenticated)
+                  ProfileMenuTile(
+                    icon: IconsaxPlusLinear.logout,
+                    title: 'Sign Out',
+                    isDestructive: true,
+                    onTap: () => SignOutDialog.show(context),
+                  ),
               ],
             ),
             const SizedBox(height: AppSizes.lg),

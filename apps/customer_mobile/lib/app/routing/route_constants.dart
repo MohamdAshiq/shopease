@@ -12,6 +12,9 @@ abstract final class RoutePaths {
   static const orderSuccess = '/order-success';
   static const orderDetail = '/orders/:id';
   static const productDetail = '/product/:id';
+  static const login = '/login';
+  static const register = '/register';
+  static const forgotPassword = '/forgot-password';
 
   // Helper method for path-based navigation
   static String productDetailOf(String id) => '/product/$id';
@@ -34,4 +37,7 @@ abstract final class RouteNames {
   static const orderSuccess = 'orderSuccess';
   static const orderDetail = 'orderDetail';
   static const productDetail = 'productDetail';
+  static const login = 'login';
+  static const register = 'register';
+  static const forgotPassword = 'forgotPassword';
 }

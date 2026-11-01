@@ -5,16 +5,36 @@ import 'wishlist_state.dart';
 
 // Cubit managing wishlist
 class WishlistCubit extends Cubit<WishlistState> {
-  WishlistCubit({List<ProductModel>? initialItems})
-    : super(
-        WishlistState(
-          items:
-              initialItems ??
-              (mockProducts.length >= 3
-                  ? [mockProducts[0], mockProducts[2]]
-                  : mockProducts.take(2).toList()),
-        ),
-      );
+  WishlistCubit({
+    List<ProductModel>? initialItems,
+    WishlistStorageService? storageService,
+  }) : _storageService = storageService ?? WishlistStorageService(),
+       super(
+         WishlistState(
+           items:
+               initialItems ??
+               (mockProducts.length >= 3
+                   ? [mockProducts[0], mockProducts[2]]
+                   : mockProducts.take(2).toList()),
+         ),
+       ) {
+    if (initialItems == null) {
+      _loadSavedWishlist();
+    }
+  }
+
+  final WishlistStorageService _storageService;
+
+  Future<void> _loadSavedWishlist() async {
+    final saved = await _storageService.loadWishlist();
+    if (saved.isNotEmpty) {
+      emit(state.copyWith(items: saved));
+    }
+  }
+
+  void _saveWishlist() {
+    _storageService.saveWishlist(state.items);
+  }
 
   // Sets the active filter for the wishlist
   void setFilter(WishlistFilter filter) {
@@ -39,6 +59,7 @@ class WishlistCubit extends Cubit<WishlistState> {
     final updatedList = List<ProductModel>.from(state.items)
       ..insert(0, product);
     emit(state.copyWith(items: updatedList));
+    _saveWishlist();
   }
 
   // Removes a product from the wishlist
@@ -48,11 +69,13 @@ class WishlistCubit extends Cubit<WishlistState> {
         .where((product) => product.id != productId)
         .toList();
     emit(state.copyWith(items: updatedList));
+    _saveWishlist();
   }
 
   // Clears all items from the wishlist
   void clearWishlist() {
     if (state.isEmpty) return;
     emit(const WishlistState(items: []));
+    _storageService.clearWishlist();
   }
 }

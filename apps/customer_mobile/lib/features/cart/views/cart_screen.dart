@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopease_core/shopease_core.dart';
 
 import '../../../app/routing/route_constants.dart';
+import '../../auth/cubits/auth_cubit.dart';
+import '../../auth/widgets/auth_prompt_sheet.dart';
 import '../cubits/cart_cubit.dart';
 import '../cubits/cart_state.dart';
 import '../widgets/cart_app_bar.dart';
@@ -97,7 +99,23 @@ class CartScreen extends StatelessWidget {
           bottomNavigationBar: state.isNotEmpty
               ? CartBottomBar(
                   state: state,
-                  onCheckout: () => context.push(RoutePaths.checkout),
+                  onCheckout: () {
+                    final authCubit = context.read<AuthCubit>();
+                    if (authCubit.isAuthenticated) {
+                      context.push(RoutePaths.checkout);
+                    } else {
+                      AuthPromptSheet.show(
+                        context,
+                        title: 'Sign In to Complete Order',
+                        subtitle: 'Sign in or create an account to save your delivery address, track this order, and checkout securely.',
+                        redirectPath: RoutePaths.checkout,
+                        icon: IconsaxPlusBold.bag_2,
+                        onAuthenticated: () {
+                          context.push(RoutePaths.checkout);
+                        },
+                      );
+                    }
+                  },
                 )
               : null,
         );

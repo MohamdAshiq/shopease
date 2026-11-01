@@ -3,16 +3,19 @@ import 'package:shopease_core/shopease_core.dart';
 // Profile State
 class ProfileState extends Equatable {
   const ProfileState({
-    required this.user,
-    required this.addresses,
+    this.user,
+    this.addresses = const [],
     this.defaultAddressIndex = 0,
     this.notificationsEnabled = true,
   });
 
-  final UserModel user;
+  final UserModel? user;
   final List<CustomerAddressModel> addresses;
   final int defaultAddressIndex;
   final bool notificationsEnabled;
+
+  bool get isAuthenticated => user != null;
+  bool get isGuest => user == null;
 
   // Active default address
   CustomerAddressModel? get defaultAddress {
@@ -40,12 +43,13 @@ class ProfileState extends Equatable {
 
   ProfileState copyWith({
     UserModel? user,
+    bool clearUser = false,
     List<CustomerAddressModel>? addresses,
     int? defaultAddressIndex,
     bool? notificationsEnabled,
   }) {
     return ProfileState(
-      user: user ?? this.user,
+      user: clearUser ? null : (user ?? this.user),
       addresses: addresses ?? this.addresses,
       defaultAddressIndex: defaultAddressIndex ?? this.defaultAddressIndex,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,

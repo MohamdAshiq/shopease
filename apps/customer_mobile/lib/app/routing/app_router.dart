@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shopease_core/shopease_core.dart';
 
+import '../../features/auth/views/forgot_password_screen.dart';
+import '../../features/auth/views/login_screen.dart';
+import '../../features/auth/views/register_screen.dart';
 import '../../features/cart/views/cart_screen.dart';
 import '../../features/checkout/views/checkout_screen.dart';
 import '../../features/checkout/views/order_success_screen.dart';
@@ -165,6 +168,36 @@ final GoRouter appRouter = GoRouter(
         final initialSize = state.uri.queryParameters['size'];
         return ProductDetailScreen(product: product, initialSize: initialSize);
       },
+    ),
+
+    // Login Route
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: RoutePaths.login,
+      name: RouteNames.login,
+      builder: (context, state) {
+        final redirect = state.uri.queryParameters['redirect'];
+        return LoginScreen(redirect: redirect);
+      },
+    ),
+
+    // Register Route
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: RoutePaths.register,
+      name: RouteNames.register,
+      builder: (context, state) {
+        final redirect = state.uri.queryParameters['redirect'];
+        return RegisterScreen(redirect: redirect);
+      },
+    ),
+
+    // Forgot Password Route
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: RoutePaths.forgotPassword,
+      name: RouteNames.forgotPassword,
+      builder: (context, state) => const ForgotPasswordScreen(),
     ),
   ],
 );

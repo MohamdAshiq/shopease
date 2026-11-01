@@ -40,9 +40,9 @@ class _EditProfileBottomSheetState extends State<EditProfileBottomSheet> {
   void initState() {
     super.initState();
     final user = context.read<ProfileCubit>().state.user;
-    _nameController = TextEditingController(text: user.displayName);
-    _emailController = TextEditingController(text: user.email);
-    _phoneController = TextEditingController(text: user.phone);
+    _nameController = TextEditingController(text: user?.displayName ?? '');
+    _emailController = TextEditingController(text: user?.email ?? '');
+    _phoneController = TextEditingController(text: user?.phone ?? '');
 
     _nameFocusNode = FocusNode();
     _emailFocusNode = FocusNode();
@@ -147,12 +147,7 @@ class _EditProfileBottomSheetState extends State<EditProfileBottomSheet> {
                   textCapitalization: TextCapitalization.words,
                   textInputAction: TextInputAction.next,
                   onFieldSubmitted: (_) => _emailFocusNode.requestFocus(),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Name is required';
-                    }
-                    return null;
-                  },
+                  validator: (v) => AppValidators.validateRequired(v, 'name'),
                 ),
                 const SizedBox(height: AppSizes.md),
 
@@ -166,15 +161,7 @@ class _EditProfileBottomSheetState extends State<EditProfileBottomSheet> {
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
                   onFieldSubmitted: (_) => _phoneFocusNode.requestFocus(),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Email is required';
-                    }
-                    if (!value.contains('@') || !value.contains('.')) {
-                      return 'Enter a valid email address';
-                    }
-                    return null;
-                  },
+                  validator: AppValidators.validateEmail,
                 ),
                 const SizedBox(height: AppSizes.md),
 
@@ -188,12 +175,7 @@ class _EditProfileBottomSheetState extends State<EditProfileBottomSheet> {
                   keyboardType: TextInputType.phone,
                   textInputAction: TextInputAction.done,
                   onFieldSubmitted: (_) => _onSave(),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Phone number is required';
-                    }
-                    return null;
-                  },
+                  validator: AppValidators.validatePhone,
                 ),
                 const SizedBox(height: AppSizes.lg),
 

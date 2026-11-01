@@ -301,7 +301,7 @@ class _AddressEditBottomSheetState extends State<AddressEditBottomSheet> {
                   hintText: 'e.g. Alex Morgan',
                   prefixIcon: IconsaxPlusLinear.user,
                   validator: (v) =>
-                      v == null || v.trim().isEmpty ? 'Required' : null,
+                      AppValidators.validateRequired(v, 'full name'),
                 ),
                 const SizedBox(height: AppSizes.sm),
 
@@ -315,8 +315,7 @@ class _AddressEditBottomSheetState extends State<AddressEditBottomSheet> {
                   hintText: 'e.g. +91 98765 43210',
                   prefixIcon: IconsaxPlusLinear.call,
                   keyboardType: TextInputType.phone,
-                  validator: (v) =>
-                      v == null || v.trim().isEmpty ? 'Required' : null,
+                  validator: AppValidators.validatePhone,
                 ),
                 const SizedBox(height: AppSizes.sm),
 
@@ -330,7 +329,7 @@ class _AddressEditBottomSheetState extends State<AddressEditBottomSheet> {
                   hintText: 'e.g. Flat 402, Lotus Residency, MG Road',
                   prefixIcon: IconsaxPlusLinear.location,
                   validator: (v) =>
-                      v == null || v.trim().isEmpty ? 'Required' : null,
+                      AppValidators.validateRequired(v, 'street address'),
                 ),
                 const SizedBox(height: AppSizes.sm),
 
@@ -347,7 +346,7 @@ class _AddressEditBottomSheetState extends State<AddressEditBottomSheet> {
                         hintText: 'e.g. Bengaluru',
                         prefixIcon: IconsaxPlusLinear.buildings,
                         validator: (v) =>
-                            v == null || v.trim().isEmpty ? 'Required' : null,
+                            AppValidators.validateRequired(v, 'city'),
                       ),
                     ),
                     const SizedBox(width: AppSizes.sm),
@@ -361,7 +360,7 @@ class _AddressEditBottomSheetState extends State<AddressEditBottomSheet> {
                         hintText: 'e.g. Karnataka',
                         prefixIcon: IconsaxPlusLinear.map_1,
                         validator: (v) =>
-                            v == null || v.trim().isEmpty ? 'Required' : null,
+                            AppValidators.validateRequired(v, 'state'),
                       ),
                     ),
                   ],
@@ -378,8 +377,7 @@ class _AddressEditBottomSheetState extends State<AddressEditBottomSheet> {
                   hintText: 'e.g. 560001',
                   prefixIcon: IconsaxPlusLinear.code,
                   keyboardType: TextInputType.number,
-                  validator: (v) =>
-                      v == null || v.trim().isEmpty ? 'Required' : null,
+                  validator: AppValidators.validatePostalCode,
                 ),
 
                 // Default Address toggle switch

@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopease_core/shopease_core.dart';
 
+import '../../../app/routing/route_constants.dart';
+import '../../../widgets/app_button.dart';
 import '../cubits/profile_cubit.dart';
 import '../cubits/profile_state.dart';
 import 'edit_profile_sheet.dart';
@@ -11,22 +13,91 @@ import 'edit_profile_sheet.dart';
 class ProfileHeaderCard extends StatelessWidget {
   const ProfileHeaderCard({super.key});
 
-  String _getInitials(String name) {
-    if (name.trim().isEmpty) return 'U';
-    final parts = name.trim().split(' ').where((s) => s.isNotEmpty).toList();
-    if (parts.length > 1) {
-      return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
-    }
-    return parts[0][0].toUpperCase();
-  }
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ProfileCubit, ProfileState>(
       builder: (context, state) {
         final user = state.user;
-        final initials = _getInitials(user.displayName);
 
+        // Guest State View
+        if (user == null) {
+          return Container(
+            padding: const EdgeInsets.all(AppSizes.md),
+            decoration: BoxDecoration(
+              color: AppColors.background,
+              borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+              border: Border.all(color: AppColors.divider),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.02),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: AppSizes.inputHeight,
+                      height: AppSizes.inputHeight,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppColors.background,
+                        border: Border.all(color: AppColors.divider),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Icon(
+                        IconsaxPlusBold.user,
+                        color: AppColors.textSecondary,
+                        size: AppSizes.iconMd,
+                      ),
+                    ),
+                    const SizedBox(width: AppSizes.md),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Welcome to ShopEase',
+                            style: AppTextStyles.h3.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: AppSizes.xs / 2),
+                          Text(
+                            'Sign in for a personalized shopping experience',
+                            style: AppTextStyles.bodySmall.copyWith(
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSizes.md),
+                SizedBox(
+                  width: double.infinity,
+                  child: AppButton(
+                    label: 'Sign In / Register',
+                    icon: IconsaxPlusBold.login,
+                    onPressed: () {
+                      HapticFeedback.lightImpact();
+                      context.pushNamed(RouteNames.login);
+                    },
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        final initials = user.displayName.initials;
+
+        // Authenticated User View
         return Container(
           padding: const EdgeInsets.all(AppSizes.md),
           decoration: BoxDecoration(

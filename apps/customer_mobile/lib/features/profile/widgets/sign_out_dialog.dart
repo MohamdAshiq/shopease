@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopease_core/shopease_core.dart';
+
+import '../../auth/cubits/auth_cubit.dart';
+import '../cubits/profile_cubit.dart';
 
 // Sign Out Confirmation Dialog
 class SignOutDialog extends StatelessWidget {
@@ -48,7 +52,9 @@ class SignOutDialog extends StatelessWidget {
           onPressed: () {
             HapticFeedback.mediumImpact();
             Navigator.of(context).pop();
-            AppSnackBar.showSuccess(context, 'You have been safely signed out');
+            context.read<AuthCubit>().signOut();
+            context.read<ProfileCubit>().setUser(null);
+            AppSnackBar.showSuccess(context, 'Signed out successfully');
           },
           child: Text(
             'Sign Out',

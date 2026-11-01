@@ -41,7 +41,7 @@ void main() {
     });
 
     test('initial state initializes correctly', () {
-      expect(profileCubit.state.user.displayName, mockCustomer.displayName);
+      expect(profileCubit.state.user?.displayName, mockCustomer.displayName);
       expect(profileCubit.state.addresses.length, 2);
       expect(profileCubit.state.defaultAddressIndex, 0);
       expect(profileCubit.state.defaultAddress, testAddress1);
@@ -54,9 +54,20 @@ void main() {
         phone: '+91 98765 99999',
       );
 
-      expect(profileCubit.state.user.displayName, 'Alexander Morgan');
-      expect(profileCubit.state.user.phone, '+91 98765 99999');
-      expect(profileCubit.state.user.email, mockCustomer.email);
+      expect(profileCubit.state.user?.displayName, 'Alexander Morgan');
+      expect(profileCubit.state.user?.phone, '+91 98765 99999');
+      expect(profileCubit.state.user?.email, mockCustomer.email);
+    });
+
+    test('setUser updates user and can clear to guest', () {
+      expect(profileCubit.state.isAuthenticated, isTrue);
+      profileCubit.setUser(null);
+      expect(profileCubit.state.isGuest, isTrue);
+      expect(profileCubit.state.user, isNull);
+
+      profileCubit.setUser(mockCustomer);
+      expect(profileCubit.state.isAuthenticated, isTrue);
+      expect(profileCubit.state.user?.displayName, mockCustomer.displayName);
     });
 
     test('addAddress appends address and can set as default', () {
