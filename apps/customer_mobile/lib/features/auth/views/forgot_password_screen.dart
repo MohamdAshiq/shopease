@@ -1,7 +1,6 @@
 import 'package:customer_mobile/app/routing/route_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopease_core/shopease_core.dart';
 
 import '../../../widgets/app_button.dart';

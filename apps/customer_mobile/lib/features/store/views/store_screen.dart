@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopease_core/shopease_core.dart';
 
 import '../../../widgets/app_search_bar.dart';

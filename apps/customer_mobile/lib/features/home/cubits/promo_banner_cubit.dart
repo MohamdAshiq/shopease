@@ -1,4 +1,4 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shopease_core/shopease_core.dart';
 
 // State management for promo carousel active page index
 class PromoBannerCubit extends Cubit<int> {

@@ -31,6 +31,7 @@ void main() {
     late WishlistCubit cubit;
 
     setUp(() {
+      SharedPreferences.setMockInitialValues({});
       cubit = WishlistCubit(initialItems: []);
     });
 
@@ -111,3 +112,4 @@ void main() {
     });
   });
 }
+

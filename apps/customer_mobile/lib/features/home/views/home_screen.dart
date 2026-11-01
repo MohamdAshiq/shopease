@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopease_core/shopease_core.dart';
 
 import '../../../app/routing/route_constants.dart';
