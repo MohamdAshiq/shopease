@@ -102,15 +102,16 @@ final mockCustomer = UserModel(
   email: 'customer@shopease.com',
   displayName: 'Alex Morgan',
   role: 'customer',
-  phone: '+1 555-0199',
+  phone: '+91 98765 43210',
   address: const CustomerAddressModel(
     street: '742 Evergreen Terrace',
     city: 'Springfield',
     state: 'OR',
     postalCode: '97477',
-    country: 'USA',
+    country: 'India',
     recipientName: 'Alex Morgan',
-    phone: '9876543210',
+    phone: '+91 98765 43210',
+    label: 'Home',
   ),
   createdAt: DateTime(2026, 1, 10),
 );
@@ -121,6 +122,6 @@ final mockAdmin = UserModel(
   email: 'admin@shopease.com',
   displayName: 'Store Manager',
   role: 'admin',
-  phone: '9876543201',
+  phone: '+91 98765 43201',
   createdAt: DateTime(2026, 1, 1),
 );

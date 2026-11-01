@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 import '../constants/order_status.dart';
 import 'customer_address_model.dart';
 import 'order_item_model.dart';
+import 'payment_method_model.dart';
 
 // Order Entity
 class OrderModel extends Equatable {
@@ -17,6 +18,7 @@ class OrderModel extends Equatable {
     required this.deliveryFee,
     required this.total,
     this.customerPhone = '',
+    this.paymentMethod = PaymentMethodType.upi,
     this.status = 'pending',
     this.statusHistory = const [],
     this.createdAt,
@@ -28,6 +30,7 @@ class OrderModel extends Equatable {
   final String customerName;
   final String customerEmail;
   final String customerPhone;
+  final PaymentMethodType paymentMethod;
   final List<OrderItemModel> items;
   final CustomerAddressModel deliveryAddress;
   final double subtotal;
@@ -48,6 +51,7 @@ class OrderModel extends Equatable {
     String? customerName,
     String? customerEmail,
     String? customerPhone,
+    PaymentMethodType? paymentMethod,
     List<OrderItemModel>? items,
     CustomerAddressModel? deliveryAddress,
     double? subtotal,
@@ -64,6 +68,7 @@ class OrderModel extends Equatable {
       customerName: customerName ?? this.customerName,
       customerEmail: customerEmail ?? this.customerEmail,
       customerPhone: customerPhone ?? this.customerPhone,
+      paymentMethod: paymentMethod ?? this.paymentMethod,
       items: items ?? this.items,
       deliveryAddress: deliveryAddress ?? this.deliveryAddress,
       subtotal: subtotal ?? this.subtotal,
@@ -83,6 +88,7 @@ class OrderModel extends Equatable {
       'customerName': customerName,
       'customerEmail': customerEmail,
       'customerPhone': customerPhone,
+      'paymentMethod': paymentMethod.name,
       'items': items.map((i) => i.toMap()).toList(),
       'deliveryAddress': deliveryAddress.toMap(),
       'subtotal': subtotal,
@@ -117,6 +123,9 @@ class OrderModel extends Equatable {
       customerName: map['customerName'] as String? ?? '',
       customerEmail: map['customerEmail'] as String? ?? '',
       customerPhone: map['customerPhone'] as String? ?? '',
+      paymentMethod: PaymentMethodType.fromString(
+        map['paymentMethod'] as String?,
+      ),
       items: rawItems
           .map((i) => OrderItemModel.fromMap(i as Map<String, dynamic>))
           .toList(),
@@ -150,6 +159,7 @@ class OrderModel extends Equatable {
     customerName,
     customerEmail,
     customerPhone,
+    paymentMethod,
     items,
     deliveryAddress,
     subtotal,
@@ -212,7 +222,7 @@ final List<OrderModel> mockOrders = [
     customerId: 'usr_cust_001',
     customerName: 'Alex Morgan',
     customerEmail: 'customer@shopease.com',
-    customerPhone: '+1 555-0199',
+    customerPhone: '+91 98765 43210',
     items: const [
       OrderItemModel(
         productId: 'prod_001',
@@ -236,11 +246,12 @@ final List<OrderModel> mockOrders = [
       postalCode: '97477',
       country: 'USA',
       recipientName: 'Alex Morgan',
-      phone: '+1 555-0199',
+      phone: '+91 98765 43210',
     ),
     subtotal: 478.99,
     deliveryFee: 15.00,
     total: 493.99,
+    paymentMethod: PaymentMethodType.upi,
     status: 'processing',
     statusHistory: [
       OrderStatusHistory(
@@ -262,7 +273,7 @@ final List<OrderModel> mockOrders = [
     customerId: 'usr_cust_001',
     customerName: 'Alex Morgan',
     customerEmail: 'customer@shopease.com',
-    customerPhone: '+1 555-0199',
+    customerPhone: '+91 98765 43210',
     items: const [
       OrderItemModel(
         productId: 'prod_002',
@@ -279,11 +290,12 @@ final List<OrderModel> mockOrders = [
       postalCode: '97477',
       country: 'USA',
       recipientName: 'Alex Morgan',
-      phone: '+1 555-0199',
+      phone: '+91 98765 43210',
     ),
     subtotal: 149.99,
     deliveryFee: 10.00,
     total: 159.99,
+    paymentMethod: PaymentMethodType.upi,
     status: 'delivered',
     statusHistory: [
       OrderStatusHistory(
