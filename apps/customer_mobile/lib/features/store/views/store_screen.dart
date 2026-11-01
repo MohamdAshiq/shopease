@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shopease_core/shopease_core.dart';
 
-import '../../../widgets/app_search_bar.dart';
 import '../cubits/store_cubit.dart';
 import '../widgets/store_app_bar.dart';
 import '../widgets/store_category_chips.dart';

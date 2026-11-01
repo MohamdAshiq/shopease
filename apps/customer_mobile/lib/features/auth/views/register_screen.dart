@@ -3,9 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:shopease_core/shopease_core.dart';
 
 import '../../../app/routing/route_constants.dart';
-import '../../../widgets/app_brand_logo.dart';
-import '../../../widgets/app_button.dart';
-import '../../../widgets/app_text_field.dart';
 import '../cubits/auth_cubit.dart';
 import '../cubits/auth_state.dart';
 import '../widgets/auth_footer.dart';

@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:shopease_core/shopease_core.dart';
 
 import '../../../app/routing/route_constants.dart';
-import '../../../widgets/app_network_image.dart';
 
 // Order summary card displayed in My Orders screen
 class OrderCard extends StatelessWidget {

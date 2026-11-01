@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shopease_core/shopease_core.dart';
 
-import '../../../widgets/app_search_bar.dart';
-
 // Search Screen AppBar
 class SearchAppBar extends StatelessWidget implements PreferredSizeWidget {
   const SearchAppBar({

@@ -38,3 +38,13 @@ export 'utils/app_validators.dart';
 export 'utils/currency_formatter.dart';
 export 'utils/date_formatter.dart';
 export 'utils/string_extensions.dart';
+
+// Shared Widgets
+export 'widgets/app_brand_logo.dart';
+export 'widgets/app_button.dart';
+export 'widgets/app_circle_button.dart';
+export 'widgets/app_network_image.dart';
+export 'widgets/app_search_bar.dart';
+export 'widgets/app_text_field.dart';
+export 'widgets/discount_badge.dart';
+export 'widgets/section_card_header.dart';

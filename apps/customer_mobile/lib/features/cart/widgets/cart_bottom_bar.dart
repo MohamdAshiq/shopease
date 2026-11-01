@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shopease_core/shopease_core.dart';
 
-import '../../../widgets/app_button.dart';
 import '../cubits/cart_state.dart';
 
 // Bottom summary bar with price and checkout button

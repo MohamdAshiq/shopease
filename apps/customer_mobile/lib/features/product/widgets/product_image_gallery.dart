@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shopease_core/shopease_core.dart';
 
-import '../../../widgets/app_circle_button.dart';
-import '../../../widgets/app_network_image.dart';
 import '../../wishlist/cubits/wishlist_cubit.dart';
 import '../../wishlist/cubits/wishlist_state.dart';
 import '../cubits/product_detail_cubit.dart';

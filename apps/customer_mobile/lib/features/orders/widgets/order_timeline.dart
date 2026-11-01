@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shopease_core/shopease_core.dart';
 
-import '../../../widgets/section_card_header.dart';
-
 // Vertical timeline for tracking order status
 class OrderTimeline extends StatelessWidget {
   const OrderTimeline({super.key, required this.order});

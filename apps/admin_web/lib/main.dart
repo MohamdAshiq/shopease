@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:shopease_core/shopease_core.dart';
+
+import 'app/routing/admin_router.dart';
+import 'features/auth/cubits/admin_auth_cubit.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const AdminApp());
 }
 
@@ -9,36 +14,13 @@ class AdminApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'ShopEase Admin',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.indigo,
-          brightness: Brightness.light,
-        ),
-        useMaterial3: true,
-      ),
-      home: const AdminHomeScreen(),
-    );
-  }
-}
-
-class AdminHomeScreen extends StatelessWidget {
-  const AdminHomeScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('ShopEase Admin Portal'),
-        centerTitle: false,
-      ),
-      body: const Center(
-        child: Text(
-          'Admin Dashboard',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-        ),
+    return MultiBlocProvider(
+      providers: [BlocProvider(create: (_) => AdminAuthCubit())],
+      child: MaterialApp.router(
+        title: 'ShopEase Admin',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.light,
+        routerConfig: adminRouter,
       ),
     );
   }

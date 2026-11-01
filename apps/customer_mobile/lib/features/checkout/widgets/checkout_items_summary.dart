@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shopease_core/shopease_core.dart';
 
-import '../../../widgets/app_network_image.dart';
-import '../../../widgets/section_card_header.dart';
-
 // Item Summary in Checkout Screen
 class CheckoutItemsSummary extends StatefulWidget {
   const CheckoutItemsSummary({super.key, required this.items});

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shopease_core/shopease_core.dart';
 
-import '../../../widgets/section_card_header.dart';
-
 // Payment Method Selection in Checkout Screen
 class CheckoutPaymentSection extends StatelessWidget {
   const CheckoutPaymentSection({
