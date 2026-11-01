@@ -69,15 +69,16 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             ),
           ),
           body: ResponsiveLayout(
-            desktop: _buildDesktopLayout(
+            desktop: _buildSidebarLayout(
               selectedDestination,
               adminName,
               admin.email,
             ),
-            tablet: _buildTabletLayout(
+            tablet: _buildSidebarLayout(
               selectedDestination,
               adminName,
               admin.email,
+              isCompact: true,
             ),
             mobile: _buildMainContent(selectedDestination, isMobile: true),
           ),
@@ -86,34 +87,16 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     );
   }
 
-  Widget _buildDesktopLayout(
+  Widget _buildSidebarLayout(
     AdminNavDestination selectedDestination,
     String adminName,
-    String adminEmail,
-  ) {
+    String adminEmail, {
+    bool isCompact = false,
+  }) {
     return Row(
       children: [
         AdminSidebar(
-          selectedDestination: selectedDestination,
-          onDestinationSelected: (dest) => context.go(dest.routePath),
-          adminName: adminName,
-          adminEmail: adminEmail,
-          onLogout: () => context.read<AdminAuthCubit>().logout(),
-        ),
-        Expanded(child: _buildMainContent(selectedDestination)),
-      ],
-    );
-  }
-
-  Widget _buildTabletLayout(
-    AdminNavDestination selectedDestination,
-    String adminName,
-    String adminEmail,
-  ) {
-    return Row(
-      children: [
-        AdminSidebar(
-          isCompact: true,
+          isCompact: isCompact,
           selectedDestination: selectedDestination,
           onDestinationSelected: (dest) => context.go(dest.routePath),
           adminName: adminName,
