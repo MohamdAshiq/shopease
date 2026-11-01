@@ -15,6 +15,7 @@ abstract final class AppColors {
   static const Color background = Color(0xFFFFFFFF);
   static const Color surface = Color(0xFFFFFFFF);
   static const Color scaffoldBackground = Color(0xFFF8F7FC);
+  static const Color sidebarBackground = Color(0xFF160A3A);
 
   // Typography colors
   static const Color textPrimary = Color(0xFF1A1A2E);
