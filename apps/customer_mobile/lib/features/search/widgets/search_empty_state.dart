@@ -24,8 +24,8 @@ class SearchEmptyState extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Lottie.asset(
-              'assets/lottie/not_found.json',
-              package: 'shopease_core',
+              AppAssets.notFoundAnimation,
+              package: AppAssets.package,
               width: 180,
               height: 180,
               fit: BoxFit.contain,

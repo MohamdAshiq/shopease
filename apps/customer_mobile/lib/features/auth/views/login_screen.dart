@@ -41,7 +41,11 @@ class _LoginScreenState extends State<LoginScreen> {
     AppSnackBar.showSuccess(context, 'Signed in successfully');
     final redirectPath = widget.redirect;
     if (redirectPath != null && redirectPath.isNotEmpty) {
-      context.go(redirectPath);
+      if (Navigator.of(context).canPop()) {
+        context.pushReplacement(redirectPath);
+      } else {
+        context.go(redirectPath);
+      }
     } else if (Navigator.of(context).canPop()) {
       Navigator.of(context).pop();
     } else {
@@ -88,181 +92,189 @@ class _LoginScreenState extends State<LoginScreen> {
       },
       builder: (context, state) {
         final canPop = Navigator.of(context).canPop();
-        return Scaffold(
-          backgroundColor: AppColors.background,
-          appBar: canPop
-              ? AppBar(
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
-                  toolbarHeight: 44.0,
-                  leading: IconButton(
-                    icon: const Icon(
-                      Icons.close_rounded,
-                      color: AppColors.textPrimary,
+        return PopScope(
+          canPop: canPop,
+          onPopInvokedWithResult: (didPop, _) {
+            if (!didPop) {
+              context.go(RoutePaths.home);
+            }
+          },
+          child: Scaffold(
+            backgroundColor: AppColors.background,
+            appBar: canPop
+                ? AppBar(
+                    backgroundColor: Colors.transparent,
+                    elevation: 0,
+                    toolbarHeight: 44.0,
+                    leading: IconButton(
+                      icon: const Icon(
+                        Icons.close_rounded,
+                        color: AppColors.textPrimary,
+                      ),
+                      onPressed: () => Navigator.of(context).pop(),
                     ),
-                    onPressed: () => Navigator.of(context).pop(),
+                  )
+                : null,
+            body: SafeArea(
+              top: !canPop,
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () => FocusScope.of(context).unfocus(),
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSizes.screenPadding,
                   ),
-                )
-              : null,
-          body: SafeArea(
-            top: !canPop,
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () => FocusScope.of(context).unfocus(),
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSizes.screenPadding,
-                ),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      SizedBox(height: canPop ? AppSizes.xs : AppSizes.md),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(height: canPop ? AppSizes.xs : AppSizes.md),
 
-                      // App Logo
-                      const AppBrandLogo(size: AppSizes.logoSize),
-                      const SizedBox(height: AppSizes.sm),
+                        // App Logo
+                        const AppBrandLogo(size: AppSizes.logoSize),
+                        const SizedBox(height: AppSizes.sm),
 
-                      // Welcome Msg
-                      Text('Welcome back 👋', style: AppTextStyles.h2),
-                      const SizedBox(height: AppSizes.sm),
-                      Text(
-                        _subtitle,
-                        style: AppTextStyles.bodyLarge.copyWith(
-                          fontSize: 13,
-                          color: AppColors.textSecondary,
+                        // Welcome Msg
+                        Text('Welcome back 👋', style: AppTextStyles.h2),
+                        const SizedBox(height: AppSizes.sm),
+                        Text(
+                          _subtitle,
+                          style: AppTextStyles.bodyLarge.copyWith(
+                            fontSize: 13,
+                            color: AppColors.textSecondary,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: AppSizes.xxl),
+                        const SizedBox(height: AppSizes.xxl),
 
-                      // Email
-                      AppTextField(
-                        hintText: 'Email',
-                        controller: _emailController,
-                        keyboardType: TextInputType.emailAddress,
-                        textInputAction: TextInputAction.next,
-                        validator: AppValidators.validateEmail,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: AppSizes.lg - 4,
-                          vertical: AppSizes.md + 2,
+                        // Email
+                        AppTextField(
+                          hintText: 'Email',
+                          controller: _emailController,
+                          keyboardType: TextInputType.emailAddress,
+                          textInputAction: TextInputAction.next,
+                          validator: AppValidators.validateEmail,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: AppSizes.lg - 4,
+                            vertical: AppSizes.md + 2,
+                          ),
+                          prefixWidget: const Icon(
+                            Icons.email_outlined,
+                            color: AppColors.textHint,
+                            size: AppSizes.iconSm + AppSizes.xs,
+                          ),
                         ),
-                        prefixWidget: const Icon(
-                          Icons.email_outlined,
-                          color: AppColors.textHint,
-                          size: AppSizes.iconSm + AppSizes.xs,
-                        ),
-                      ),
-                      const SizedBox(height: AppSizes.md),
+                        const SizedBox(height: AppSizes.md),
 
-                      // Password
-                      AppTextField(
-                        hintText: 'Password',
-                        controller: _passwordController,
-                        isPassword: true,
-                        textInputAction: TextInputAction.done,
-                        onFieldSubmitted: (_) => _submitLogin(),
-                        validator: AppValidators.validatePassword,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: AppSizes.lg - 4,
-                          vertical: AppSizes.md + 2,
+                        // Password
+                        AppTextField(
+                          hintText: 'Password',
+                          controller: _passwordController,
+                          isPassword: true,
+                          textInputAction: TextInputAction.done,
+                          onFieldSubmitted: (_) => _submitLogin(),
+                          validator: AppValidators.validatePassword,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: AppSizes.lg - 4,
+                            vertical: AppSizes.md + 2,
+                          ),
+                          prefixWidget: const Icon(
+                            Icons.lock_outline_rounded,
+                            color: AppColors.textHint,
+                            size: AppSizes.iconSm + AppSizes.xs,
+                          ),
                         ),
-                        prefixWidget: const Icon(
-                          Icons.lock_outline_rounded,
-                          color: AppColors.textHint,
-                          size: AppSizes.iconSm + AppSizes.xs,
-                        ),
-                      ),
-                      const SizedBox(height: AppSizes.md),
+                        const SizedBox(height: AppSizes.md),
 
-                      // Remember me + Forgot password
-                      Row(
-                        children: [
-                          GestureDetector(
-                            behavior: HitTestBehavior.opaque,
-                            onTap: () {
-                              setState(() {
-                                _rememberMe = !_rememberMe;
-                              });
-                            },
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                SizedBox(
-                                  height: AppSizes.checkboxSize,
-                                  width: AppSizes.checkboxSize,
-                                  child: Checkbox(
-                                    value: _rememberMe,
-                                    onChanged: (v) {
-                                      setState(() {
-                                        _rememberMe = v ?? false;
-                                      });
-                                    },
-                                    activeColor: AppColors.primary,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(
-                                        AppSizes.xs,
+                        // Remember me + Forgot password
+                        Row(
+                          children: [
+                            GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onTap: () {
+                                setState(() {
+                                  _rememberMe = !_rememberMe;
+                                });
+                              },
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SizedBox(
+                                    height: AppSizes.checkboxSize,
+                                    width: AppSizes.checkboxSize,
+                                    child: Checkbox(
+                                      value: _rememberMe,
+                                      onChanged: (v) {
+                                        setState(() {
+                                          _rememberMe = v ?? false;
+                                        });
+                                      },
+                                      activeColor: AppColors.primary,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                          AppSizes.xs,
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                                const SizedBox(width: AppSizes.sm),
-                                Text(
-                                  'Remember me',
-                                  style: AppTextStyles.bodyMedium.copyWith(
-                                    color: AppColors.textSecondary,
-                                    fontSize: 12,
+                                  const SizedBox(width: AppSizes.sm),
+                                  Text(
+                                    'Remember me',
+                                    style: AppTextStyles.bodyMedium.copyWith(
+                                      color: AppColors.textSecondary,
+                                      fontSize: 12,
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const Spacer(),
-                          TextButton(
-                            onPressed: () {
-                              HapticFeedback.lightImpact();
-                              context.pushNamed(RouteNames.forgotPassword);
-                            },
-                            child: Text(
-                              'Forgot Password?',
-                              style: AppTextStyles.labelMedium.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.primary,
-                                fontSize: 12,
+                                ],
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: AppSizes.lg),
+                            const Spacer(),
+                            TextButton(
+                              onPressed: () {
+                                HapticFeedback.lightImpact();
+                                context.pushNamed(RouteNames.forgotPassword);
+                              },
+                              child: Text(
+                                'Forgot Password?',
+                                style: AppTextStyles.labelMedium.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primary,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: AppSizes.lg),
 
-                      // Sign In Button
-                      AppButton(
-                        label: 'Sign In',
-                        isFullWidth: true,
-                        height: AppSizes.inputHeight,
-                        borderRadius: AppSizes.radiusMd,
-                        isLoading: state.isLoading,
-                        onPressed: state.isLoading ? null : _submitLogin,
-                      ),
-                      const SizedBox(height: AppSizes.lg),
+                        // Sign In Button
+                        AppButton(
+                          label: 'Sign In',
+                          isFullWidth: true,
+                          height: AppSizes.inputHeight,
+                          borderRadius: AppSizes.radiusMd,
+                          isLoading: state.isLoading,
+                          onPressed: state.isLoading ? null : _submitLogin,
+                        ),
+                        const SizedBox(height: AppSizes.lg),
 
-                      // Auth Footer
-                      AuthFooter(
-                        onGoogleAuthSuccess: _handleSuccess,
-                        promptText: "Don't have an account? ",
-                        actionText: 'Sign up',
-                        onActionTap: () {
-                          context.pushNamed(
-                            RouteNames.register,
-                            queryParameters: widget.redirect != null
-                                ? {'redirect': widget.redirect!}
-                                : const {},
-                          );
-                        },
-                      ),
-                    ],
+                        // Auth Footer
+                        AuthFooter(
+                          onGoogleAuthSuccess: _handleSuccess,
+                          promptText: "Don't have an account? ",
+                          actionText: 'Sign up',
+                          onActionTap: () {
+                            context.pushNamed(
+                              RouteNames.register,
+                              queryParameters: widget.redirect != null
+                                  ? {'redirect': widget.redirect!}
+                                  : const {},
+                            );
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

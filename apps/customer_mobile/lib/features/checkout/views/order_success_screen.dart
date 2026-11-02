@@ -40,8 +40,8 @@ class OrderSuccessScreen extends StatelessWidget {
                   width: 140,
                   height: 140,
                   child: Lottie.asset(
-                    'assets/lottie/success_animation.json',
-                    package: 'shopease_core',
+                    AppAssets.successAnimation,
+                    package: AppAssets.package,
                     repeat: true,
                     fit: BoxFit.contain,
                   ),
