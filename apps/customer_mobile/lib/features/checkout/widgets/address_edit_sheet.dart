@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shopease_core/shopease_core.dart';
 
-import '../../../widgets/app_button.dart';
-import '../../../widgets/app_text_field.dart';
-
 class AddressEditResult {
   const AddressEditResult({required this.address, this.isDefault = false});
 

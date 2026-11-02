@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shopease_core/shopease_core.dart';
 
-import '../../../widgets/app_network_image.dart';
-import '../../../widgets/section_card_header.dart';
-
 // Items Card in Order Detail Screen
 class OrderItemsCard extends StatelessWidget {
   const OrderItemsCard({super.key, required this.order});

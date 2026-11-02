@@ -8,4 +8,9 @@ abstract final class AppAssets {
 
   // Google Icon
   static const String googleIcon = 'assets/images/google.webp';
+
+  // Animations
+  static const String loginAnimation = 'assets/lottie/login_animation.json';
+  static const String notFoundAnimation = 'assets/lottie/not_found.json';
+  static const String successAnimation = 'assets/lottie/success_animation.json';
 }

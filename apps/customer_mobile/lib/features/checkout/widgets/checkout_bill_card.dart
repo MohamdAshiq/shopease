@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shopease_core/shopease_core.dart';
 
-import '../../../widgets/section_card_header.dart';
 import '../../cart/cubits/cart_state.dart';
 
 // Checkout Bill Card in Checkout Screen

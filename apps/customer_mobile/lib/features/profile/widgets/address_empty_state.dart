@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shopease_core/shopease_core.dart';
 
-import '../../../widgets/app_button.dart';
-
 // Empty State for Addresses screen
 class AddressEmptyState extends StatelessWidget {
   const AddressEmptyState({super.key, required this.onAddAddress});

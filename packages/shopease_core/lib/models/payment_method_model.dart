@@ -22,6 +22,19 @@ enum PaymentMethodType {
     }
   }
 
+  String get shortLabel {
+    switch (this) {
+      case PaymentMethodType.cod:
+        return 'Cash on Delivery';
+      case PaymentMethodType.upi:
+        return 'UPI';
+      case PaymentMethodType.card:
+        return 'Card';
+      case PaymentMethodType.netbanking:
+        return 'Net Banking';
+    }
+  }
+
   IconData get icon {
     switch (this) {
       case PaymentMethodType.cod:
@@ -32,6 +45,19 @@ enum PaymentMethodType {
         return IconsaxPlusBold.card_pos;
       case PaymentMethodType.netbanking:
         return IconsaxPlusBold.bank;
+    }
+  }
+
+  IconData get linearIcon {
+    switch (this) {
+      case PaymentMethodType.cod:
+        return IconsaxPlusLinear.money;
+      case PaymentMethodType.upi:
+        return IconsaxPlusLinear.mobile;
+      case PaymentMethodType.card:
+        return IconsaxPlusLinear.card;
+      case PaymentMethodType.netbanking:
+        return IconsaxPlusLinear.bank;
     }
   }
 

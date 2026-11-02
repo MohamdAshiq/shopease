@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:shopease_core/shopease_core.dart';
 
 import '../../../app/routing/route_constants.dart';
-import '../../../widgets/app_circle_button.dart';
-import '../../../widgets/app_network_image.dart';
-import '../../../widgets/discount_badge.dart';
 import '../../../widgets/quick_size_bottom_sheet.dart';
 import '../../cart/cubits/cart_cubit.dart';
 import '../../cart/cubits/cart_state.dart';

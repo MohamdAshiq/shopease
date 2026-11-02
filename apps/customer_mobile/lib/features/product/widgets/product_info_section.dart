@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shopease_core/shopease_core.dart';
 
-import '../../../widgets/discount_badge.dart';
 import '../cubits/product_detail_cubit.dart';
 
 // Product Info Section in Product Details Page

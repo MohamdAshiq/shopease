@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shopease_core/shopease_core.dart';
 
-import '../../../widgets/app_network_image.dart';
 import '../../../widgets/app_quantity_stepper.dart';
 
 // Each Cart Item Card

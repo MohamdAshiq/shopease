@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shopease_core/shopease_core.dart';
 
-import '../../../widgets/section_card_header.dart';
-
 // Payment Summary Card in Order Details Screen
 class OrderPaymentCard extends StatelessWidget {
   const OrderPaymentCard({super.key, required this.order});
