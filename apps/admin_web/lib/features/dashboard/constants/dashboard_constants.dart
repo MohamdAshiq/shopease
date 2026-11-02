@@ -15,7 +15,9 @@ abstract final class DashboardConstants {
   static const double donutChartHeight = 290.0;
 
   // UI component dimensions
+  static const double mobileBreakpoint = 650.0;
   static const double productThumbnailSize = 44.0;
+  static const double adminAvatarSize = 52.0;
   static const double minTableWidth = 650.0;
   static const double productsTableMinWidth = 880.0;
   static const double ordersTableMinWidth = 1080.0;
@@ -25,6 +27,9 @@ abstract final class DashboardConstants {
   static const double statCardHeight = 138.0;
   static const double productFormDialogWidth = 580.0;
   static const double deleteDialogWidth = 390.0;
+  static const double settingsDialogWidth = 440.0;
+  static const double changePasswordDialogWidth = settingsDialogWidth;
+  static const double editStoreProfileDialogWidth = settingsDialogWidth;
   static const double statusIndicatorDotSize = 6.0;
   static const double pagerButtonSize = 32.0;
 
