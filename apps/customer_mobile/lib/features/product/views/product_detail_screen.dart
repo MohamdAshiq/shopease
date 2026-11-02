@@ -1,3 +1,4 @@
+import 'package:customer_mobile/features/product/widgets/product_hero_image.dart';
 import 'package:flutter/material.dart';
 import 'package:shopease_core/shopease_core.dart';
 
@@ -7,16 +8,143 @@ import '../../cart/cubits/cart_state.dart';
 import '../../cart/utils/cart_action_helper.dart';
 import '../cubits/product_detail_cubit.dart';
 import '../widgets/product_bottom_bar.dart';
-import '../widgets/product_image_gallery.dart';
 import '../widgets/product_info_section.dart';
 
 // Product Detail Screen
-class ProductDetailScreen extends StatelessWidget {
+class ProductDetailScreen extends StatefulWidget {
   const ProductDetailScreen({
     super.key,
-    required this.product,
+    this.product,
+    this.productId,
     this.initialSize,
+    this.productRepository,
   });
+
+  final ProductModel? product;
+  final String? productId;
+  final String? initialSize;
+  final ProductRepository? productRepository;
+
+  @override
+  State<ProductDetailScreen> createState() => _ProductDetailScreenState();
+}
+
+class _ProductDetailScreenState extends State<ProductDetailScreen> {
+  Future<ProductModel?>? _productFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.product == null &&
+        widget.productId != null &&
+        widget.productId!.isNotEmpty) {
+      final repo = widget.productRepository ?? FirestoreProductRepository();
+      _productFuture = repo.getProductById(widget.productId!);
+    }
+  }
+
+  void _retry() {
+    if (widget.productId != null && widget.productId!.isNotEmpty) {
+      final repo = widget.productRepository ?? FirestoreProductRepository();
+      setState(() {
+        _productFuture = repo.getProductById(widget.productId!);
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.product != null) {
+      return _ProductDetailContent(
+        product: widget.product!,
+        initialSize: widget.initialSize,
+      );
+    }
+
+    if (widget.productId == null || widget.productId!.isEmpty) {
+      return Scaffold(
+        backgroundColor: AppColors.scaffoldBackground,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          iconTheme: const IconThemeData(color: AppColors.textPrimary),
+        ),
+        body: Center(
+          child: AppEmptyState(
+            icon: Icons.inventory_2_outlined,
+            title: 'Product Not Found',
+            message: 'Invalid product ID or product does not exist.',
+            action: AppButton.compact(
+              onPressed: () => Navigator.of(context).maybePop(),
+              label: 'Go Back',
+            ),
+          ),
+        ),
+      );
+    }
+
+    return FutureBuilder<ProductModel?>(
+      future: _productFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            backgroundColor: AppColors.scaffoldBackground,
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        if (snapshot.hasError) {
+          return Scaffold(
+            backgroundColor: AppColors.scaffoldBackground,
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              iconTheme: const IconThemeData(color: AppColors.textPrimary),
+            ),
+            body: Center(
+              child: AppEmptyState.error(
+                message: 'Failed to load product details. Please check your internet connection.',
+                onRetry: _retry,
+              ),
+            ),
+          );
+        }
+
+        final loadedProduct = snapshot.data;
+        if (loadedProduct == null) {
+          return Scaffold(
+            backgroundColor: AppColors.scaffoldBackground,
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              iconTheme: const IconThemeData(color: AppColors.textPrimary),
+            ),
+            body: Center(
+              child: AppEmptyState(
+                icon: Icons.inventory_2_outlined,
+                title: 'Product Not Found',
+                message:
+                    'This product may have been removed or is unavailable.',
+                action: AppButton.compact(
+                  onPressed: () => Navigator.of(context).maybePop(),
+                  label: 'Go Back',
+                ),
+              ),
+            ),
+          );
+        }
+
+        return _ProductDetailContent(
+          product: loadedProduct,
+          initialSize: widget.initialSize,
+        );
+      },
+    );
+  }
+}
+
+class _ProductDetailContent extends StatelessWidget {
+  const _ProductDetailContent({required this.product, this.initialSize});
 
   final ProductModel product;
   final String? initialSize;
@@ -36,7 +164,7 @@ class ProductDetailScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Hero Image Gallery with Back and Share buttons
-              ProductImageGallery(product: product),
+              ProductHeroImage(product: product),
 
               const SizedBox(height: AppSizes.md + 4),
 

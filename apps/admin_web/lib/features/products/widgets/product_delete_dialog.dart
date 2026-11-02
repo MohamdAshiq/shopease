@@ -97,7 +97,7 @@ class ProductDeleteDialog extends StatelessWidget {
                     ),
                     clipBehavior: Clip.antiAlias,
                     child: AppNetworkImage(
-                      imageUrl: product.primaryImageUrl,
+                      imageUrl: product.imageUrl,
                       fit: BoxFit.cover,
                       iconSize: AppSizes.iconSm,
                     ),

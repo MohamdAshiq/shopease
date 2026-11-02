@@ -14,7 +14,7 @@ void main() {
     price: 1500.0,
     stock: 10,
     category: 'Footwear',
-    imageUrls: ['https://example.com/shoes.jpg'],
+    imageUrl: 'https://example.com/shoes.jpg',
   );
 
   const testAddress = CustomerAddressModel(

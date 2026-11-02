@@ -8,15 +8,7 @@ class WishlistCubit extends Cubit<WishlistState> {
     List<ProductModel>? initialItems,
     WishlistStorageService? storageService,
   }) : _storageService = storageService ?? WishlistStorageService(),
-       super(
-         WishlistState(
-           items:
-               initialItems ??
-               (mockProducts.length >= 3
-                   ? [mockProducts[0], mockProducts[2]]
-                   : mockProducts.take(2).toList()),
-         ),
-       ) {
+       super(WishlistState(items: initialItems ?? const [])) {
     if (initialItems == null) {
       _loadSavedWishlist();
     }

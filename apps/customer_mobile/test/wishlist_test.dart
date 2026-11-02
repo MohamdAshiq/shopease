@@ -13,7 +13,7 @@ void main() {
     price: 3999.0,
     stock: 15,
     category: 'Electronics',
-    imageUrls: ['https://example.com/headphones.jpg'],
+    imageUrl: 'https://example.com/headphones.jpg',
   );
 
   const testProduct2 = ProductModel(
@@ -24,7 +24,7 @@ void main() {
     stock: 0, // out of stock
     category: 'Fashion',
     sizes: ['M', 'L', 'XL'],
-    imageUrls: ['https://example.com/jacket.jpg'],
+    imageUrl: 'https://example.com/jacket.jpg',
   );
 
   group('WishlistCubit Unit Tests', () {

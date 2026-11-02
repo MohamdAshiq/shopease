@@ -13,7 +13,7 @@ void main() {
       price: 1200.0,
       stock: 5,
       category: 'Clothing',
-      imageUrls: ['https://example.com/hoodie.jpg'],
+      imageUrl: 'https://example.com/hoodie.jpg',
     );
 
     const testProduct2 = ProductModel(
@@ -23,7 +23,7 @@ void main() {
       price: 400.0,
       stock: 10,
       category: 'Accessories',
-      imageUrls: ['https://example.com/bottle.jpg'],
+      imageUrl: 'https://example.com/bottle.jpg',
     );
 
     setUp(() {

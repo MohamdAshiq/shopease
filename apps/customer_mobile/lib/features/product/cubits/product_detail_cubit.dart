@@ -2,30 +2,20 @@ import 'package:shopease_core/shopease_core.dart';
 
 // State model for the Product Detail screen
 class ProductDetailState extends Equatable {
-  const ProductDetailState({
-    this.quantity = 1,
-    this.selectedImageIndex = 0,
-    this.selectedSize = '',
-  });
+  const ProductDetailState({this.quantity = 1, this.selectedSize = ''});
 
   final int quantity;
-  final int selectedImageIndex;
   final String selectedSize;
 
-  ProductDetailState copyWith({
-    int? quantity,
-    int? selectedImageIndex,
-    String? selectedSize,
-  }) {
+  ProductDetailState copyWith({int? quantity, String? selectedSize}) {
     return ProductDetailState(
       quantity: quantity ?? this.quantity,
-      selectedImageIndex: selectedImageIndex ?? this.selectedImageIndex,
       selectedSize: selectedSize ?? this.selectedSize,
     );
   }
 
   @override
-  List<Object?> get props => [quantity, selectedImageIndex, selectedSize];
+  List<Object?> get props => [quantity, selectedSize];
 }
 
 // Cubit managing state for Product Detail screen
@@ -43,10 +33,6 @@ class ProductDetailCubit extends Cubit<ProductDetailState> {
     if (state.quantity > 1) {
       emit(state.copyWith(quantity: state.quantity - 1));
     }
-  }
-
-  void selectImage(int index) {
-    emit(state.copyWith(selectedImageIndex: index));
   }
 
   void selectSize(String size) {

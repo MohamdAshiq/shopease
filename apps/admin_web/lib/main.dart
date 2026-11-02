@@ -3,9 +3,11 @@ import 'package:shopease_core/shopease_core.dart';
 
 import 'app/routing/admin_router.dart';
 import 'features/auth/cubits/admin_auth_cubit.dart';
+import 'firebase_options.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const AdminApp());
 }
 

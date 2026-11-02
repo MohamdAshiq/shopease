@@ -47,7 +47,11 @@ class AdminProductsState extends Equatable {
 
     // Category filter
     if (selectedCategory != 'All') {
-      result = result.where((p) => p.category == selectedCategory).toList();
+      result = result
+          .where(
+            (p) => p.category.toLowerCase() == selectedCategory.toLowerCase(),
+          )
+          .toList();
     }
 
     // Stock filter
@@ -134,6 +138,10 @@ class AdminProductsState extends Equatable {
 
   int get outOfStockCount =>
       products.where((p) => p.stock == 0 || !p.isAvailable).length;
+
+  // Dynamic list of all categories
+  List<String> get availableCategories =>
+      AppCategories.categoryNamesFromProducts(products);
 
   AdminProductsState copyWith({
     AdminProductsStatus? status,

@@ -147,14 +147,10 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
                 hintText: 'Enter new password (min. 6 characters)',
                 prefixIcon: IconsaxPlusLinear.lock,
                 isPassword: true,
-                validator: (val) {
-                  final error = AppValidators.validatePassword(val);
-                  if (error != null) return error;
-                  if (val == _currentPasswordController.text) {
-                    return 'New password must be different from current password';
-                  }
-                  return null;
-                },
+                validator: (val) => AppValidators.validateNewPassword(
+                  val,
+                  _currentPasswordController.text,
+                ),
               ),
               const SizedBox(height: AppSizes.md),
 

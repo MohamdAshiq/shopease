@@ -5,35 +5,43 @@ import '../constants/dashboard_constants.dart';
 import 'dashboard_overview_state.dart';
 
 class DashboardOverviewCubit extends Cubit<DashboardOverviewState> {
-  DashboardOverviewCubit() : super(const DashboardOverviewState());
+  DashboardOverviewCubit({ProductRepository? productRepository})
+    : _productRepository = productRepository ?? FirestoreProductRepository(),
+      super(const DashboardOverviewState());
+
+  final ProductRepository _productRepository;
 
   // Loads dashboard overview data
-  void loadDashboard() {
+  Future<void> loadDashboard() async {
     emit(state.copyWith(status: DashboardOverviewStatus.loading));
 
     try {
+      final products = await _productRepository.getProducts();
+      final effectiveProducts = products;
+
       // Aggregate KPI Metrics
       final totalRevenue = mockOrders.fold<double>(
         0.0,
-        (sum, order) => sum + order.total,
+        (acc, order) => acc + order.total,
       );
       final pendingOrdersCount = mockOrders
           .where((order) => order.status == 'pending')
           .length;
-      final lowStockProducts = mockProducts
+      final lowStockProducts = effectiveProducts
           .where(
             (product) => product.stock < DashboardConstants.lowStockThreshold,
           )
           .take(4)
           .toList();
-      final categoryCount = AppCategories.items
-          .where((item) => item.name != AppCategories.all)
-          .length;
+      final categoryCount = AppCategories.categoryNamesFromProducts(
+        effectiveProducts,
+        includeAll: false,
+      ).length;
 
       final kpiMetrics = KpiMetrics(
         totalRevenue: totalRevenue,
         totalOrdersCount: mockOrders.length,
-        activeProductsCount: mockProducts.length,
+        activeProductsCount: effectiveProducts.length,
         lowStockCount: lowStockProducts.length,
         pendingOrdersCount: pendingOrdersCount,
         categoryCount: categoryCount,

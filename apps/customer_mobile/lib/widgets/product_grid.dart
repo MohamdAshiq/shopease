@@ -41,7 +41,7 @@ class ProductGrid extends StatelessWidget {
         crossAxisCount: 2,
         crossAxisSpacing: AppSizes.sm + 4,
         mainAxisSpacing: AppSizes.md,
-        childAspectRatio: 0.73,
+        childAspectRatio: 0.70,
       ),
       itemBuilder: (context, index) {
         final product = products[index];

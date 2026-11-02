@@ -3,7 +3,7 @@ import 'package:shopease_core/shopease_core.dart';
 
 import 'header_wave_painter.dart';
 
-// HomePage Header with wave curve
+// HomePage Header with wave curve and dynamic categories
 class HomeHeaderCurved extends StatelessWidget {
   const HomeHeaderCurved({
     super.key,
@@ -13,6 +13,7 @@ class HomeHeaderCurved extends StatelessWidget {
     this.onCategoryTap,
     this.userName = 'User',
     this.isGuest = false,
+    this.categories,
   });
 
   final int cartItemCount;
@@ -21,6 +22,7 @@ class HomeHeaderCurved extends StatelessWidget {
   final ValueChanged<String>? onCategoryTap;
   final String userName;
   final bool isGuest;
+  final List<CategoryItem>? categories;
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +52,6 @@ class HomeHeaderCurved extends StatelessWidget {
               child: CustomPaint(painter: HeaderWavePainter()),
             ),
 
-            // Header Content
             SafeArea(
               bottom: false,
               child: Padding(
@@ -74,10 +75,7 @@ class HomeHeaderCurved extends StatelessWidget {
                     _HeaderSearchBar(onTap: onSearchTap),
                     const SizedBox(height: AppSizes.lg),
 
-                    _HeaderCategoriesList(
-                      categories: AppCategories.items,
-                      onCategoryTap: onCategoryTap,
-                    ),
+                    _buildCategoriesSection(context),
                   ],
                 ),
               ),
@@ -85,6 +83,26 @@ class HomeHeaderCurved extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildCategoriesSection(BuildContext context) {
+    if (categories != null) {
+      return _HeaderCategoriesList(
+        categories: categories!,
+        onCategoryTap: onCategoryTap,
+      );
+    }
+
+    return StreamBuilder<List<ProductModel>>(
+      stream: FirestoreProductRepository().streamProducts(),
+      builder: (context, snapshot) {
+        final products = snapshot.data ?? const [];
+        return _HeaderCategoriesList(
+          categories: AppCategories.itemsFromProducts(products),
+          onCategoryTap: onCategoryTap,
+        );
+      },
     );
   }
 }

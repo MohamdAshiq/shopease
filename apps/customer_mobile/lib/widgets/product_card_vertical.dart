@@ -5,6 +5,7 @@ import '../app/routing/route_constants.dart';
 import '../features/cart/utils/cart_action_helper.dart';
 import '../features/wishlist/cubits/wishlist_cubit.dart';
 import '../features/wishlist/cubits/wishlist_state.dart';
+import '../features/wishlist/utils/wishlist_action_helper.dart';
 import 'quick_size_bottom_sheet.dart';
 
 // Single product card
@@ -89,23 +90,26 @@ class _CardThumbnail extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Container(
-          height: 125,
-          width: double.infinity,
-          padding: const EdgeInsets.all(AppSizes.sm),
-          decoration: const BoxDecoration(
-            color: AppColors.scaffoldBackground,
-            borderRadius: BorderRadius.only(
+        // Thumbnail Image
+        Skeleton.leaf(
+          child: ClipRRect(
+            borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(AppSizes.radiusMd),
               topRight: Radius.circular(AppSizes.radiusMd),
             ),
-          ),
-          child: Center(
-            child: Hero(
-              tag: 'product_image_${product.id}',
-              child: AppNetworkImage(
-                imageUrl: product.primaryImageUrl,
-                iconSize: AppSizes.iconLg,
+            child: Container(
+              height: 130,
+              width: double.infinity,
+              color: AppColors.scaffoldBackground,
+              child: Hero(
+                tag: 'product_image_${product.id}',
+                child: AppNetworkImage(
+                  imageUrl: product.imageUrl,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: 130,
+                  iconSize: AppSizes.iconLg,
+                ),
               ),
             ),
           ),
@@ -114,21 +118,34 @@ class _CardThumbnail extends StatelessWidget {
         // Out of stock overlay
         if (!product.isInStock)
           Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.45),
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(AppSizes.radiusMd),
-                  topRight: Radius.circular(AppSizes.radiusMd),
+            child: Skeleton.ignore(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.5),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(AppSizes.radiusMd),
+                    topRight: Radius.circular(AppSizes.radiusMd),
+                  ),
                 ),
-              ),
-              child: Center(
-                child: Text(
-                  'OUT OF STOCK',
-                  style: AppTextStyles.labelSmall.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.8,
+                child: Center(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSizes.sm,
+                      vertical: AppSizes.xs,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.65),
+                      borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+                    ),
+                    child: Text(
+                      'OUT OF STOCK',
+                      style: AppTextStyles.labelSmall.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.8,
+                        fontSize: 10,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -136,44 +153,43 @@ class _CardThumbnail extends StatelessWidget {
           ),
 
         // Discount percentage badge
-        Positioned(
-          top: AppSizes.sm,
-          left: AppSizes.sm,
-          child: DiscountBadge(percentage: product.discountPercentage),
-        ),
+        if (product.discountPercentage > 0)
+          Positioned(
+            top: AppSizes.sm,
+            left: AppSizes.sm,
+            child: Skeleton.leaf(
+              child: DiscountBadge(percentage: product.discountPercentage),
+            ),
+          ),
 
         // Wishlist badge
         Positioned(
-          top: AppSizes.xs,
-          right: AppSizes.xs,
-          child: BlocBuilder<WishlistCubit, WishlistState>(
-            buildWhen: (previous, current) =>
-                previous.isFavorite(product.id) !=
-                current.isFavorite(product.id),
-            builder: (context, state) {
-              final isFavorite = state.isFavorite(product.id);
-              return AppCircleButton(
-                icon: isFavorite
-                    ? IconsaxPlusBold.heart
-                    : IconsaxPlusLinear.heart,
-                iconSize: AppSizes.iconSm,
-                iconColor: isFavorite ? AppColors.error : AppColors.textPrimary,
-                padding: const EdgeInsets.all(6),
-                hasShadow: true,
-                onTap: () {
-                  final added = context.read<WishlistCubit>().toggleWishlist(
-                    product,
-                  );
-                  AppSnackBar.show(
+          top: AppSizes.xs + 2,
+          right: AppSizes.xs + 2,
+          child: Skeleton.leaf(
+            child: BlocBuilder<WishlistCubit, WishlistState>(
+              buildWhen: (previous, current) =>
+                  previous.isFavorite(product.id) !=
+                  current.isFavorite(product.id),
+              builder: (context, state) {
+                final isFavorite = state.isFavorite(product.id);
+                return AppCircleButton(
+                  icon: isFavorite
+                      ? IconsaxPlusBold.heart
+                      : IconsaxPlusLinear.heart,
+                  iconSize: AppSizes.iconSm,
+                  iconColor: isFavorite
+                      ? AppColors.error
+                      : AppColors.textPrimary,
+                  padding: const EdgeInsets.all(6),
+                  hasShadow: true,
+                  onTap: () => WishlistActionHelper.toggleWishlist(
                     context,
-                    message: added
-                        ? 'Added "${product.title}" to wishlist'
-                        : 'Removed "${product.title}" from wishlist',
-                    duration: const Duration(milliseconds: 1500),
-                  );
-                },
-              );
-            },
+                    product: product,
+                  ),
+                );
+              },
+            ),
           ),
         ),
       ],
@@ -281,21 +297,23 @@ class _CardDetails extends StatelessWidget {
               ),
 
               // Add to cart button
-              InkWell(
-                onTap: onAddToCart,
-                borderRadius: BorderRadius.circular(AppSizes.radiusSm),
-                child: Container(
-                  padding: const EdgeInsets.all(AppSizes.xs + 2),
-                  decoration: BoxDecoration(
-                    color: product.isInStock
-                        ? AppColors.primary
-                        : AppColors.border,
-                    borderRadius: BorderRadius.circular(AppSizes.radiusSm),
-                  ),
-                  child: const Icon(
-                    IconsaxPlusLinear.add,
-                    color: Colors.white,
-                    size: AppSizes.iconSm,
+              Skeleton.leaf(
+                child: InkWell(
+                  onTap: onAddToCart,
+                  borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+                  child: Container(
+                    padding: const EdgeInsets.all(AppSizes.xs + 2),
+                    decoration: BoxDecoration(
+                      color: product.isInStock
+                          ? AppColors.primary
+                          : AppColors.border,
+                      borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+                    ),
+                    child: const Icon(
+                      IconsaxPlusLinear.add,
+                      color: Colors.white,
+                      size: AppSizes.iconSm,
+                    ),
                   ),
                 ),
               ),

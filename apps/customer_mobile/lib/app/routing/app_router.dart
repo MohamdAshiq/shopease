@@ -9,6 +9,7 @@ import '../../features/checkout/views/checkout_screen.dart';
 import '../../features/checkout/views/order_success_screen.dart';
 import '../../features/home/views/customer_shell.dart';
 import '../../features/home/views/home_screen.dart';
+import '../../features/home/views/popular_products_screen.dart';
 import '../../features/orders/views/my_orders_screen.dart';
 import '../../features/orders/views/order_detail_screen.dart';
 import '../../features/product/views/product_detail_screen.dart';
@@ -89,6 +90,14 @@ final GoRouter appRouter = GoRouter(
       ],
     ),
 
+    // Popular Products Screen
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: RoutePaths.popularProducts,
+      name: RouteNames.popularProducts,
+      builder: (context, state) => const PopularProductsScreen(),
+    ),
+
     // Search Screen
     GoRoute(
       parentNavigatorKey: _rootNavigatorKey,
@@ -159,14 +168,13 @@ final GoRouter appRouter = GoRouter(
       name: RouteNames.productDetail,
       builder: (context, state) {
         final id = state.pathParameters['id'];
-        final product =
-            state.extra as ProductModel? ??
-            mockProducts.firstWhere(
-              (p) => p.id == id,
-              orElse: () => mockProducts.first,
-            );
+        final product = state.extra as ProductModel?;
         final initialSize = state.uri.queryParameters['size'];
-        return ProductDetailScreen(product: product, initialSize: initialSize);
+        return ProductDetailScreen(
+          productId: id,
+          product: product,
+          initialSize: initialSize,
+        );
       },
     ),
 

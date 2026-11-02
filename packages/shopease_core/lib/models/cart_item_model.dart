@@ -44,7 +44,7 @@ class CartItemModel extends Equatable {
       title: titleWithSize,
       price: product.price,
       quantity: quantity,
-      imageUrl: product.primaryImageUrl,
+      imageUrl: product.imageUrl,
     );
   }
 

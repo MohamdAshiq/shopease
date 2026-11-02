@@ -179,7 +179,9 @@ class _ProductFilterToolbarState extends State<ProductFilterToolbar> {
     return FilterDropdownChip<String>(
       value: state.selectedCategory,
       isActive: isActive,
-      items: AppCategories.items.map((item) {
+      items: AppCategories.itemsFromNames(state.availableCategories).map((
+        item,
+      ) {
         final isItemActive = isActive && state.selectedCategory == item.name;
         return DropdownMenuItem<String>(
           value: item.name,

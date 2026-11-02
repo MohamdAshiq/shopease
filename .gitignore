@@ -15,6 +15,13 @@ migrate_working_dir/
 *.env
 *.env.*
 
+# Firebase credentials and environment config
+**/google-services.json
+**/GoogleService-Info.plist
+**/firebase_options.dart
+**/firebase.json
+*-firebase-adminsdk-*.json
+
 # IDE / Editor specific
 *.iml
 *.ipr

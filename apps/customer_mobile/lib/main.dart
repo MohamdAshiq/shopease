@@ -8,9 +8,11 @@ import 'features/cart/cubits/cart_cubit.dart';
 import 'features/orders/cubits/order_cubit.dart';
 import 'features/profile/cubits/profile_cubit.dart';
 import 'features/wishlist/cubits/wishlist_cubit.dart';
+import 'firebase_options.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const CustomerApp());
 }
 

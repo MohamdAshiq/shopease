@@ -3,7 +3,7 @@ import 'package:shopease_core/shopease_core.dart';
 
 import '../../../dashboard/constants/dashboard_constants.dart';
 
-// Text field for image URL with reactive thumbnail
+// Text field for image URL with reactive thumbnail preview and validation
 class ProductImagePreviewField extends StatelessWidget {
   const ProductImagePreviewField({super.key, required this.controller});
 
@@ -17,20 +17,22 @@ class ProductImagePreviewField extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Primary Image URL',
+          'Image URL',
           style: AppTextStyles.labelMedium.copyWith(
             fontWeight: FontWeight.w600,
           ),
         ),
         const SizedBox(height: AppSizes.xs + 2),
         Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
               child: AppTextField(
                 controller: controller,
                 hintText: 'https://images.unsplash.com/...',
                 prefixIcon: IconsaxPlusLinear.link,
+                validator: (v) =>
+                    AppValidators.validateUrl(v, 'product image URL'),
               ),
             ),
             const SizedBox(width: AppSizes.sm),

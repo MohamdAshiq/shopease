@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shopease_core/shopease_core.dart';
 
+import '../../../widgets/product_grid_skeleton.dart';
 import '../cubits/store_cubit.dart';
 import '../widgets/store_app_bar.dart';
 import '../widgets/store_category_chips.dart';
@@ -86,15 +87,22 @@ class _StoreScreenViewState extends State<_StoreScreenView> {
           // Results summary Bar
           const StoreResultsBar(),
 
-          // Product Grid or Empty State
+          // Product Grid or Empty State with Shimmer Skeletonizer
           Expanded(
             child: BlocBuilder<StoreCubit, StoreState>(
-              buildWhen: (previous, current) =>
-                  previous.filteredProducts != current.filteredProducts,
               builder: (context, state) {
+                if (state.isLoading) {
+                  return const ProductGridSkeleton(itemCount: 6);
+                }
+
                 if (state.filteredProducts.isEmpty) {
+                  final isCatalogEmpty = state.allProducts.isEmpty;
+                  final hasActiveFilter =
+                      state.searchQuery.isNotEmpty ||
+                      state.selectedCategory != 'All';
                   return StoreEmptyState(
                     query: state.searchQuery,
+                    showResetButton: hasActiveFilter && !isCatalogEmpty,
                     onReset: () {
                       _searchController.clear();
                       context.read<StoreCubit>().resetFilters();

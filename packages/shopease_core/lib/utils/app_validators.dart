@@ -43,7 +43,7 @@ abstract final class AppValidators {
   // Validates required text field
   static String? validateRequired(String? value, [String fieldName = 'field']) {
     if (value == null || value.trim().isEmpty) {
-      return 'Please enter your $fieldName';
+      return 'Please enter $fieldName';
     }
     return null;
   }
@@ -79,10 +79,13 @@ abstract final class AppValidators {
     String fieldName = 'field',
   ]) {
     if (value == null || value.trim().isEmpty) {
-      return 'Please enter your $fieldName';
+      return 'Please enter $fieldName';
     }
     if (value.trim().length < minLength) {
-      return '$fieldName must be at least $minLength characters';
+      final capitalized = fieldName.isEmpty
+          ? 'Field'
+          : '${fieldName[0].toUpperCase()}${fieldName.substring(1)}';
+      return '$capitalized must be at least $minLength characters';
     }
     return null;
   }
@@ -94,6 +97,61 @@ abstract final class AppValidators {
     }
     if (num.tryParse(value.trim()) == null) {
       return 'Please enter a valid number';
+    }
+    return null;
+  }
+
+  // Validates positive price value (price > 0)
+  static String? validatePrice(String? value, [String fieldName = 'price']) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Please enter $fieldName';
+    }
+    final numVal = double.tryParse(value.trim());
+    if (numVal == null || numVal <= 0) {
+      return 'Enter valid $fieldName > 0';
+    }
+    return null;
+  }
+
+  // Validates non-negative integer stock value (stock >= 0)
+  static String? validateStock(
+    String? value, [
+    String fieldName = 'stock quantity',
+  ]) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Please enter $fieldName';
+    }
+    final intVal = int.tryParse(value.trim());
+    if (intVal == null || intVal < 0) {
+      return 'Enter integer >= 0';
+    }
+    return null;
+  }
+
+  // Validates standard web URL (http:// or https://)
+  static String? validateUrl(String? value, [String fieldName = 'URL']) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Please enter a $fieldName';
+    }
+    final trimmed = value.trim();
+    if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://')) {
+      return '$fieldName must start with http:// or https://';
+    }
+    return null;
+  }
+
+  // Validates new password
+  static String? validateNewPassword(
+    String? value,
+    String? currentPassword, {
+    int minLength = 6,
+  }) {
+    final passwordError = validatePassword(value, minLength: minLength);
+    if (passwordError != null) return passwordError;
+    if (value != null &&
+        currentPassword != null &&
+        value.trim() == currentPassword.trim()) {
+      return 'New password must be different from current password';
     }
     return null;
   }
