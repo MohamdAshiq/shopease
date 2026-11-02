@@ -32,20 +32,30 @@ class AuthPromptSheet extends StatelessWidget {
     required String redirectPath,
     IconData icon = IconsaxPlusBold.bag_2,
     VoidCallback? onAuthenticated,
-  }) {
+  }) async {
     HapticFeedback.lightImpact();
-    return showModalBottomSheet<bool>(
+    final result = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
+      useRootNavigator: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => AuthPromptSheet(
+      builder: (sheetContext) => AuthPromptSheet(
         title: title,
         subtitle: subtitle,
         redirectPath: redirectPath,
         icon: icon,
-        onAuthenticated: onAuthenticated,
       ),
     );
+
+    if (result == true) {
+      // Allow modal bottom sheet reverse transition (250-300ms) to finish completely
+      // and unmount from the root navigator before triggering destination route!
+      await Future.delayed(const Duration(milliseconds: 300));
+      if (context.mounted) {
+        onAuthenticated?.call();
+      }
+    }
+    return result;
   }
 
   @override
@@ -53,8 +63,7 @@ class AuthPromptSheet extends StatelessWidget {
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
         if (state.isAuthenticated) {
-          Navigator.of(context).pop(true);
-          onAuthenticated?.call();
+          Navigator.of(context, rootNavigator: true).pop(true);
         } else if (state.hasError && state.errorMessage != null) {
           AppSnackBar.showError(context, state.errorMessage!);
         }
@@ -145,12 +154,18 @@ class AuthPromptSheet extends StatelessWidget {
                   borderRadius: AppSizes.radiusMd,
                   onPressed: state.isLoading
                       ? null
-                      : () {
-                          Navigator.of(context).pop(false);
-                          context.pushNamed(
-                            RouteNames.login,
-                            queryParameters: {'redirect': redirectPath},
+                      : () async {
+                          Navigator.of(context, rootNavigator: true).pop(false);
+                          // Allow the bottom sheet dismissal transition to complete
+                          await Future.delayed(
+                            const Duration(milliseconds: 300),
                           );
+                          if (context.mounted) {
+                            context.pushNamed(
+                              RouteNames.login,
+                              queryParameters: {'redirect': redirectPath},
+                            );
+                          }
                         },
                 ),
                 const SizedBox(height: AppSizes.sm),
@@ -159,7 +174,10 @@ class AuthPromptSheet extends StatelessWidget {
                 TextButton(
                   onPressed: state.isLoading
                       ? null
-                      : () => Navigator.of(context).pop(false),
+                      : () => Navigator.of(
+                          context,
+                          rootNavigator: true,
+                        ).pop(false),
                   child: Text(
                     'Maybe Later',
                     style: AppTextStyles.bodyMedium.copyWith(
