@@ -5,12 +5,16 @@ import 'cart_state.dart';
 // Result of an addToCart operation
 enum AddToCartResult { success, maxStockReached, outOfStock }
 
-// Cubit managing shopping cart
+// Cubit managing user-scoped shopping cart with Firestore synchronization
 class CartCubit extends Cubit<CartState> {
   CartCubit({
+    UserModel? initialUser,
     List<CartItemModel>? initialItems,
     CartStorageService? storageService,
-  }) : _storageService = storageService ?? CartStorageService(),
+    FirebaseFirestore? firestore,
+  }) : _currentUser = initialUser,
+       _customFirestore = firestore,
+       _storageService = storageService ?? CartStorageService(),
        super(CartState(items: initialItems ?? const [])) {
     if (initialItems == null) {
       _loadSavedCart();
@@ -18,16 +22,116 @@ class CartCubit extends Cubit<CartState> {
   }
 
   final CartStorageService _storageService;
+  final FirebaseFirestore? _customFirestore;
+  UserModel? _currentUser;
+
+  FirebaseFirestore? get _firestore {
+    if (_customFirestore != null) return _customFirestore;
+    try {
+      return FirebaseFirestore.instance;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  UserModel? get currentUser => _currentUser;
 
   Future<void> _loadSavedCart() async {
-    final saved = await _storageService.loadCart();
-    if (saved.isNotEmpty) {
+    final saved = await _storageService.loadCart(userId: _currentUser?.uid);
+    if (!isClosed && saved.isNotEmpty) {
       emit(state.copyWith(items: saved));
     }
   }
 
+  // Update current customer and synchronize user-scoped cart
+  Future<void> setCustomer(UserModel? user) async {
+    if (_currentUser?.uid == user?.uid) return;
+    _currentUser = user;
+
+    if (user == null) {
+      // Switched to guest mode: load local guest cart
+      final guestItems = await _storageService.loadCart(userId: null);
+      if (!isClosed) {
+        emit(state.copyWith(items: guestItems));
+      }
+      return;
+    }
+
+    // Authenticated user logged in
+    final guestItems = await _storageService.loadCart(userId: null);
+    final userLocalItems = await _storageService.loadCart(userId: user.uid);
+    List<CartItemModel> cloudItems = [];
+    try {
+      final firestore = _firestore;
+      if (firestore != null) {
+        final doc = await firestore.collection('users').doc(user.uid).get();
+        if (doc.exists && doc.data() != null) {
+          final data = doc.data()!;
+          if (data['cart'] is List) {
+            cloudItems = (data['cart'] as List)
+                .whereType<Map<String, dynamic>>()
+                .map(CartItemModel.fromMap)
+                .toList();
+          }
+        }
+      }
+    } catch (_) {}
+
+    var merged = _mergeCartLists(cloudItems, userLocalItems);
+    merged = _mergeCartLists(merged, guestItems);
+
+    if (isClosed) return;
+    emit(state.copyWith(items: merged));
+
+    await _storageService.saveCart(merged, userId: user.uid);
+
+    _syncToFirestore(merged, user.uid);
+
+    if (guestItems.isNotEmpty) {
+      await _storageService.clearCart(userId: null);
+    }
+  }
+
+  List<CartItemModel> _mergeCartLists(
+    List<CartItemModel> base,
+    List<CartItemModel> incoming,
+  ) {
+    final result = List<CartItemModel>.from(base);
+    for (final inc in incoming) {
+      final index = result.indexWhere((item) => item.id == inc.id);
+      if (index != -1) {
+        final existing = result[index];
+        final maxStock = inc.product.stock > 0 ? inc.product.stock : 99;
+        final combinedQty = (existing.quantity + inc.quantity).clamp(
+          1,
+          maxStock,
+        );
+        result[index] = existing.copyWith(quantity: combinedQty);
+      } else {
+        result.add(inc);
+      }
+    }
+    return result;
+  }
+
   void _saveCart() {
-    _storageService.saveCart(state.items);
+    _storageService.saveCart(state.items, userId: _currentUser?.uid);
+    if (_currentUser != null) {
+      _syncToFirestore(state.items, _currentUser!.uid);
+    }
+  }
+
+  Future<void> _syncToFirestore(List<CartItemModel> items, String uid) async {
+    try {
+      final firestore = _firestore;
+      if (firestore == null) return;
+
+      final cartMaps = items.map((e) => e.toMap()).toList();
+      await firestore.collection('users').doc(uid).set({
+        'cart': cartMaps,
+        'cartUpdatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+    } catch (_) {}
   }
 
   // Add product to cart or increment quantity if already present

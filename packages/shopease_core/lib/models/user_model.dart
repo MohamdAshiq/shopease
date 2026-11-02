@@ -48,6 +48,7 @@ class UserModel extends Equatable {
     String? role,
     String? phone,
     CustomerAddressModel? address,
+    bool clearAddress = false,
     List<CustomerAddressModel>? addresses,
     int? defaultAddressIndex,
     DateTime? createdAt,
@@ -58,7 +59,7 @@ class UserModel extends Equatable {
       displayName: displayName ?? this.displayName,
       role: role ?? this.role,
       phone: phone ?? this.phone,
-      address: address ?? this.address,
+      address: clearAddress ? null : (address ?? this.address),
       addresses: addresses ?? this.addresses,
       defaultAddressIndex: defaultAddressIndex ?? this.defaultAddressIndex,
       createdAt: createdAt ?? this.createdAt,
@@ -139,7 +140,7 @@ class UserModel extends Equatable {
   ];
 }
 
-// Mock Customer
+// Mock Customer (Testing)
 final mockCustomer = UserModel(
   uid: 'usr_cust_001',
   email: 'customer@shopease.com',
@@ -172,7 +173,7 @@ final mockCustomer = UserModel(
   createdAt: DateTime(2026, 1, 10),
 );
 
-// Mock Admin
+// Mock Admin (Testing)
 final mockAdmin = UserModel(
   uid: 'usr_admin_001',
   email: 'admin@shopease.com',

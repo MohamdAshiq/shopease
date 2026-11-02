@@ -16,7 +16,9 @@ class ProfileCubit extends Cubit<ProfileState> {
                (initialUser != null
                    ? (initialUser.addresses.isNotEmpty
                          ? initialUser.addresses
-                         : ProfileState.defaultStarterAddresses)
+                         : (initialUser.address != null
+                               ? [initialUser.address!]
+                               : const []))
                    : const []),
            defaultAddressIndex: initialUser?.defaultAddressIndex ?? 0,
          ),
@@ -39,24 +41,17 @@ class ProfileCubit extends Cubit<ProfileState> {
 
     final List<CustomerAddressModel> addresses;
     final int defaultIndex;
-    if (user.uid == mockCustomer.uid) {
-      addresses = state.addresses.isNotEmpty
-          ? state.addresses
-          : ProfileState.defaultStarterAddresses;
-      defaultIndex = state.defaultAddressIndex;
+    if (user.addresses.isNotEmpty) {
+      addresses = user.addresses;
+      defaultIndex = user.defaultAddressIndex < addresses.length
+          ? user.defaultAddressIndex
+          : 0;
+    } else if (user.address != null) {
+      addresses = [user.address!];
+      defaultIndex = 0;
     } else {
-      if (user.addresses.isNotEmpty) {
-        addresses = user.addresses;
-        defaultIndex = user.defaultAddressIndex < addresses.length
-            ? user.defaultAddressIndex
-            : 0;
-      } else if (user.address != null) {
-        addresses = [user.address!];
-        defaultIndex = 0;
-      } else {
-        addresses = state.addresses;
-        defaultIndex = state.defaultAddressIndex;
-      }
+      addresses = const [];
+      defaultIndex = 0;
     }
 
     emit(
@@ -160,7 +155,6 @@ class ProfileCubit extends Cubit<ProfileState> {
   ) async {
     final currentUser = state.user;
     if (authRepository == null || currentUser == null) return;
-    if (currentUser.uid == mockCustomer.uid) return;
 
     try {
       final activeAddress =
@@ -172,6 +166,7 @@ class ProfileCubit extends Cubit<ProfileState> {
         addresses: updatedList,
         defaultAddressIndex: defaultIndex,
         address: activeAddress,
+        clearAddress: activeAddress == null,
       );
       await authRepository!.updateUserProfile(updatedUser);
     } catch (_) {}

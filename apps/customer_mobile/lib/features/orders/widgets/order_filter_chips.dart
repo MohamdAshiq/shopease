@@ -1,31 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shopease_core/shopease_core.dart';
 
-// Filter tabs for Orders screen
-enum OrderFilterType {
-  all('All'),
-  inProgress('In Progress'),
-  delivered('Delivered'),
-  cancelled('Cancelled');
+import '../cubits/order_state.dart';
 
-  const OrderFilterType(this.label);
-  final String label;
-
-  bool matches(OrderModel order) {
-    switch (this) {
-      case OrderFilterType.all:
-        return true;
-      case OrderFilterType.inProgress:
-        return order.status == 'pending' ||
-            order.status == 'processing' ||
-            order.status == 'shipped';
-      case OrderFilterType.delivered:
-        return order.status == 'delivered';
-      case OrderFilterType.cancelled:
-        return order.status == 'cancelled';
-    }
-  }
-}
+export '../cubits/order_state.dart' show OrderFilterType;
 
 class OrderFilterChips extends StatelessWidget {
   const OrderFilterChips({

@@ -200,26 +200,6 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  // Quick Sign In for testing
-  Future<void> signInWithMock() async {
-    emit(
-      state.copyWith(
-        status: AuthStatus.loading,
-        action: AuthAction.resetPassword,
-        clearError: true,
-      ),
-    );
-    await Future<void>.delayed(const Duration(milliseconds: 200));
-    emit(
-      state.copyWith(
-        status: AuthStatus.authenticated,
-        user: mockCustomer,
-        clearError: true,
-      ),
-    );
-    onUserChanged?.call(mockCustomer);
-  }
-
   // Sign out
   Future<void> signOut() async {
     try {

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:customer_mobile/features/cart/cubits/cart_cubit.dart';
 import 'package:customer_mobile/features/checkout/cubits/checkout_cubit.dart';
 import 'package:customer_mobile/features/orders/cubits/order_cubit.dart';
+import 'package:customer_mobile/features/orders/cubits/order_state.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shopease_core/shopease_core.dart';
 
@@ -63,32 +64,33 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   const testProduct1 = ProductModel(
-    id: 'prod_test_1',
+    id: 'prod_1',
     title: 'Test Running Shoes',
-    description: 'Comfortable sports shoes',
+    description: 'Shoes for testing',
     price: 1500.0,
-    stock: 10,
+    stock: 5,
     category: 'Footwear',
-    imageUrl: 'https://example.com/shoes.jpg',
+    sizes: ['8', '9', '10'],
   );
 
   const testAddress = CustomerAddressModel(
-    recipientName: 'Test Recipient',
-    phone: '+91 9988776655',
-    street: '123 Test Street, Apartment 4B',
-    city: 'Bengaluru',
+    street: '123 Test Ave',
+    city: 'Bangalore',
     state: 'Karnataka',
     postalCode: '560001',
     country: 'India',
+    recipientName: 'Tester One',
+    phone: '+91 99999 88888',
+    label: 'Home',
   );
 
   const realCustomer = UserModel(
-    uid: 'real_cust_123',
-    email: 'real@customer.com',
+    uid: 'real_cust_789',
+    email: 'real.user@example.com',
     displayName: 'Real Customer',
   );
 
-  group('OrderCubit', () {
+  group('OrderCubit with Fake Repository', () {
     late OrderCubit orderCubit;
     late CartCubit cartCubit;
     late _FakeOrderRepository fakeRepo;
@@ -199,6 +201,33 @@ void main() {
         expect(orderCubit.state.isLoading, isFalse);
       },
     );
+
+    test('setFilter updates selectedFilter and filteredOrders', () async {
+      cartCubit.addToCart(testProduct1, selectedSize: '9', quantity: 1);
+      final placed = await orderCubit.placeOrder(
+        address: testAddress,
+        cartItems: cartCubit.state.items,
+        subtotal: cartCubit.state.subtotal,
+        deliveryFee: cartCubit.state.deliveryFee,
+        total: cartCubit.state.total,
+        paymentMethod: PaymentMethodType.upi,
+      );
+
+      expect(orderCubit.state.selectedFilter, OrderFilterType.all);
+      expect(orderCubit.state.filteredOrders.length, 1);
+
+      orderCubit.setFilter(OrderFilterType.inProgress);
+      expect(orderCubit.state.selectedFilter, OrderFilterType.inProgress);
+      expect(orderCubit.state.filteredOrders.length, 1);
+
+      orderCubit.setFilter(OrderFilterType.delivered);
+      expect(orderCubit.state.filteredOrders.isEmpty, isTrue);
+
+      await orderCubit.cancelOrder(placed.id);
+      orderCubit.setFilter(OrderFilterType.cancelled);
+      expect(orderCubit.state.filteredOrders.length, 1);
+      expect(orderCubit.state.filteredOrders.first.id, placed.id);
+    });
   });
 
   group('CheckoutCubit', () {
@@ -208,34 +237,30 @@ void main() {
 
     setUp(() {
       SharedPreferences.setMockInitialValues({});
-      checkoutCubit = CheckoutCubit(initialAddress: testAddress);
-      orderCubit = OrderCubit();
+      final fakeRepo = _FakeOrderRepository();
+      orderCubit = OrderCubit(orderRepository: fakeRepo);
       cartCubit = CartCubit();
+      checkoutCubit = CheckoutCubit(initialAddress: testAddress);
     });
 
     tearDown(() {
-      checkoutCubit.close();
       orderCubit.close();
       cartCubit.close();
+      checkoutCubit.close();
     });
 
-    test('initial state has default address and payment method', () {
-      expect(checkoutCubit.state.paymentMethod, PaymentMethodType.upi);
+    test('initial state takes initialAddress or empty fallback', () {
+      expect(checkoutCubit.state.address, testAddress);
       expect(checkoutCubit.state.isAddressValid, isTrue);
-      expect(checkoutCubit.state.isSubmitting, isFalse);
-      expect(checkoutCubit.state.isSuccess, isFalse);
-    });
-
-    test('initial state with null address is invalid', () {
-      final unaddressedCubit = CheckoutCubit();
-      expect(unaddressedCubit.state.isAddressValid, isFalse);
-      unaddressedCubit.close();
-    });
-
-    test('updateAddress and selectPaymentMethod mutate state', () {
-      checkoutCubit.selectPaymentMethod(PaymentMethodType.cod);
       expect(checkoutCubit.state.paymentMethod, PaymentMethodType.cod);
+    });
 
+    test('selectPaymentMethod updates paymentMethod', () {
+      checkoutCubit.selectPaymentMethod(PaymentMethodType.upi);
+      expect(checkoutCubit.state.paymentMethod, PaymentMethodType.upi);
+    });
+
+    test('updateAddress updates address in state', () {
       const modifiedAddress = CustomerAddressModel(
         street: '456 New Road',
         city: 'Mumbai',

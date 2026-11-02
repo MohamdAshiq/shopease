@@ -45,7 +45,7 @@ class OrderAddressCard extends StatelessWidget {
               children: [
                 const Icon(
                   IconsaxPlusLinear.call,
-                  size: 14,
+                  size: AppSizes.iconSm,
                   color: AppColors.textSecondary,
                 ),
                 const SizedBox(width: AppSizes.xs),

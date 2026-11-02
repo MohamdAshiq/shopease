@@ -8,13 +8,24 @@ import 'order_state.dart';
 // Cubit for managing orders with real-time synchronization
 class OrderCubit extends Cubit<OrderState> {
   OrderCubit({
+    UserModel? initialCustomer,
     List<OrderModel>? initialOrders,
     OrderRepository? orderRepository,
   }) : _orderRepository = orderRepository ?? FirestoreOrderRepository(),
-       super(OrderState(orders: initialOrders ?? const [], isLoading: false));
+       super(OrderState(orders: initialOrders ?? const [], isLoading: false)) {
+    if (initialCustomer != null) {
+      setCustomer(initialCustomer);
+    }
+  }
 
   final OrderRepository _orderRepository;
   StreamSubscription<List<OrderModel>>? _ordersSubscription;
+
+  // Set active filter
+  void setFilter(OrderFilterType filter) {
+    if (state.selectedFilter == filter) return;
+    emit(state.copyWith(selectedFilter: filter));
+  }
 
   // Listen to customer orders
   void setCustomer(UserModel? user) {

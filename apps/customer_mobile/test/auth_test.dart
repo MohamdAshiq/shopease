@@ -72,29 +72,6 @@ void main() {
       },
     );
 
-    test(
-      'signIn with mock customer email returns mockCustomer entity',
-      () async {
-        final success = await authCubit.signIn(
-          email: mockCustomer.email,
-          password: 'securePassword123',
-        );
-
-        expect(success, isTrue);
-        expect(authCubit.state.isAuthenticated, isTrue);
-        expect(authCubit.state.user?.uid, mockCustomer.uid);
-        expect(authCubit.state.user?.displayName, mockCustomer.displayName);
-      },
-    );
-
-    test('signInWithMock immediately authenticates mock customer', () async {
-      await authCubit.signInWithMock();
-
-      expect(authCubit.state.isAuthenticated, isTrue);
-      expect(authCubit.state.user?.uid, mockCustomer.uid);
-      expect(authCubit.state.user?.displayName, mockCustomer.displayName);
-    });
-
     test('signInWithGoogle authenticates user with Google account', () async {
       final success = await authCubit.signInWithGoogle();
 
@@ -145,7 +122,10 @@ void main() {
     });
 
     test('signOut resets authenticated user back to guest mode', () async {
-      await authCubit.signInWithMock();
+      await authCubit.signIn(
+        email: 'test@example.com',
+        password: 'password123',
+      );
       expect(authCubit.state.isAuthenticated, isTrue);
 
       await authCubit.signOut();
@@ -165,7 +145,10 @@ void main() {
     });
 
     test('updateUser modifies active user details', () async {
-      await authCubit.signInWithMock();
+      await authCubit.signIn(
+        email: 'test@example.com',
+        password: 'password123',
+      );
       final updated = authCubit.state.user!.copyWith(
         displayName: 'Alex Updated',
       );
@@ -200,17 +183,11 @@ class _FakeAuthRepository implements AuthRepository {
     required String email,
     required String password,
   }) async {
-    final user = (email.toLowerCase() == mockCustomer.email.toLowerCase())
-        ? mockCustomer
-        : UserModel(
-            uid: 'test_uid',
-            email: email,
-            displayName: email
-                .split('@')
-                .first
-                .replaceAll('.', ' ')
-                .capitalizeWords,
-          );
+    final user = UserModel(
+      uid: 'test_uid',
+      email: email,
+      displayName: email.split('@').first.replaceAll('.', ' ').capitalizeWords,
+    );
     _user = user;
     _controller.add(user);
     return user;

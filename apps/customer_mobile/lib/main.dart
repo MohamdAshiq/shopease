@@ -37,6 +37,8 @@ class CustomerApp extends StatelessWidget {
         listener: (context, state) {
           context.read<ProfileCubit>().setUser(state.user);
           context.read<OrderCubit>().setCustomer(state.user);
+          context.read<WishlistCubit>().setCustomer(state.user);
+          context.read<CartCubit>().setCustomer(state.user);
         },
         child: MaterialApp.router(
           title: 'ShopEase',

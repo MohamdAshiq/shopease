@@ -28,6 +28,7 @@ abstract final class AppSizes {
   static const double appBarHeight = 56.0;
   static const double bottomNavHeight = 72.0;
   static const double cardMinHeight = 80.0;
+  static const double itemThumbnailSize = 50.0;
   static const double logoSize = 130.0;
   static const double checkboxSize = 24.0;
 

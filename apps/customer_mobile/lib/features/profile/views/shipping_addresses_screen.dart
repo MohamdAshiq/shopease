@@ -48,13 +48,6 @@ class ShippingAddressesScreen extends StatelessWidget {
 
   void _onDeleteAddress(BuildContext context, int index) {
     final cubit = context.read<ProfileCubit>();
-    if (cubit.state.addresses.length <= 1) {
-      AppSnackBar.showError(
-        context,
-        'You must have at least one delivery address saved.',
-      );
-      return;
-    }
     cubit.deleteAddress(index);
     AppSnackBar.showSuccess(context, 'Address deleted');
   }
@@ -124,13 +117,13 @@ class ShippingAddressesScreen extends StatelessWidget {
             }
             return Container(
               padding: const EdgeInsets.all(AppSizes.screenPadding),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: AppColors.background,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
+                    color: AppColors.shadow,
                     blurRadius: 10,
-                    offset: const Offset(0, -4),
+                    offset: Offset(0, -4),
                   ),
                 ],
               ),
