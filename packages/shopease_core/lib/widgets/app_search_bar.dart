@@ -12,6 +12,10 @@ class AppSearchBar extends StatelessWidget {
     this.onChanged,
     this.onSubmitted,
     this.onClear,
+    this.fillColor,
+    this.borderRadius,
+    this.borderColor,
+    this.contentPadding,
   });
 
   final TextEditingController controller;
@@ -21,9 +25,17 @@ class AppSearchBar extends StatelessWidget {
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onSubmitted;
   final VoidCallback? onClear;
+  final Color? fillColor;
+  final BorderRadius? borderRadius;
+  final Color? borderColor;
+  final EdgeInsetsGeometry? contentPadding;
 
   @override
   Widget build(BuildContext context) {
+    final effectiveRadius =
+        borderRadius ?? BorderRadius.circular(AppSizes.radiusLg);
+    final effectiveBorderColor = borderColor ?? AppColors.border;
+
     return TextField(
       controller: controller,
       focusNode: focusNode,
@@ -52,21 +64,23 @@ class AppSearchBar extends StatelessWidget {
           },
         ),
         filled: true,
-        fillColor: AppColors.scaffoldBackground,
-        contentPadding: const EdgeInsets.symmetric(
-          vertical: AppSizes.sm,
-          horizontal: AppSizes.md,
-        ),
+        fillColor: fillColor ?? AppColors.scaffoldBackground,
+        contentPadding:
+            contentPadding ??
+            const EdgeInsets.symmetric(
+              vertical: AppSizes.sm,
+              horizontal: AppSizes.md,
+            ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSizes.radiusLg),
-          borderSide: const BorderSide(color: AppColors.border, width: 0.8),
+          borderRadius: effectiveRadius,
+          borderSide: BorderSide(color: effectiveBorderColor, width: 0.8),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSizes.radiusLg),
-          borderSide: const BorderSide(color: AppColors.border, width: 0.8),
+          borderRadius: effectiveRadius,
+          borderSide: BorderSide(color: effectiveBorderColor, width: 0.8),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSizes.radiusLg),
+          borderRadius: effectiveRadius,
           borderSide: const BorderSide(color: AppColors.primary, width: 1.2),
         ),
       ),
