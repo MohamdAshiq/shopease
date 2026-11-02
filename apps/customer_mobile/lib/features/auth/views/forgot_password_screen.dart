@@ -62,7 +62,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
         if (state.hasError && state.errorMessage != null) {
-          AppSnackBar.showError(context, state.errorMessage!);
+          AppSnackBar.showAuthFeedback(context, state.errorMessage!);
         }
       },
       builder: (context, state) {
@@ -93,8 +93,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             // Subtitle
                             Text(
                               'Enter your registered email address to find your account.',
-                              style: AppTextStyles.bodyLarge.copyWith(
-                                fontSize: 13,
+                              style: AppTextStyles.bodyMedium.copyWith(
                                 color: AppColors.textSecondary,
                               ),
                             ),

@@ -30,6 +30,8 @@ export 'models/product_model.dart';
 export 'models/user_model.dart';
 
 // Repositories
+export 'repositories/auth_repository.dart';
+export 'repositories/firebase_auth_repository.dart';
 export 'repositories/product_repository.dart';
 export 'repositories/firestore_product_repository.dart';
 

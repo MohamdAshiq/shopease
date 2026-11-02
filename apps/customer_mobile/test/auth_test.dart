@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:customer_mobile/features/auth/cubits/auth_cubit.dart';
 import 'package:customer_mobile/features/auth/cubits/auth_state.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -10,7 +12,7 @@ void main() {
     late AuthCubit authCubit;
 
     setUp(() {
-      authCubit = AuthCubit();
+      authCubit = AuthCubit(authRepository: _FakeAuthRepository());
     });
 
     tearDown(() {
@@ -181,4 +183,82 @@ void main() {
       expect(authCubit.state.errorMessage, isNull);
     });
   });
+}
+
+class _FakeAuthRepository implements AuthRepository {
+  UserModel? _user;
+  final _controller = StreamController<UserModel?>.broadcast();
+
+  @override
+  Stream<UserModel?> authStateChanges() => _controller.stream;
+
+  @override
+  UserModel? get currentUser => _user;
+
+  @override
+  Future<UserModel> signInWithEmail({
+    required String email,
+    required String password,
+  }) async {
+    final user = (email.toLowerCase() == mockCustomer.email.toLowerCase())
+        ? mockCustomer
+        : UserModel(
+            uid: 'test_uid',
+            email: email,
+            displayName: email
+                .split('@')
+                .first
+                .replaceAll('.', ' ')
+                .capitalizeWords,
+          );
+    _user = user;
+    _controller.add(user);
+    return user;
+  }
+
+  @override
+  Future<UserModel> registerWithEmail({
+    required String name,
+    required String email,
+    required String password,
+    String phone = '',
+  }) async {
+    final user = UserModel(
+      uid: 'test_reg_uid',
+      email: email,
+      displayName: name,
+      phone: phone,
+    );
+    _user = user;
+    _controller.add(user);
+    return user;
+  }
+
+  @override
+  Future<UserModel> signInWithGoogle() async {
+    final user = const UserModel(
+      uid: 'usr_google_123',
+      email: 'alex.google@example.com',
+      displayName: 'Alex Morgan',
+    );
+    _user = user;
+    _controller.add(user);
+    return user;
+  }
+
+  @override
+  Future<void> sendPasswordResetEmail(String email) async {}
+
+  @override
+  Future<void> signOut() async {
+    _user = null;
+    _controller.add(null);
+  }
+
+  @override
+  Future<UserModel> updateUserProfile(UserModel user) async {
+    _user = user;
+    _controller.add(user);
+    return user;
+  }
 }

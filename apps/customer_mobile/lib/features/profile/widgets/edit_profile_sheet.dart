@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shopease_core/shopease_core.dart';
 
+import '../../auth/cubits/auth_cubit.dart';
 import '../cubits/profile_cubit.dart';
 
 // Edit Customer Profile Bottom Sheet
@@ -33,6 +34,8 @@ class _EditProfileBottomSheetState extends State<EditProfileBottomSheet> {
   late final FocusNode _emailFocusNode;
   late final FocusNode _phoneFocusNode;
 
+  bool _isSaving = false;
+
   @override
   void initState() {
     super.initState();
@@ -58,16 +61,39 @@ class _EditProfileBottomSheetState extends State<EditProfileBottomSheet> {
     super.dispose();
   }
 
-  void _onSave() {
+  Future<void> _onSave() async {
     if (!_formKey.currentState!.validate()) return;
     HapticFeedback.lightImpact();
 
-    context.read<ProfileCubit>().updateProfile(
-      displayName: _nameController.text.trim(),
-      email: _emailController.text.trim(),
-      phone: _phoneController.text.trim(),
+    setState(() => _isSaving = true);
+
+    final profileCubit = context.read<ProfileCubit>();
+    final authCubit = context.read<AuthCubit>();
+    final currentUser = profileCubit.state.user ?? authCubit.currentUser;
+
+    final newName = _nameController.text.trim();
+    final newEmail = _emailController.text.trim();
+    final newPhone = _phoneController.text.trim();
+
+    // Update ProfileCubit local state
+    profileCubit.updateProfile(
+      displayName: newName,
+      email: newEmail,
+      phone: newPhone,
     );
 
+    // Synchronize with Firebase Auth and Firestore if user is authenticated
+    if (currentUser != null) {
+      final updatedUser = currentUser.copyWith(
+        displayName: newName,
+        email: newEmail,
+        phone: newPhone,
+      );
+      await authCubit.updateUser(updatedUser);
+    }
+
+    if (!mounted) return;
+    setState(() => _isSaving = false);
     Navigator.of(context).pop();
     AppSnackBar.showSuccess(context, 'Profile updated successfully');
   }
@@ -180,7 +206,8 @@ class _EditProfileBottomSheetState extends State<EditProfileBottomSheet> {
                 SizedBox(
                   width: double.infinity,
                   child: AppButton(
-                    onPressed: _onSave,
+                    onPressed: _isSaving ? null : _onSave,
+                    isLoading: _isSaving,
                     label: 'Save Changes',
                     icon: IconsaxPlusBold.tick_circle,
                   ),

@@ -20,17 +20,29 @@ class ProfileCubit extends Cubit<ProfileState> {
 
   // Set active user on login or signout
   void setUser(UserModel? user) {
-    emit(
-      state.copyWith(
-        user: user,
-        clearUser: user == null,
-        addresses: user != null
-            ? (state.addresses.isNotEmpty
-                  ? state.addresses
-                  : ProfileState.defaultStarterAddresses)
-            : const [],
-      ),
-    );
+    if (user == null) {
+      emit(
+        state.copyWith(
+          clearUser: true,
+          addresses: const [],
+          defaultAddressIndex: 0,
+        ),
+      );
+      return;
+    }
+
+    final List<CustomerAddressModel> addresses;
+    if (user.uid == mockCustomer.uid) {
+      addresses = state.addresses.isNotEmpty
+          ? state.addresses
+          : ProfileState.defaultStarterAddresses;
+    } else {
+      addresses = user.address != null
+          ? [user.address!]
+          : (state.addresses.isNotEmpty ? state.addresses : const []);
+    }
+
+    emit(state.copyWith(user: user, clearUser: false, addresses: addresses));
   }
 
   // Update profile basic info
