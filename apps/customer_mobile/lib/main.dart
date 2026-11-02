@@ -27,12 +27,16 @@ class CustomerApp extends StatelessWidget {
         BlocProvider(create: (context) => CartCubit()),
         BlocProvider(create: (context) => OrderCubit()),
         BlocProvider(create: (context) => WishlistCubit()),
-        BlocProvider(create: (context) => ProfileCubit()),
+        BlocProvider(
+          create: (context) =>
+              ProfileCubit(authRepository: FirebaseAuthRepository()),
+        ),
       ],
       child: BlocListener<AuthCubit, AuthState>(
         listenWhen: (previous, current) => previous.user != current.user,
         listener: (context, state) {
           context.read<ProfileCubit>().setUser(state.user);
+          context.read<OrderCubit>().setCustomer(state.user);
         },
         child: MaterialApp.router(
           title: 'ShopEase',

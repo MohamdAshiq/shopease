@@ -11,15 +11,12 @@ class CheckoutCubit extends Cubit<CheckoutState> {
         CheckoutState(
           address:
               initialAddress ??
-              mockCustomer.address ??
               const CustomerAddressModel(
-                street: '742 Evergreen Terrace',
-                city: 'Springfield',
-                state: 'OR',
-                postalCode: '97477',
-                country: 'India',
-                recipientName: 'Alex Morgan',
-                phone: '+91 98765 43210',
+                street: '',
+                city: '',
+                state: '',
+                postalCode: '',
+                country: '',
               ),
         ),
       );
@@ -35,6 +32,7 @@ class CheckoutCubit extends Cubit<CheckoutState> {
   Future<OrderModel?> placeOrder({
     required OrderCubit orderCubit,
     required CartCubit cartCubit,
+    UserModel? customer,
   }) async {
     final cartState = cartCubit.state;
     if (cartState.isEmpty) {
@@ -54,8 +52,6 @@ class CheckoutCubit extends Cubit<CheckoutState> {
     emit(state.copyWith(isSubmitting: true, errorMessage: null));
 
     try {
-      await Future<void>.delayed(const Duration(milliseconds: 700));
-
       final order = await orderCubit.placeOrder(
         address: state.address,
         cartItems: cartState.items,
@@ -63,6 +59,7 @@ class CheckoutCubit extends Cubit<CheckoutState> {
         deliveryFee: cartState.deliveryFee,
         total: cartState.total,
         paymentMethod: state.paymentMethod,
+        customer: customer,
       );
 
       // Clear shopping cart on successful checkout

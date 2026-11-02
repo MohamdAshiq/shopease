@@ -1,8 +1,63 @@
+import 'dart:async';
+
 import 'package:customer_mobile/features/cart/cubits/cart_cubit.dart';
 import 'package:customer_mobile/features/checkout/cubits/checkout_cubit.dart';
 import 'package:customer_mobile/features/orders/cubits/order_cubit.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shopease_core/shopease_core.dart';
+
+class _FakeOrderRepository implements OrderRepository {
+  final List<OrderModel> orders = [];
+  final _controller = StreamController<List<OrderModel>>.broadcast();
+
+  @override
+  Future<OrderModel> createOrder(OrderModel order) async {
+    orders.insert(0, order);
+    _controller.add(List.unmodifiable(orders));
+    return order;
+  }
+
+  @override
+  Stream<List<OrderModel>> watchCustomerOrders(String customerId) {
+    return _controller.stream.map(
+      (list) => list.where((o) => o.customerId == customerId).toList(),
+    );
+  }
+
+  @override
+  Stream<List<OrderModel>> watchAllOrders() => _controller.stream;
+
+  @override
+  Future<OrderModel?> getOrderById(String orderId) async {
+    return orders.where((o) => o.id == orderId).firstOrNull;
+  }
+
+  @override
+  Future<void> updateOrderStatus({
+    required String orderId,
+    required String status,
+    String? note,
+  }) async {
+    final idx = orders.indexWhere((o) => o.id == orderId);
+    if (idx != -1) {
+      orders[idx] = orders[idx].copyWith(status: status);
+      _controller.add(List.unmodifiable(orders));
+    }
+  }
+
+  @override
+  Future<void> cancelOrder({required String orderId, String? reason}) async {
+    await updateOrderStatus(
+      orderId: orderId,
+      status: 'cancelled',
+      note: reason,
+    );
+  }
+
+  void dispose() {
+    _controller.close();
+  }
+}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -27,26 +82,55 @@ void main() {
     country: 'India',
   );
 
+  const realCustomer = UserModel(
+    uid: 'real_cust_123',
+    email: 'real@customer.com',
+    displayName: 'Real Customer',
+  );
+
   group('OrderCubit', () {
     late OrderCubit orderCubit;
     late CartCubit cartCubit;
+    late _FakeOrderRepository fakeRepo;
 
     setUp(() {
       SharedPreferences.setMockInitialValues({});
-      orderCubit = OrderCubit();
+      fakeRepo = _FakeOrderRepository();
+      orderCubit = OrderCubit(orderRepository: fakeRepo);
       cartCubit = CartCubit();
     });
 
     tearDown(() {
       orderCubit.close();
       cartCubit.close();
+      fakeRepo.dispose();
     });
 
-    test('initial state initializes with mockOrders', () {
-      expect(orderCubit.state.orders.isNotEmpty, isTrue);
-      expect(orderCubit.state.orders.length, mockOrders.length);
-      expect(orderCubit.state.isLoading, isFalse);
-    });
+    test(
+      'initial state initializes with empty orders or custom initialOrders',
+      () {
+        expect(orderCubit.state.orders.isEmpty, isTrue);
+        expect(orderCubit.state.isLoading, isFalse);
+
+        final populatedCubit = OrderCubit(
+          initialOrders: [
+            const OrderModel(
+              id: 'ORD-TEST-1',
+              customerId: 'cust_1',
+              customerName: 'Test',
+              customerEmail: 'test@example.com',
+              items: [],
+              deliveryAddress: testAddress,
+              subtotal: 100,
+              deliveryFee: 10,
+              total: 110,
+            ),
+          ],
+        );
+        expect(populatedCubit.state.orders.length, 1);
+        populatedCubit.close();
+      },
+    );
 
     test('placeOrder creates order with valid items and history', () async {
       cartCubit.addToCart(testProduct1, selectedSize: '9', quantity: 2);
@@ -69,14 +153,52 @@ void main() {
       expect(orderCubit.state.orders.first.id, placed.id);
     });
 
-    test('cancelOrder updates order status to cancelled', () async {
-      await Future<void>.delayed(const Duration(milliseconds: 50));
-      final firstId = orderCubit.state.orders.first.id;
+    test('placeOrder with real customer persists to repository without leaking mock data', () async {
+      cartCubit.addToCart(testProduct1, selectedSize: '9', quantity: 1);
 
-      await orderCubit.cancelOrder(firstId);
-      final cancelled = orderCubit.state.findById(firstId);
+      final placed = await orderCubit.placeOrder(
+        address: testAddress,
+        cartItems: cartCubit.state.items,
+        subtotal: cartCubit.state.subtotal,
+        deliveryFee: cartCubit.state.deliveryFee,
+        total: cartCubit.state.total,
+        paymentMethod: PaymentMethodType.upi,
+        customer: realCustomer,
+      );
+
+      expect(placed.customerId, realCustomer.uid);
+      expect(placed.customerEmail, realCustomer.email);
+      expect(fakeRepo.orders.length, 1);
+      expect(fakeRepo.orders.first.id, placed.id);
+    });
+
+    test('cancelOrder updates order status to cancelled', () async {
+      cartCubit.addToCart(testProduct1, selectedSize: '9', quantity: 1);
+      final placed = await orderCubit.placeOrder(
+        address: testAddress,
+        cartItems: cartCubit.state.items,
+        subtotal: cartCubit.state.subtotal,
+        deliveryFee: cartCubit.state.deliveryFee,
+        total: cartCubit.state.total,
+        paymentMethod: PaymentMethodType.upi,
+      );
+
+      await orderCubit.cancelOrder(placed.id);
+      final cancelled = orderCubit.state.findById(placed.id);
       expect(cancelled?.status, 'cancelled');
     });
+
+    test(
+      'setCustomer switches to customer stream or clears on logout',
+      () async {
+        orderCubit.setCustomer(realCustomer);
+        expect(orderCubit.state.isLoading, isTrue);
+
+        orderCubit.setCustomer(null);
+        expect(orderCubit.state.orders.isEmpty, isTrue);
+        expect(orderCubit.state.isLoading, isFalse);
+      },
+    );
   });
 
   group('CheckoutCubit', () {
@@ -86,7 +208,7 @@ void main() {
 
     setUp(() {
       SharedPreferences.setMockInitialValues({});
-      checkoutCubit = CheckoutCubit();
+      checkoutCubit = CheckoutCubit(initialAddress: testAddress);
       orderCubit = OrderCubit();
       cartCubit = CartCubit();
     });
@@ -102,6 +224,12 @@ void main() {
       expect(checkoutCubit.state.isAddressValid, isTrue);
       expect(checkoutCubit.state.isSubmitting, isFalse);
       expect(checkoutCubit.state.isSuccess, isFalse);
+    });
+
+    test('initial state with null address is invalid', () {
+      final unaddressedCubit = CheckoutCubit();
+      expect(unaddressedCubit.state.isAddressValid, isFalse);
+      unaddressedCubit.close();
     });
 
     test('updateAddress and selectPaymentMethod mutate state', () {

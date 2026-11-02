@@ -11,6 +11,8 @@ class UserModel extends Equatable {
     this.role = 'customer',
     this.phone = '',
     this.address,
+    this.addresses = const [],
+    this.defaultAddressIndex = 0,
     this.createdAt,
   });
 
@@ -20,11 +22,24 @@ class UserModel extends Equatable {
   final String role;
   final String phone;
   final CustomerAddressModel? address;
+  final List<CustomerAddressModel> addresses;
+  final int defaultAddressIndex;
   final DateTime? createdAt;
 
   // Role checks
   bool get isAdmin => role == 'admin';
   bool get isCustomer => role == 'customer';
+
+  // Active default address
+  CustomerAddressModel? get defaultAddress {
+    if (addresses.isNotEmpty) {
+      if (defaultAddressIndex >= 0 && defaultAddressIndex < addresses.length) {
+        return addresses[defaultAddressIndex];
+      }
+      return addresses.first;
+    }
+    return address;
+  }
 
   UserModel copyWith({
     String? uid,
@@ -33,6 +48,8 @@ class UserModel extends Equatable {
     String? role,
     String? phone,
     CustomerAddressModel? address,
+    List<CustomerAddressModel>? addresses,
+    int? defaultAddressIndex,
     DateTime? createdAt,
   }) {
     return UserModel(
@@ -42,18 +59,23 @@ class UserModel extends Equatable {
       role: role ?? this.role,
       phone: phone ?? this.phone,
       address: address ?? this.address,
+      addresses: addresses ?? this.addresses,
+      defaultAddressIndex: defaultAddressIndex ?? this.defaultAddressIndex,
       createdAt: createdAt ?? this.createdAt,
     );
   }
 
   Map<String, dynamic> toMap() {
+    final activeAddress = defaultAddress;
     return {
       'uid': uid,
       'email': email,
       'displayName': displayName,
       'role': role,
       'phone': phone,
-      'address': address?.toMap(),
+      'address': activeAddress?.toMap(),
+      'addresses': addresses.map((a) => a.toMap()).toList(),
+      'defaultAddressIndex': defaultAddressIndex,
       'createdAt': createdAt?.toIso8601String(),
     };
   }
@@ -71,15 +93,34 @@ class UserModel extends Equatable {
       }
     }
 
+    final rawAddresses = map['addresses'] as List<dynamic>? ?? const [];
+    final parsedAddresses = rawAddresses
+        .whereType<Map<String, dynamic>>()
+        .map(CustomerAddressModel.fromMap)
+        .toList();
+
+    CustomerAddressModel? addr;
+    if (map['address'] != null && map['address'] is Map<String, dynamic>) {
+      addr = CustomerAddressModel.fromMap(
+        map['address'] as Map<String, dynamic>,
+      );
+    } else if (parsedAddresses.isNotEmpty) {
+      addr = parsedAddresses.first;
+    }
+
+    final defaultIdx = (map['defaultAddressIndex'] as num?)?.toInt() ?? 0;
+
     return UserModel(
       uid: documentId ?? (map['uid'] as String? ?? ''),
       email: map['email'] as String? ?? '',
       displayName: map['displayName'] as String? ?? '',
       role: map['role'] as String? ?? 'customer',
       phone: map['phone'] as String? ?? '',
-      address: map['address'] != null && map['address'] is Map<String, dynamic>
-          ? CustomerAddressModel.fromMap(map['address'] as Map<String, dynamic>)
-          : null,
+      address: addr,
+      addresses: parsedAddresses.isNotEmpty
+          ? parsedAddresses
+          : (addr != null ? [addr] : const []),
+      defaultAddressIndex: defaultIdx,
       createdAt: parseDate(map['createdAt']),
     );
   }
@@ -92,6 +133,8 @@ class UserModel extends Equatable {
     role,
     phone,
     address,
+    addresses,
+    defaultAddressIndex,
     createdAt,
   ];
 }
@@ -113,6 +156,19 @@ final mockCustomer = UserModel(
     phone: '+91 98765 43210',
     label: 'Home',
   ),
+  addresses: const [
+    CustomerAddressModel(
+      street: '742 Evergreen Terrace',
+      city: 'Springfield',
+      state: 'OR',
+      postalCode: '97477',
+      country: 'India',
+      recipientName: 'Alex Morgan',
+      phone: '+91 98765 43210',
+      label: 'Home',
+    ),
+  ],
+  defaultAddressIndex: 0,
   createdAt: DateTime(2026, 1, 10),
 );
 

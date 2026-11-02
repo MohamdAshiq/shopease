@@ -2,21 +2,27 @@ import 'package:shopease_core/shopease_core.dart';
 
 import 'profile_state.dart';
 
-// Cubit for managing customer profile
+// Cubit for managing customer profile & addresses with Firestore synchronization
 class ProfileCubit extends Cubit<ProfileState> {
   ProfileCubit({
     UserModel? initialUser,
     List<CustomerAddressModel>? initialAddresses,
+    this.authRepository,
   }) : super(
          ProfileState(
            user: initialUser,
            addresses:
                initialAddresses ??
                (initialUser != null
-                   ? ProfileState.defaultStarterAddresses
+                   ? (initialUser.addresses.isNotEmpty
+                         ? initialUser.addresses
+                         : ProfileState.defaultStarterAddresses)
                    : const []),
+           defaultAddressIndex: initialUser?.defaultAddressIndex ?? 0,
          ),
        );
+
+  final AuthRepository? authRepository;
 
   // Set active user on login or signout
   void setUser(UserModel? user) {
@@ -32,17 +38,35 @@ class ProfileCubit extends Cubit<ProfileState> {
     }
 
     final List<CustomerAddressModel> addresses;
+    final int defaultIndex;
     if (user.uid == mockCustomer.uid) {
       addresses = state.addresses.isNotEmpty
           ? state.addresses
           : ProfileState.defaultStarterAddresses;
+      defaultIndex = state.defaultAddressIndex;
     } else {
-      addresses = user.address != null
-          ? [user.address!]
-          : (state.addresses.isNotEmpty ? state.addresses : const []);
+      if (user.addresses.isNotEmpty) {
+        addresses = user.addresses;
+        defaultIndex = user.defaultAddressIndex < addresses.length
+            ? user.defaultAddressIndex
+            : 0;
+      } else if (user.address != null) {
+        addresses = [user.address!];
+        defaultIndex = 0;
+      } else {
+        addresses = state.addresses;
+        defaultIndex = state.defaultAddressIndex;
+      }
     }
 
-    emit(state.copyWith(user: user, clearUser: false, addresses: addresses));
+    emit(
+      state.copyWith(
+        user: user,
+        clearUser: false,
+        addresses: addresses,
+        defaultAddressIndex: defaultIndex,
+      ),
+    );
   }
 
   // Update profile basic info
@@ -69,6 +93,7 @@ class ProfileCubit extends Cubit<ProfileState> {
         defaultAddressIndex: newDefaultIndex,
       ),
     );
+    _syncAddressesToFirestore(updatedList, newDefaultIndex);
   }
 
   // Update existing address
@@ -90,6 +115,7 @@ class ProfileCubit extends Cubit<ProfileState> {
         defaultAddressIndex: newDefaultIndex,
       ),
     );
+    _syncAddressesToFirestore(updatedList, newDefaultIndex);
   }
 
   // Delete address at index
@@ -112,16 +138,42 @@ class ProfileCubit extends Cubit<ProfileState> {
         defaultAddressIndex: newDefaultIndex,
       ),
     );
+    _syncAddressesToFirestore(updatedList, newDefaultIndex);
   }
 
   // Change default address index
   void setDefaultAddress(int index) {
     if (index < 0 || index >= state.addresses.length) return;
     emit(state.copyWith(defaultAddressIndex: index));
+    _syncAddressesToFirestore(state.addresses, index);
   }
 
   // Toggle push notifications
   void toggleNotifications(bool enabled) {
     emit(state.copyWith(notificationsEnabled: enabled));
+  }
+
+  // Background synchronization helper
+  Future<void> _syncAddressesToFirestore(
+    List<CustomerAddressModel> updatedList,
+    int defaultIndex,
+  ) async {
+    final currentUser = state.user;
+    if (authRepository == null || currentUser == null) return;
+    if (currentUser.uid == mockCustomer.uid) return;
+
+    try {
+      final activeAddress =
+          defaultIndex >= 0 && defaultIndex < updatedList.length
+          ? updatedList[defaultIndex]
+          : (updatedList.isNotEmpty ? updatedList.first : null);
+
+      final updatedUser = currentUser.copyWith(
+        addresses: updatedList,
+        defaultAddressIndex: defaultIndex,
+        address: activeAddress,
+      );
+      await authRepository!.updateUserProfile(updatedUser);
+    } catch (_) {}
   }
 }

@@ -47,9 +47,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                 // Filter Chips
                 Container(
                   color: AppColors.background,
-                  padding: const EdgeInsets.symmetric(
-                    vertical: AppSizes.xs + 2,
-                  ),
+                  padding: const EdgeInsets.symmetric(vertical: AppSizes.sm),
                   child: OrderFilterChips(
                     selectedFilter: _selectedFilter,
                     onSelected: (filter) {
@@ -60,9 +58,15 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                 ),
                 const Divider(height: 1, color: AppColors.divider),
 
-                // Orders List or Empty State
+                // Orders List, Loading, or Empty State
                 Expanded(
-                  child: filteredOrders.isEmpty
+                  child: state.isLoading && allOrders.isEmpty
+                      ? const Center(
+                          child: CircularProgressIndicator(
+                            color: AppColors.primary,
+                          ),
+                        )
+                      : filteredOrders.isEmpty
                       ? OrderEmptyState(filter: _selectedFilter)
                       : ListView.separated(
                           padding: const EdgeInsets.all(AppSizes.screenPadding),

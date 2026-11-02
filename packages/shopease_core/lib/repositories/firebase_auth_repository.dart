@@ -9,15 +9,18 @@ import 'auth_repository.dart';
 // Firebase implementation of AuthRepository
 class FirebaseAuthRepository implements AuthRepository {
   FirebaseAuthRepository({FirebaseAuth? auth, FirebaseFirestore? firestore})
-    : _auth = auth ?? FirebaseAuth.instance,
-      _firestore = firestore ?? FirebaseFirestore.instance {
+    : _customAuth = auth,
+      _customFirestore = firestore {
     if (!kIsWeb) {
       GoogleSignIn.instance.initialize();
     }
   }
 
-  final FirebaseAuth _auth;
-  final FirebaseFirestore _firestore;
+  final FirebaseAuth? _customAuth;
+  final FirebaseFirestore? _customFirestore;
+  FirebaseAuth get _auth => _customAuth ?? FirebaseAuth.instance;
+  FirebaseFirestore get _firestore =>
+      _customFirestore ?? FirebaseFirestore.instance;
   UserModel? _cachedUser;
 
   CollectionReference<Map<String, dynamic>> get _usersRef =>

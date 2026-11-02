@@ -127,10 +127,10 @@ final GoRouter appRouter = GoRouter(
       parentNavigatorKey: _rootNavigatorKey,
       path: RoutePaths.orderSuccess,
       name: RouteNames.orderSuccess,
-      builder: (context, state) {
-        final order = state.extra as OrderModel? ?? mockOrders.first;
-        return OrderSuccessScreen(order: order);
-      },
+      redirect: (context, state) =>
+          state.extra is! OrderModel ? RoutePaths.home : null,
+      builder: (context, state) =>
+          OrderSuccessScreen(order: state.extra! as OrderModel),
     ),
 
     // Order Tracking & Detail Route
