@@ -112,17 +112,25 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     AdminNavDestination selectedDestination, {
     bool isMobile = false,
   }) {
-    return Column(
-      children: [
-        AdminHeader(
-          title: selectedDestination.label,
-          showMenuButton: isMobile,
-          onMenuPressed: isMobile
-              ? () => _scaffoldKey.currentState?.openDrawer()
-              : null,
-        ),
-        Expanded(child: widget.child),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxHeight < 64 || constraints.maxWidth < 10) {
+          return const SizedBox.shrink();
+        }
+
+        return Column(
+          children: [
+            AdminHeader(
+              title: selectedDestination.label,
+              showMenuButton: isMobile,
+              onMenuPressed: isMobile
+                  ? () => _scaffoldKey.currentState?.openDrawer()
+                  : null,
+            ),
+            Expanded(child: widget.child),
+          ],
+        );
+      },
     );
   }
 }

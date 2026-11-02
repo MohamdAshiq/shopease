@@ -80,10 +80,10 @@ class RecentOrdersTable extends StatelessWidget {
                       child: Table(
                         columnWidths: const {
                           0: FlexColumnWidth(2.0),
-                          1: FlexColumnWidth(3.8),
-                          2: FlexColumnWidth(1.8),
-                          3: FlexColumnWidth(2.0),
-                          4: FlexColumnWidth(2.2),
+                          1: FlexColumnWidth(3.4),
+                          2: FlexColumnWidth(1.6),
+                          3: FlexColumnWidth(1.8),
+                          4: FlexColumnWidth(2.6),
                         },
                         defaultVerticalAlignment:
                             TableCellVerticalAlignment.middle,
@@ -200,8 +200,13 @@ class RecentOrdersTable extends StatelessWidget {
                                   ),
                                   child: Align(
                                     alignment: Alignment.centerLeft,
-                                    child: OrderStatusBadge(
-                                      status: order.orderStatus,
+                                    child: FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      alignment: Alignment.centerLeft,
+                                      child: OrderStatusBadge(
+                                        status: order.orderStatus,
+                                        compact: true,
+                                      ),
                                     ),
                                   ),
                                 ),

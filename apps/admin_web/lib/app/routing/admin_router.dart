@@ -5,6 +5,7 @@ import '../../features/auth/views/admin_login_screen.dart';
 import '../../features/dashboard/views/admin_dashboard_overview_screen.dart';
 import '../../features/dashboard/views/admin_dashboard_screen.dart';
 import '../../features/dashboard/views/admin_placeholder_screen.dart';
+import '../../features/orders/views/admin_orders_screen.dart';
 import '../../features/products/views/admin_products_screen.dart';
 import 'admin_route_constants.dart';
 
@@ -44,9 +45,8 @@ final GoRouter adminRouter = GoRouter(
         GoRoute(
           path: AdminRoutePaths.orders,
           name: AdminRouteNames.orders,
-          pageBuilder: (context, state) => const NoTransitionPage(
-            child: AdminPlaceholderScreen(title: 'Orders Screen'),
-          ),
+          pageBuilder: (context, state) =>
+              const NoTransitionPage(child: AdminOrdersScreen()),
         ),
         GoRoute(
           path: AdminRoutePaths.customers,

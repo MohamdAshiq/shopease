@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shopease_core/shopease_core.dart';
 
 import '../../dashboard/constants/dashboard_constants.dart';
+import '../../dashboard/widgets/components/admin_table_pagination.dart';
 import '../../dashboard/widgets/components/dashboard_card.dart';
 import '../cubits/admin_products_cubit.dart';
 import '../cubits/admin_products_state.dart';
@@ -9,7 +10,6 @@ import 'product_form_dialog.dart';
 import 'table/product_table_row_builder.dart';
 import 'table/products_table_empty_state.dart';
 import 'table/products_table_header.dart';
-import 'table/products_table_pagination.dart';
 
 // Data Table for managing products
 class ProductsDataTable extends StatelessWidget {
@@ -70,7 +70,7 @@ class ProductsDataTable extends StatelessWidget {
 
               // Pagination Footer
               if (totalCount > 0 && state.status != AdminProductsStatus.loading)
-                ProductsTablePagination(
+                AdminTablePagination(
                   currentPage: state.currentPage,
                   totalPages: state.totalPages,
                   totalItems: totalCount,

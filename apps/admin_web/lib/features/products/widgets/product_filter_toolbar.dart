@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shopease_core/shopease_core.dart';
 
+import '../../dashboard/widgets/components/filter_dropdown_chip.dart';
 import '../cubits/admin_products_cubit.dart';
 import '../cubits/admin_products_state.dart';
-import 'filter_dropdown_chip.dart';
 import 'product_form_dialog.dart';
 
 // Filter and Search Toolbar for Products Catalog

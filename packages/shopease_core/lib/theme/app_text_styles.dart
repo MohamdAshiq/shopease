@@ -71,6 +71,12 @@ abstract final class AppTextStyles {
     height: 1.4,
   );
 
+  static TextStyle get badge => GoogleFonts.poppins(
+    fontSize: 10.5,
+    fontWeight: FontWeight.w700,
+    letterSpacing: 0.2,
+  );
+
   // E-commerce specific typography
   static TextStyle get priceLarge => GoogleFonts.poppins(
     fontSize: 20,

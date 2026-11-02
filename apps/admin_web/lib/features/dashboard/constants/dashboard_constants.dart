@@ -7,6 +7,7 @@ abstract final class DashboardConstants {
 
   // Pagination defaults
   static const int defaultProductsPerPage = 8;
+  static const int defaultOrdersPerPage = 8;
 
   // Chart canvas heights
   static const double trendChartHeight = 260.0;
@@ -16,6 +17,8 @@ abstract final class DashboardConstants {
   static const double productThumbnailSize = 44.0;
   static const double minTableWidth = 650.0;
   static const double productsTableMinWidth = 880.0;
+  static const double ordersTableMinWidth = 1080.0;
+  static const double orderDetailsDrawerWidth = 460.0;
   static const double statCardHeight = 130.0;
   static const double productFormDialogWidth = 580.0;
   static const double deleteDialogWidth = 390.0;

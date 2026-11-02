@@ -43,6 +43,21 @@ enum OrderStatus {
     }
   }
 
+  // Next fulfillment status in the lifecycle
+  OrderStatus? get nextStatus {
+    switch (this) {
+      case OrderStatus.pending:
+        return OrderStatus.processing;
+      case OrderStatus.processing:
+        return OrderStatus.shipped;
+      case OrderStatus.shipped:
+        return OrderStatus.delivered;
+      case OrderStatus.delivered:
+      case OrderStatus.cancelled:
+        return null;
+    }
+  }
+
   // Status Colors
   Color get statusColor {
     switch (this) {

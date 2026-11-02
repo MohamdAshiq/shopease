@@ -29,24 +29,26 @@ class ProductsTableHeader extends StatelessWidget {
             horizontal: horizontalPadding,
             vertical: verticalPadding,
           ),
-          child: isMobile
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildTitle(),
-                    if (hasFilters) ...[
-                      const SizedBox(height: AppSizes.xs),
-                      _buildResetButton(),
-                    ],
-                  ],
-                )
-              : Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _buildTitle(),
-                    if (hasFilters) _buildResetButton(),
-                  ],
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: _buildTitle(),
                 ),
+              ),
+              if (hasFilters) ...[
+                const SizedBox(width: AppSizes.sm),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerRight,
+                  child: _buildResetButton(),
+                ),
+              ],
+            ],
+          ),
         );
       },
     );
