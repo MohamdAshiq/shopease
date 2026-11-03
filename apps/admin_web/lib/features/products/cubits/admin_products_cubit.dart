@@ -1,27 +1,39 @@
+import 'dart:async';
+
 import 'package:shopease_core/shopease_core.dart';
 
 import 'admin_products_state.dart';
 
 class AdminProductsCubit extends Cubit<AdminProductsState> {
-  AdminProductsCubit() : super(const AdminProductsState());
+  AdminProductsCubit({ProductRepository? productRepository})
+    : _productRepository = productRepository ?? FirestoreProductRepository(),
+      super(const AdminProductsState());
 
-  void loadProducts() {
+  final ProductRepository _productRepository;
+  StreamSubscription<List<ProductModel>>? _productsSubscription;
+
+  Future<void> loadProducts() async {
     emit(state.copyWith(status: AdminProductsStatus.loading));
-    try {
-      emit(
-        state.copyWith(
-          status: AdminProductsStatus.loaded,
-          products: List<ProductModel>.from(mockProducts),
-        ),
-      );
-    } catch (e) {
-      emit(
-        state.copyWith(
-          status: AdminProductsStatus.error,
-          errorMessage: e.toString(),
-        ),
-      );
-    }
+    _productsSubscription?.cancel();
+
+    _productsSubscription = _productRepository.streamProducts().listen(
+      (products) {
+        emit(
+          state.copyWith(
+            status: AdminProductsStatus.loaded,
+            products: products,
+          ),
+        );
+      },
+      onError: (e) {
+        emit(
+          state.copyWith(
+            status: AdminProductsStatus.error,
+            errorMessage: e.toString(),
+          ),
+        );
+      },
+    );
   }
 
   void search(String query) {
@@ -45,36 +57,42 @@ class AdminProductsCubit extends Cubit<AdminProductsState> {
     emit(state.copyWith(currentPage: page));
   }
 
-  void addProduct(ProductModel product) {
-    final updatedList = [product, ...state.products];
-    emit(state.copyWith(products: updatedList, currentPage: 1));
+  Future<void> addProduct(ProductModel product) async {
+    try {
+      await _productRepository.addProduct(product);
+    } catch (e) {
+      emit(state.copyWith(errorMessage: e.toString()));
+    }
   }
 
-  void updateProduct(ProductModel product) {
-    final updatedList = state.products.map((p) {
-      return p.id == product.id ? product : p;
-    }).toList();
-    emit(state.copyWith(products: updatedList));
+  Future<void> updateProduct(ProductModel product) async {
+    try {
+      await _productRepository.updateProduct(product);
+    } catch (e) {
+      emit(state.copyWith(errorMessage: e.toString()));
+    }
   }
 
-  void deleteProduct(String id) {
-    final updatedList = state.products.where((p) => p.id != id).toList();
-    final newTotalPages = (updatedList.length / state.itemsPerPage)
-        .ceil()
-        .clamp(1, 999);
-    final validPage = state.currentPage > newTotalPages
-        ? newTotalPages
-        : state.currentPage;
-    emit(state.copyWith(products: updatedList, currentPage: validPage));
+  Future<void> deleteProduct(String id) async {
+    try {
+      await _productRepository.deleteProduct(id);
+    } catch (e) {
+      emit(state.copyWith(errorMessage: e.toString()));
+    }
   }
 
-  void toggleAvailability(String id) {
-    final updatedList = state.products.map((p) {
-      if (p.id == id) {
-        return p.copyWith(isAvailable: !p.isAvailable);
-      }
-      return p;
-    }).toList();
-    emit(state.copyWith(products: updatedList));
+  Future<void> toggleAvailability(String id) async {
+    try {
+      final product = state.products.firstWhere((p) => p.id == id);
+      await updateProduct(product.copyWith(isAvailable: !product.isAvailable));
+    } catch (e) {
+      emit(state.copyWith(errorMessage: e.toString()));
+    }
+  }
+
+  @override
+  Future<void> close() {
+    _productsSubscription?.cancel();
+    return super.close();
   }
 }

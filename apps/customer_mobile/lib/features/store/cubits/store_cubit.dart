@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:shopease_core/shopease_core.dart';
 
 // Sort options for the product catalog
@@ -20,6 +22,8 @@ class StoreState extends Equatable {
     this.searchQuery = '',
     this.selectedCategory = 'All',
     this.selectedSort = StoreSortOption.featured,
+    this.isLoading = false,
+    this.errorMessage,
   });
 
   final List<ProductModel> allProducts;
@@ -28,6 +32,8 @@ class StoreState extends Equatable {
   final String searchQuery;
   final String selectedCategory;
   final StoreSortOption selectedSort;
+  final bool isLoading;
+  final String? errorMessage;
 
   StoreState copyWith({
     List<ProductModel>? allProducts,
@@ -36,6 +42,8 @@ class StoreState extends Equatable {
     String? searchQuery,
     String? selectedCategory,
     StoreSortOption? selectedSort,
+    bool? isLoading,
+    String? errorMessage,
   }) {
     return StoreState(
       allProducts: allProducts ?? this.allProducts,
@@ -44,6 +52,8 @@ class StoreState extends Equatable {
       searchQuery: searchQuery ?? this.searchQuery,
       selectedCategory: selectedCategory ?? this.selectedCategory,
       selectedSort: selectedSort ?? this.selectedSort,
+      isLoading: isLoading ?? this.isLoading,
+      errorMessage: errorMessage ?? this.errorMessage,
     );
   }
 
@@ -55,26 +65,63 @@ class StoreState extends Equatable {
     searchQuery,
     selectedCategory,
     selectedSort,
+    isLoading,
+    errorMessage,
   ];
 }
 
 // Cubit managing filtering, searching and sorting
 class StoreCubit extends Cubit<StoreState> {
   StoreCubit({
+    ProductRepository? productRepository,
     List<ProductModel>? initialProducts,
     String initialCategory = 'All',
-  }) : super(
+  }) : _productRepository = productRepository ?? FirestoreProductRepository(),
+       super(
          _computeInitialState(
-           initialProducts ?? List.unmodifiable(mockProducts),
+           initialProducts ?? const [],
            initialCategory: initialCategory,
+           isLoading: initialProducts == null,
          ),
-       );
+       ) {
+    if (initialProducts == null) {
+      loadProducts();
+    }
+  }
+
+  final ProductRepository _productRepository;
+  StreamSubscription<List<ProductModel>>? _productsSubscription;
+
+  void loadProducts() {
+    emit(state.copyWith(isLoading: true));
+    _productsSubscription?.cancel();
+    _productsSubscription = _productRepository.streamProducts().listen(
+      (products) {
+        final allCategories = AppCategories.categoryNamesFromProducts(products);
+
+        emit(
+          _filter(
+            state.copyWith(
+              allProducts: products,
+              availableCategories: allCategories,
+              isLoading: false,
+              errorMessage: null,
+            ),
+          ),
+        );
+      },
+      onError: (err) {
+        emit(state.copyWith(isLoading: false, errorMessage: err.toString()));
+      },
+    );
+  }
 
   static StoreState _computeInitialState(
     List<ProductModel> products, {
     String initialCategory = 'All',
+    bool isLoading = false,
   }) {
-    final categories = AppCategories.names;
+    final categories = AppCategories.categoryNamesFromProducts(products);
 
     final effectiveCategory = categories.firstWhere(
       (c) => c.toLowerCase() == initialCategory.toLowerCase(),
@@ -88,6 +135,7 @@ class StoreCubit extends Cubit<StoreState> {
       searchQuery: '',
       selectedCategory: effectiveCategory,
       selectedSort: StoreSortOption.featured,
+      isLoading: isLoading,
     );
 
     return _filter(base);
@@ -123,6 +171,8 @@ class StoreCubit extends Cubit<StoreState> {
     final trimmedQuery = current.searchQuery.trim().toLowerCase();
 
     final matching = current.allProducts.where((product) {
+      if (!product.isAvailable) return false;
+
       final matchesCategory =
           current.selectedCategory == 'All' ||
           product.category.toLowerCase() ==
@@ -151,5 +201,11 @@ class StoreCubit extends Cubit<StoreState> {
     });
 
     return current.copyWith(filteredProducts: matching);
+  }
+
+  @override
+  Future<void> close() {
+    _productsSubscription?.cancel();
+    return super.close();
   }
 }

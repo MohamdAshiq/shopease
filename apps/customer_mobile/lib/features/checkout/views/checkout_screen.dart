@@ -4,6 +4,7 @@ import 'package:shopease_core/shopease_core.dart';
 
 import '../../../app/routing/route_constants.dart';
 import '../../../widgets/app_top_bar.dart';
+import '../../auth/cubits/auth_cubit.dart';
 import '../../cart/cubits/cart_cubit.dart';
 import '../../orders/cubits/order_cubit.dart';
 import '../../profile/cubits/profile_cubit.dart';
@@ -165,9 +166,13 @@ class _CheckoutView extends StatelessWidget {
                           child: AppButton(
                             isLoading: state.isSubmitting,
                             onPressed: () {
+                              final authUser =
+                                  context.read<AuthCubit>().currentUser ??
+                                  context.read<ProfileCubit>().state.user;
                               checkoutCubit.placeOrder(
                                 orderCubit: context.read<OrderCubit>(),
                                 cartCubit: context.read<CartCubit>(),
+                                customer: authUser,
                               );
                             },
                             label: 'Place Order',

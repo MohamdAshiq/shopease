@@ -61,7 +61,7 @@ class CartItemCard extends StatelessWidget {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(AppSizes.radiusSm),
                     child: AppNetworkImage(
-                      imageUrl: product.primaryImageUrl,
+                      imageUrl: product.imageUrl,
                       iconSize: AppSizes.iconMd,
                       indicatorSize: 18,
                     ),

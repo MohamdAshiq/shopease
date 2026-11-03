@@ -13,7 +13,7 @@ void main() {
       price: 1200.0,
       stock: 5,
       category: 'Clothing',
-      imageUrls: ['https://example.com/hoodie.jpg'],
+      imageUrl: 'https://example.com/hoodie.jpg',
     );
 
     const testProduct2 = ProductModel(
@@ -23,7 +23,7 @@ void main() {
       price: 400.0,
       stock: 10,
       category: 'Accessories',
-      imageUrls: ['https://example.com/bottle.jpg'],
+      imageUrl: 'https://example.com/bottle.jpg',
     );
 
     setUp(() {
@@ -162,5 +162,58 @@ void main() {
       expect(cubit.state.totalOriginalPrice, 1500.0);
       expect(cubit.state.totalSavings, 300.0);
     });
+
+    test(
+      'isolates carts between different users and merges guest items',
+      () async {
+        const userA = UserModel(
+          uid: 'user_a',
+          email: 'usera@example.com',
+          displayName: 'User A',
+        );
+        const userB = UserModel(
+          uid: 'user_b',
+          email: 'userb@example.com',
+          displayName: 'User B',
+        );
+
+        // Guest adds product 1
+        cubit.addToCart(testProduct1, selectedSize: 'M', quantity: 1);
+        expect(cubit.state.items.length, 1);
+
+        // User A logs in -> guest item merges into User A's cart
+        await cubit.setCustomer(userA);
+        expect(cubit.state.items.length, 1);
+        expect(cubit.state.items.first.product.id, 'prod_1');
+
+        // User A adds product 2
+        cubit.addToCart(testProduct2, quantity: 2);
+        expect(cubit.state.items.length, 2);
+
+        // User A logs out
+        await cubit.setCustomer(null);
+        // Guest cart was cleared upon merge, so guest sees 0 items
+        expect(cubit.state.items.isEmpty, isTrue);
+
+        // User B logs in -> User B has empty cart (never sees User A's items)
+        await cubit.setCustomer(userB);
+        expect(cubit.state.items.isEmpty, isTrue);
+
+        // User B adds product 2 with quantity 1
+        cubit.addToCart(testProduct2, quantity: 1);
+        expect(cubit.state.items.length, 1);
+        expect(cubit.state.items.first.quantity, 1);
+
+        // User A logs back in -> sees their own 2 items
+        await cubit.setCustomer(userA);
+        expect(cubit.state.items.length, 2);
+        expect(
+          cubit.state.items
+              .firstWhere((i) => i.product.id == 'prod_2')
+              .quantity,
+          2,
+        );
+      },
+    );
   });
 }

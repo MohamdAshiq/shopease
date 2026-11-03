@@ -1,243 +1,186 @@
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:customer_mobile/features/home/widgets/promo_card.dart';
 import 'package:flutter/material.dart';
 import 'package:shopease_core/shopease_core.dart';
 
-import '../cubits/promo_banner_cubit.dart';
-
-// Promo carousel banner
+// Promo Banner Carousel
 class PromoBannerSlider extends StatelessWidget {
-  const PromoBannerSlider({super.key});
+  const PromoBannerSlider({super.key, this.products, this.productRepository});
 
-  final List<_PromoBannerData> _banners = const [
-    _PromoBannerData(
-      title: 'SNEAKERS OF\nTHE WEEK',
-      subtitle: 'Nike Air Max Pulse',
-      imageUrl: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=80',
-      badgeText: '20% OFF',
-    ),
-    _PromoBannerData(
-      title: 'PURE NOISE\nCANCELLATION',
-      subtitle: 'Sony WH-1000XM5',
-      imageUrl: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&q=80',
-      badgeText: 'NEW',
-    ),
-    _PromoBannerData(
-      title: 'TACTILE RGB\nKEYBOARD',
-      subtitle: 'Ergonomic Mechanical',
-      imageUrl: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600&q=80',
-      badgeText: 'HOT',
-    ),
-  ];
+  final List<ProductModel>? products;
+  final ProductRepository? productRepository;
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => PromoBannerCubit(),
-      child: _PromoBannerSliderView(banners: _banners),
+    if (products != null) {
+      final available = products!.where((p) => p.isAvailable).toList();
+      if (available.isEmpty) return const SizedBox.shrink();
+
+      return Padding(
+        padding: const EdgeInsets.only(top: AppSizes.md, bottom: AppSizes.lg),
+        child: _PromoBannerSliderView(allProducts: available),
+      );
+    }
+
+    final repo = productRepository ?? FirestoreProductRepository();
+
+    return StreamBuilder<List<ProductModel>>(
+      stream: repo.streamProducts(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) return const SizedBox.shrink();
+
+        final allProducts = snapshot.data ?? const <ProductModel>[];
+        final available = allProducts.where((p) => p.isAvailable).toList();
+
+        if (available.isEmpty) {
+          return const SizedBox.shrink();
+        }
+
+        return Padding(
+          padding: const EdgeInsets.only(top: AppSizes.md, bottom: AppSizes.lg),
+          child: _PromoBannerSliderView(allProducts: available),
+        );
+      },
     );
   }
 }
 
 class _PromoBannerSliderView extends StatefulWidget {
-  const _PromoBannerSliderView({required this.banners});
+  const _PromoBannerSliderView({required this.allProducts});
 
-  final List<_PromoBannerData> banners;
+  final List<ProductModel> allProducts;
 
   @override
   State<_PromoBannerSliderView> createState() => _PromoBannerSliderViewState();
 }
 
 class _PromoBannerSliderViewState extends State<_PromoBannerSliderView> {
-  late final PageController _pageController;
-
-  @override
-  void initState() {
-    super.initState();
-    _pageController = PageController();
-  }
+  final CarouselSliderController _controller = CarouselSliderController();
+  final ValueNotifier<int> _currentPageNotifier = ValueNotifier<int>(0);
 
   @override
   void dispose() {
-    _pageController.dispose();
+    _currentPageNotifier.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final displayProducts = widget.allProducts.take(3).toList();
+    if (displayProducts.isEmpty) return const SizedBox.shrink();
+
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        SizedBox(
-          height: 190,
-          child: PageView.builder(
-            controller: _pageController,
-            itemCount: widget.banners.length,
-            onPageChanged: (index) {
-              context.read<PromoBannerCubit>().setPage(index);
-            },
-            itemBuilder: (context, index) {
-              final banner = widget.banners[index];
-
-              return Container(
-                margin: const EdgeInsets.symmetric(horizontal: AppSizes.xs),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFFF8F8FB), Color(0xFFE4E4EB)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(AppSizes.radiusLg),
-                  border: Border.all(
-                    color: const Color(0xFFD8D8E0),
-                    width: 1.0,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.04),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(AppSizes.radiusLg),
-                  child: Row(
-                    children: [
-                      // Left Column: Badge, Title, Subtitle
-                      Expanded(
-                        flex: 6,
-                        child: Padding(
-                          padding: const EdgeInsets.all(AppSizes.md),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: AppSizes.sm,
-                                  vertical: AppSizes.xs,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: AppColors.primary,
-                                  borderRadius: BorderRadius.circular(
-                                    AppSizes.radiusSm,
-                                  ),
-                                ),
-                                child: Text(
-                                  banner.badgeText,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w800,
-                                    letterSpacing: 0.5,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: AppSizes.sm),
-                              Text(
-                                banner.title,
-                                style: AppTextStyles.h2.copyWith(
-                                  height: 1.15,
-                                  fontWeight: FontWeight.w800,
-                                  color: AppColors.textPrimary,
-                                ),
-                              ),
-                              const SizedBox(height: AppSizes.xs),
-                              Text(
-                                banner.subtitle,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: AppTextStyles.bodySmall.copyWith(
-                                  color: AppColors.textSecondary,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-
-                      // Right Column: Dedicated Hero Product Image
-                      Expanded(
-                        flex: 5,
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(
-                            0,
-                            AppSizes.sm,
-                            AppSizes.md,
-                            AppSizes.sm,
-                          ),
-                          child: Center(
-                            child: Image.network(
-                              banner.imageUrl,
-                              fit: BoxFit.contain,
-                              loadingBuilder: (context, child, progress) {
-                                if (progress == null) return child;
-                                return const Center(
-                                  child: SizedBox(
-                                    width: 24,
-                                    height: 24,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
-                                  ),
-                                );
-                              },
-                              errorBuilder: (context, error, stackTrace) =>
-                                  const Icon(
-                                    Icons.shopping_bag_outlined,
-                                    size: 48,
-                                    color: AppColors.textHint,
-                                  ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+        CarouselSlider.builder(
+          carouselController: _controller,
+          itemCount: displayProducts.length,
+          options: CarouselOptions(
+            height: 185,
+            autoPlay: displayProducts.length > 1,
+            autoPlayInterval: const Duration(seconds: 3),
+            autoPlayAnimationDuration: const Duration(milliseconds: 600),
+            autoPlayCurve: Curves.easeInOutCubic,
+            viewportFraction: 1.0,
+            onPageChanged: (index, _) => _currentPageNotifier.value = index,
+          ),
+          itemBuilder: (context, index, _) {
+            final product = displayProducts[index];
+            final theme = _bannerThemes[index % _bannerThemes.length];
+            return PromoCard(product: product, theme: theme);
+          },
+        ),
+        if (displayProducts.length > 1) ...[
+          const SizedBox(height: AppSizes.sm),
+          ValueListenableBuilder<int>(
+            valueListenable: _currentPageNotifier,
+            builder: (context, activeIndex, _) {
+              return _PromoDots(
+                itemCount: displayProducts.length,
+                currentIndex: activeIndex % displayProducts.length,
+                onDotTapped: _controller.animateToPage,
               );
             },
           ),
-        ),
-        const SizedBox(height: AppSizes.sm + 2),
-
-        // Dots indicators
-        BlocBuilder<PromoBannerCubit, int>(
-          builder: (context, currentPage) {
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(
-                widget.banners.length,
-                (index) => AnimatedContainer(
-                  duration: const Duration(milliseconds: 250),
-                  margin: const EdgeInsets.symmetric(horizontal: 3),
-                  width: currentPage == index ? 24 : 7,
-                  height: 6,
-                  decoration: BoxDecoration(
-                    color: currentPage == index
-                        ? AppColors.primary
-                        : AppColors.border,
-                    borderRadius: BorderRadius.circular(AppSizes.radiusFull),
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
+        ],
       ],
     );
   }
 }
 
-class _PromoBannerData {
-  const _PromoBannerData({
-    required this.title,
-    required this.subtitle,
-    required this.imageUrl,
-    required this.badgeText,
+// Indicator Dots
+class _PromoDots extends StatelessWidget {
+  const _PromoDots({
+    required this.itemCount,
+    required this.currentIndex,
+    required this.onDotTapped,
   });
 
-  final String title;
-  final String subtitle;
-  final String imageUrl;
-  final String badgeText;
+  final int itemCount;
+  final int currentIndex;
+  final ValueChanged<int> onDotTapped;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(
+        itemCount,
+        (index) => GestureDetector(
+          onTap: () => onDotTapped(index),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 250),
+            margin: const EdgeInsets.symmetric(horizontal: 3),
+            width: currentIndex == index ? 24 : 7,
+            height: 6,
+            decoration: BoxDecoration(
+              color: currentIndex == index
+                  ? AppColors.primary
+                  : AppColors.border,
+              borderRadius: BorderRadius.circular(AppSizes.radiusFull),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
+
+class BannerTheme {
+  const BannerTheme({required this.gradient, required this.badgeColor});
+
+  final LinearGradient gradient;
+  final Color badgeColor;
+}
+
+const _bannerThemes = [
+  // First Card Theme
+  BannerTheme(
+    gradient: LinearGradient(
+      colors: [Color(0xFF301B52), Color(0xFF4E287C)],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    ),
+    badgeColor: Color(0xFFFF7A45),
+  ),
+
+  // Second Card Theme
+  BannerTheme(
+    gradient: LinearGradient(
+      colors: [Color(0xFF2D1B59), Color(0xFF4C2F8A)],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    ),
+    badgeColor: AppColors.primaryLight,
+  ),
+
+  // Third Card Theme
+  BannerTheme(
+    gradient: LinearGradient(
+      colors: [Color(0xFF351A52), Color(0xFF552877)],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    ),
+    badgeColor: Color(0xFFFB7185),
+  ),
+];

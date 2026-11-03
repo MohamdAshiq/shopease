@@ -10,8 +10,6 @@ class OrderHeaderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final statusColor = order.orderStatus.statusColor;
-
     return Container(
       padding: const EdgeInsets.all(AppSizes.md),
       decoration: BoxDecoration(
@@ -49,7 +47,7 @@ class OrderHeaderCard extends StatelessWidget {
                     const SizedBox(width: AppSizes.xs),
                     const Icon(
                       IconsaxPlusLinear.copy,
-                      size: 13,
+                      size: AppSizes.iconSm,
                       color: AppColors.textSecondary,
                     ),
                   ],
@@ -59,24 +57,7 @@ class OrderHeaderCard extends StatelessWidget {
           ),
 
           // Status Badge Pill
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSizes.sm,
-              vertical: AppSizes.xs,
-            ),
-            decoration: BoxDecoration(
-              color: statusColor.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(AppSizes.radiusFull),
-            ),
-            child: Text(
-              order.orderStatus.displayName.toUpperCase(),
-              style: AppTextStyles.labelSmall.copyWith(
-                color: statusColor,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0.4,
-              ),
-            ),
-          ),
+          OrderStatusBadge(status: order.orderStatus, isUppercase: true),
         ],
       ),
     );

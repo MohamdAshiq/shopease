@@ -13,7 +13,7 @@ void main() {
     price: 3999.0,
     stock: 15,
     category: 'Electronics',
-    imageUrls: ['https://example.com/headphones.jpg'],
+    imageUrl: 'https://example.com/headphones.jpg',
   );
 
   const testProduct2 = ProductModel(
@@ -24,7 +24,7 @@ void main() {
     stock: 0, // out of stock
     category: 'Fashion',
     sizes: ['M', 'L', 'XL'],
-    imageUrls: ['https://example.com/jacket.jpg'],
+    imageUrl: 'https://example.com/jacket.jpg',
   );
 
   group('WishlistCubit Unit Tests', () {
@@ -110,5 +110,55 @@ void main() {
       cubit.setFilter(WishlistFilter.all);
       expect(cubit.state.filteredItems.length, 2);
     });
+
+    test(
+      'isolates wishlist between users and merges guest items on login',
+      () async {
+        const userA = UserModel(
+          uid: 'user_a',
+          email: 'usera@example.com',
+          displayName: 'User A',
+        );
+        const userB = UserModel(
+          uid: 'user_b',
+          email: 'userb@example.com',
+          displayName: 'User B',
+        );
+
+        // Guest adds product 1
+        cubit.addToWishlist(testProduct1);
+        expect(cubit.state.itemCount, 1);
+
+        // User A logs in -> merges guest item into User A's wishlist
+        await cubit.setCustomer(userA);
+        expect(cubit.state.itemCount, 1);
+        expect(cubit.state.isFavorite(testProduct1.id), isTrue);
+
+        // User A adds product 2
+        cubit.addToWishlist(testProduct2);
+        expect(cubit.state.itemCount, 2);
+
+        // User A logs out
+        await cubit.setCustomer(null);
+        // Guest items were cleared on merge, so logged-out view has 0 items
+        expect(cubit.state.isEmpty, isTrue);
+
+        // User B logs in -> User B starts with empty wishlist (does not see User A's items)
+        await cubit.setCustomer(userB);
+        expect(cubit.state.isEmpty, isTrue);
+
+        // User B adds product 2
+        cubit.addToWishlist(testProduct2);
+        expect(cubit.state.itemCount, 1);
+        expect(cubit.state.isFavorite(testProduct1.id), isFalse);
+        expect(cubit.state.isFavorite(testProduct2.id), isTrue);
+
+        // User A logs back in -> sees both product 1 and product 2
+        await cubit.setCustomer(userA);
+        expect(cubit.state.itemCount, 2);
+        expect(cubit.state.isFavorite(testProduct1.id), isTrue);
+        expect(cubit.state.isFavorite(testProduct2.id), isTrue);
+      },
+    );
   });
 }

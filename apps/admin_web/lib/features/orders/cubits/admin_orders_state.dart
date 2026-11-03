@@ -85,6 +85,8 @@ class AdminOrdersState extends Equatable {
     this.currentPage = 1,
     this.itemsPerPage = DashboardConstants.defaultOrdersPerPage,
     this.selectedOrderId,
+    this.isLoading = false,
+    this.errorMessage,
   });
 
   final List<OrderModel> orders;
@@ -95,6 +97,8 @@ class AdminOrdersState extends Equatable {
   final int currentPage;
   final int itemsPerPage;
   final String? selectedOrderId;
+  final bool isLoading;
+  final String? errorMessage;
 
   // Selected order for side drawer
   OrderModel? get selectedOrder {
@@ -171,25 +175,23 @@ class AdminOrdersState extends Equatable {
     return result;
   }
 
-  // Paginated subset of filtered orders
+  // Total pages
+  int get totalPages {
+    final count = filteredOrders.length;
+    if (count == 0) return 1;
+    return (count / itemsPerPage).ceil();
+  }
+
+  // Orders for active page
   List<OrderModel> get paginatedOrders {
     final list = filteredOrders;
     final startIndex = (currentPage - 1) * itemsPerPage;
-    if (startIndex >= list.length) {
-      if (list.isEmpty) return const [];
-      // Clamp to page 1 if current page is out of bounds
-      return list.take(itemsPerPage).toList();
-    }
-    return list.skip(startIndex).take(itemsPerPage).toList();
+    if (startIndex >= list.length) return [];
+    final endIndex = (startIndex + itemsPerPage).clamp(0, list.length);
+    return list.sublist(startIndex, endIndex);
   }
 
-  int get totalPages {
-    final total = filteredOrders.length;
-    if (total == 0) return 1;
-    return (total / itemsPerPage).ceil();
-  }
-
-  // KPI Metrics
+  // Count metrics for toolbar and summary chips
   int get totalOrdersCount => orders.length;
 
   int get pendingCount =>
@@ -221,6 +223,8 @@ class AdminOrdersState extends Equatable {
     int? itemsPerPage,
     String? selectedOrderId,
     bool clearSelectedOrder = false,
+    bool? isLoading,
+    String? errorMessage,
   }) {
     return AdminOrdersState(
       orders: orders ?? this.orders,
@@ -233,6 +237,8 @@ class AdminOrdersState extends Equatable {
       selectedOrderId: clearSelectedOrder
           ? null
           : (selectedOrderId ?? this.selectedOrderId),
+      isLoading: isLoading ?? this.isLoading,
+      errorMessage: errorMessage ?? this.errorMessage,
     );
   }
 
@@ -246,5 +252,7 @@ class AdminOrdersState extends Equatable {
     currentPage,
     itemsPerPage,
     selectedOrderId,
+    isLoading,
+    errorMessage,
   ];
 }

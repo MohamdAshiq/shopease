@@ -6,7 +6,6 @@ import '../../constants/dashboard_constants.dart';
 import '../../cubits/dashboard_overview_cubit.dart';
 import '../../cubits/dashboard_overview_state.dart';
 import '../components/dashboard_card.dart';
-import '../components/order_status_badge.dart';
 
 // Recent orders table widget for dashboard overview
 class RecentOrdersTable extends StatelessWidget {
@@ -65,53 +64,58 @@ class RecentOrdersTable extends StatelessWidget {
               ),
               const SizedBox(height: AppSizes.lg),
 
-              // Scrollable Table
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  final tableWidth =
-                      constraints.maxWidth < DashboardConstants.minTableWidth
-                      ? DashboardConstants.minTableWidth
-                      : constraints.maxWidth;
-
-                  return SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: SizedBox(
-                      width: tableWidth,
-                      child: Table(
-                        columnWidths: const {
-                          0: FlexColumnWidth(2.0),
-                          1: FlexColumnWidth(3.4),
-                          2: FlexColumnWidth(1.6),
-                          3: FlexColumnWidth(1.8),
-                          4: FlexColumnWidth(2.6),
-                        },
-                        defaultVerticalAlignment:
-                            TableCellVerticalAlignment.middle,
-                        children: [
-                          // Table Header Row
-                          TableRow(
-                            decoration: const BoxDecoration(
-                              color: AppColors.scaffoldBackground,
-                              border: Border(
-                                bottom: BorderSide(
-                                  color: AppColors.divider,
-                                  width: 1.0,
-                                ),
-                              ),
-                            ),
-                            children: [
-                              _buildHeaderCell('ORDER ID'),
-                              _buildHeaderCell('CUSTOMER'),
-                              _buildHeaderCell('ITEMS'),
-                              _buildHeaderCell('TOTAL'),
-                              _buildHeaderCell('STATUS'),
-                            ],
+              // Empty State or Table
+              if (recentOrders.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: AppSizes.xxl),
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          IconsaxPlusLinear.shopping_bag,
+                          size: AppSizes.iconLg,
+                          color: AppColors.textSecondary,
+                        ),
+                        const SizedBox(height: AppSizes.md),
+                        Text(
+                          'No recent orders placed yet',
+                          style: AppTextStyles.bodyLarge.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textSecondary,
                           ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              else
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final tableWidth =
+                        constraints.maxWidth < DashboardConstants.minTableWidth
+                        ? DashboardConstants.minTableWidth
+                        : constraints.maxWidth;
 
-                          // Data Rows
-                          ...recentOrders.map((order) {
-                            return TableRow(
+                    return SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: SizedBox(
+                        width: tableWidth,
+                        child: Table(
+                          columnWidths: const {
+                            0: FlexColumnWidth(2.0),
+                            1: FlexColumnWidth(3.4),
+                            2: FlexColumnWidth(1.6),
+                            3: FlexColumnWidth(1.8),
+                            4: FlexColumnWidth(2.6),
+                          },
+                          defaultVerticalAlignment:
+                              TableCellVerticalAlignment.middle,
+                          children: [
+                            // Table Header Row
+                            TableRow(
                               decoration: const BoxDecoration(
+                                color: AppColors.scaffoldBackground,
                                 border: Border(
                                   bottom: BorderSide(
                                     color: AppColors.divider,
@@ -120,105 +124,126 @@ class RecentOrdersTable extends StatelessWidget {
                                 ),
                               ),
                               children: [
-                                // Order ID
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: AppSizes.md,
-                                    vertical: AppSizes.md,
-                                  ),
-                                  child: Text(
-                                    '#${order.id.split('-').last}',
-                                    style: AppTextStyles.bodyMedium.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.textPrimary,
+                                _buildHeaderCell('ORDER ID'),
+                                _buildHeaderCell('CUSTOMER'),
+                                _buildHeaderCell('ITEMS'),
+                                _buildHeaderCell('TOTAL'),
+                                _buildHeaderCell('STATUS'),
+                              ],
+                            ),
+
+                            // Data Rows
+                            ...recentOrders.map((order) {
+                              return TableRow(
+                                decoration: const BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(
+                                      color: AppColors.divider,
+                                      width: 1.0,
                                     ),
                                   ),
                                 ),
-
-                                // Customer Info
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: AppSizes.md,
-                                    vertical: AppSizes.md,
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        order.customerName,
-                                        style: AppTextStyles.bodyMedium
-                                            .copyWith(
-                                              fontWeight: FontWeight.w600,
-                                            ),
+                                children: [
+                                  // Order ID
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: AppSizes.md,
+                                      vertical: AppSizes.md,
+                                    ),
+                                    child: Text(
+                                      '#${order.id.split('-').last}',
+                                      style: AppTextStyles.bodyMedium.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.textPrimary,
                                       ),
-                                      Text(
-                                        order.customerEmail,
-                                        style: AppTextStyles.bodySmall.copyWith(
-                                          color: AppColors.textSecondary,
+                                    ),
+                                  ),
+
+                                  // Customer Info
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: AppSizes.md,
+                                      vertical: AppSizes.md,
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          order.customerName,
+                                          style: AppTextStyles.bodyMedium
+                                              .copyWith(
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                        ),
+                                        Text(
+                                          order.customerEmail,
+                                          style: AppTextStyles.bodySmall
+                                              .copyWith(
+                                                color: AppColors.textSecondary,
+                                              ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+
+                                  // Item Count
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: AppSizes.md,
+                                      vertical: AppSizes.md,
+                                    ),
+                                    child: Text(
+                                      '${order.totalItemCount} ${order.totalItemCount == 1 ? 'item' : 'items'}',
+                                      style: AppTextStyles.bodyMedium.copyWith(
+                                        color: AppColors.textSecondary,
+                                      ),
+                                    ),
+                                  ),
+
+                                  // Total Price
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: AppSizes.md,
+                                      vertical: AppSizes.md,
+                                    ),
+                                    child: Text(
+                                      order.total.inr,
+                                      style: AppTextStyles.bodyLarge.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.primary,
+                                      ),
+                                    ),
+                                  ),
+
+                                  // Status Badge
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: AppSizes.md,
+                                      vertical: AppSizes.md,
+                                    ),
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        alignment: Alignment.centerLeft,
+                                        child: OrderStatusBadge(
+                                          status: order.orderStatus,
+                                          compact: true,
                                         ),
                                       ),
-                                    ],
-                                  ),
-                                ),
-
-                                // Item Count
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: AppSizes.md,
-                                    vertical: AppSizes.md,
-                                  ),
-                                  child: Text(
-                                    '${order.totalItemCount} ${order.totalItemCount == 1 ? 'item' : 'items'}',
-                                    style: AppTextStyles.bodyMedium.copyWith(
-                                      color: AppColors.textSecondary,
                                     ),
                                   ),
-                                ),
-
-                                // Total Price
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: AppSizes.md,
-                                    vertical: AppSizes.md,
-                                  ),
-                                  child: Text(
-                                    order.total.inr,
-                                    style: AppTextStyles.bodyLarge.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.primary,
-                                    ),
-                                  ),
-                                ),
-
-                                // Status Badge
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: AppSizes.md,
-                                    vertical: AppSizes.md,
-                                  ),
-                                  child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: FittedBox(
-                                      fit: BoxFit.scaleDown,
-                                      alignment: Alignment.centerLeft,
-                                      child: OrderStatusBadge(
-                                        status: order.orderStatus,
-                                        compact: true,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            );
-                          }),
-                        ],
+                                ],
+                              );
+                            }),
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-                },
-              ),
+                    );
+                  },
+                ),
             ],
           ),
         );

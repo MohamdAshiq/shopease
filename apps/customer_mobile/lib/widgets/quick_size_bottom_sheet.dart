@@ -113,7 +113,7 @@ class _QuickSizeBottomSheetState extends State<QuickSizeBottomSheet> {
                       border: Border.all(color: AppColors.border, width: 0.8),
                     ),
                     child: AppNetworkImage(
-                      imageUrl: product.primaryImageUrl,
+                      imageUrl: product.imageUrl,
                       iconSize: AppSizes.iconSm,
                       indicatorSize: 14,
                     ),

@@ -296,7 +296,7 @@ class _ThumbnailSection extends StatelessWidget {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(AppSizes.radiusSm),
             child: AppNetworkImage(
-              imageUrl: product.primaryImageUrl,
+              imageUrl: product.imageUrl,
               iconSize: AppSizes.iconLg,
               indicatorSize: 20,
             ),

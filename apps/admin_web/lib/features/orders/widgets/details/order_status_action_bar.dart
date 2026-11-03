@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shopease_core/shopease_core.dart';
 
-import '../../../dashboard/widgets/components/order_status_badge.dart';
 import '../../cubits/admin_orders_cubit.dart';
 
 // Status banner and action controls for order details drawer

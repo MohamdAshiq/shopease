@@ -34,7 +34,7 @@ class AuthPromptSheet extends StatelessWidget {
     VoidCallback? onAuthenticated,
   }) async {
     HapticFeedback.lightImpact();
-    final result = await showModalBottomSheet<bool>(
+    final result = await showModalBottomSheet<dynamic>(
       context: context,
       isScrollControlled: true,
       useRootNavigator: true,
@@ -54,8 +54,20 @@ class AuthPromptSheet extends StatelessWidget {
       if (context.mounted) {
         onAuthenticated?.call();
       }
+      return true;
     }
-    return result;
+
+    if (result == 'login') {
+      if (context.mounted) {
+        context.pushNamed(
+          RouteNames.login,
+          queryParameters: {'redirect': redirectPath},
+        );
+      }
+      return false;
+    }
+
+    return false;
   }
 
   @override
@@ -65,7 +77,7 @@ class AuthPromptSheet extends StatelessWidget {
         if (state.isAuthenticated) {
           Navigator.of(context, rootNavigator: true).pop(true);
         } else if (state.hasError && state.errorMessage != null) {
-          AppSnackBar.showError(context, state.errorMessage!);
+          AppSnackBar.showAuthFeedback(context, state.errorMessage!);
         }
       },
       builder: (context, state) {
@@ -115,10 +127,7 @@ class AuthPromptSheet extends StatelessWidget {
                 // Title
                 Text(
                   title,
-                  style: AppTextStyles.h2.copyWith(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: AppTextStyles.h2.copyWith(fontWeight: FontWeight.w600),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: AppSizes.sm),
@@ -130,8 +139,6 @@ class AuthPromptSheet extends StatelessWidget {
                     subtitle,
                     style: AppTextStyles.bodyMedium.copyWith(
                       color: AppColors.textSecondary,
-                      fontSize: 12.5,
-                      height: 1.35,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -154,18 +161,11 @@ class AuthPromptSheet extends StatelessWidget {
                   borderRadius: AppSizes.radiusMd,
                   onPressed: state.isLoading
                       ? null
-                      : () async {
-                          Navigator.of(context, rootNavigator: true).pop(false);
-                          // Allow the bottom sheet dismissal transition to complete
-                          await Future.delayed(
-                            const Duration(milliseconds: 300),
-                          );
-                          if (context.mounted) {
-                            context.pushNamed(
-                              RouteNames.login,
-                              queryParameters: {'redirect': redirectPath},
-                            );
-                          }
+                      : () {
+                          Navigator.of(
+                            context,
+                            rootNavigator: true,
+                          ).pop('login');
                         },
                 ),
                 const SizedBox(height: AppSizes.sm),
@@ -183,7 +183,6 @@ class AuthPromptSheet extends StatelessWidget {
                     style: AppTextStyles.bodyMedium.copyWith(
                       color: AppColors.textSecondary,
                       fontWeight: FontWeight.w500,
-                      fontSize: 13,
                     ),
                   ),
                 ),

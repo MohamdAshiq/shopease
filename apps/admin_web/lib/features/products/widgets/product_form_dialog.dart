@@ -6,6 +6,7 @@ import '../cubits/admin_products_cubit.dart';
 import 'form/product_availability_tile.dart';
 import 'form/product_category_selector.dart';
 import 'form/product_image_preview_field.dart';
+import 'form/product_sizes_field.dart';
 
 // Modal dialog for adding or editing a product in the admin panel
 class ProductFormDialog extends StatefulWidget {
@@ -41,6 +42,7 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
   late final TextEditingController _titleController;
   late final TextEditingController _priceController;
   late final TextEditingController _stockController;
+  late final TextEditingController _sizesController;
   late final TextEditingController _imageUrlController;
   late final TextEditingController _descriptionController;
 
@@ -60,13 +62,16 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
     _stockController = TextEditingController(
       text: p != null ? p.stock.toString() : '20',
     );
-    _imageUrlController = TextEditingController(text: p?.primaryImageUrl ?? '');
+    _sizesController = TextEditingController(
+      text: p != null ? p.sizes.join(', ') : '',
+    );
+    _imageUrlController = TextEditingController(text: p?.imageUrl ?? '');
     _descriptionController = TextEditingController(text: p?.description ?? '');
 
     final availableCategories = AppCategories.names
         .where((name) => name != 'All')
         .toList();
-    if (p != null && availableCategories.contains(p.category)) {
+    if (p != null && p.category.isNotEmpty) {
       _selectedCategory = p.category;
     } else {
       _selectedCategory = availableCategories.first;
@@ -80,6 +85,7 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
     _titleController.dispose();
     _priceController.dispose();
     _stockController.dispose();
+    _sizesController.dispose();
     _imageUrlController.dispose();
     _descriptionController.dispose();
     super.dispose();
@@ -91,6 +97,7 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
     final parsedPrice = double.tryParse(_priceController.text.trim()) ?? 0.0;
     final parsedStock = int.tryParse(_stockController.text.trim()) ?? 0;
     final imgUrl = _imageUrlController.text.trim();
+    final parsedSizes = ProductModel.parseSizes(_sizesController.text);
 
     if (_isEditing) {
       final existing = widget.initialProduct!;
@@ -99,8 +106,9 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
         category: _selectedCategory,
         price: parsedPrice,
         stock: parsedStock,
+        sizes: parsedSizes,
         description: _descriptionController.text.trim(),
-        imageUrls: imgUrl.isNotEmpty ? [imgUrl] : existing.imageUrls,
+        imageUrl: imgUrl.isNotEmpty ? imgUrl : existing.imageUrl,
         isAvailable: _isAvailable,
         updatedAt: DateTime.now(),
       );
@@ -114,13 +122,14 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
       );
     } else {
       final newProduct = ProductModel(
-        id: 'PROD-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}',
+        id: '',
         title: _titleController.text.trim(),
         category: _selectedCategory,
         price: parsedPrice,
         stock: parsedStock,
+        sizes: parsedSizes,
         description: _descriptionController.text.trim(),
-        imageUrls: imgUrl.isNotEmpty ? [imgUrl] : const [],
+        imageUrl: imgUrl,
         isAvailable: _isAvailable,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
@@ -146,7 +155,7 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
       ),
       child: Container(
         width: DashboardConstants.productFormDialogWidth,
-        constraints: const BoxConstraints(maxHeight: 740),
+        constraints: const BoxConstraints(maxHeight: 780),
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(AppSizes.radiusLg),
@@ -186,9 +195,7 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                             child: ProductCategorySelector(
                               selectedCategory: _selectedCategory,
                               onChanged: (val) {
-                                if (val != null) {
-                                  setState(() => _selectedCategory = val);
-                                }
+                                setState(() => _selectedCategory = val);
                               },
                             ),
                           ),
@@ -200,6 +207,10 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
 
                       // Stock Quantity Field
                       _buildStockField(),
+                      const SizedBox(height: AppSizes.md),
+
+                      // Product Sizes Field with Live Chips
+                      ProductSizesField(controller: _sizesController),
                       const SizedBox(height: AppSizes.md),
 
                       // Image URL with Live Thumbnail Preview
@@ -266,8 +277,8 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                 const SizedBox(height: 2),
                 Text(
                   _isEditing
-                      ? 'Update catalog details, pricing, and stock status'
-                      : 'Create a new inventory item in your store catalog',
+                      ? 'Update catalog details (#${widget.initialProduct?.id})'
+                      : 'Add product to your active catalog',
                   style: AppTextStyles.bodySmall.copyWith(
                     color: AppColors.textSecondary,
                   ),
@@ -303,12 +314,7 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
           controller: _titleController,
           hintText: 'e.g. Wireless Noise Canceling Headphones',
           prefixIcon: IconsaxPlusLinear.tag,
-          validator: (value) {
-            if (value == null || value.trim().isEmpty) {
-              return 'Please enter a product title';
-            }
-            return null;
-          },
+          validator: (v) => AppValidators.validateRequired(v, 'product title'),
         ),
       ],
     );
@@ -330,16 +336,7 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
           hintText: 'e.g. 1999',
           prefixIcon: IconsaxPlusLinear.money_recive,
           keyboardType: TextInputType.number,
-          validator: (value) {
-            if (value == null || value.trim().isEmpty) {
-              return 'Please enter price';
-            }
-            final numVal = double.tryParse(value.trim());
-            if (numVal == null || numVal <= 0) {
-              return 'Enter valid price > 0';
-            }
-            return null;
-          },
+          validator: AppValidators.validatePrice,
         ),
       ],
     );
@@ -361,16 +358,7 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
           hintText: 'e.g. 50 (units in inventory)',
           prefixIcon: IconsaxPlusLinear.box,
           keyboardType: TextInputType.number,
-          validator: (value) {
-            if (value == null || value.trim().isEmpty) {
-              return 'Please enter stock quantity';
-            }
-            final intVal = int.tryParse(value.trim());
-            if (intVal == null || intVal < 0) {
-              return 'Enter integer >= 0';
-            }
-            return null;
-          },
+          validator: AppValidators.validateStock,
         ),
       ],
     );
@@ -381,7 +369,7 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Description',
+          'Description *',
           style: AppTextStyles.labelMedium.copyWith(
             fontWeight: FontWeight.w600,
           ),
@@ -392,6 +380,8 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
           hintText: 'Brief summary of item highlights, materials, features...',
           maxLines: 3,
           prefixIcon: IconsaxPlusLinear.document_text,
+          validator: (v) =>
+              AppValidators.validateMinLength(v, 10, 'product description'),
         ),
       ],
     );

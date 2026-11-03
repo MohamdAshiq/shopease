@@ -2,6 +2,25 @@ import 'package:customer_mobile/features/search/cubits/search_cubit.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shopease_core/shopease_core.dart';
 
+final List<ProductModel> _testProducts = [
+  const ProductModel(
+    id: 'test_1',
+    title: 'Sony Wireless Headphones',
+    description: 'Noise canceling headphones',
+    price: 299.99,
+    stock: 10,
+    category: 'Electronics',
+  ),
+  const ProductModel(
+    id: 'test_2',
+    title: 'Nike Running Shoes',
+    description: 'Cushioned running sneakers',
+    price: 129.99,
+    stock: 5,
+    category: 'Footwear',
+  ),
+];
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -12,7 +31,7 @@ void main() {
       SharedPreferences.setMockInitialValues({
         'shopease_recent_searches': <String>[],
       });
-      cubit = SearchCubit();
+      cubit = SearchCubit(initialProducts: _testProducts);
     });
 
     tearDown(() {

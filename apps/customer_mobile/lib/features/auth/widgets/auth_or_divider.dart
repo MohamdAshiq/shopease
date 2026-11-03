@@ -18,7 +18,6 @@ class AuthOrDivider extends StatelessWidget {
             text,
             style: AppTextStyles.labelSmall.copyWith(
               color: AppColors.textHint,
-              fontSize: 12.5,
               fontWeight: FontWeight.w500,
             ),
           ),

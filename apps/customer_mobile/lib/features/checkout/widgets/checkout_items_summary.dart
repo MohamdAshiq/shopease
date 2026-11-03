@@ -67,9 +67,7 @@ class _CheckoutItemsSummaryState extends State<CheckoutItemsSummary> {
                       child: SizedBox(
                         width: 50,
                         height: 50,
-                        child: AppNetworkImage(
-                          imageUrl: item.product.primaryImageUrl,
-                        ),
+                        child: AppNetworkImage(imageUrl: item.product.imageUrl),
                       ),
                     ),
                     const SizedBox(width: AppSizes.sm + 4),

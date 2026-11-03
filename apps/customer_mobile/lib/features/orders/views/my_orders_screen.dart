@@ -10,15 +10,8 @@ import '../widgets/order_empty_state.dart';
 import '../widgets/order_filter_chips.dart';
 
 // Customer Order History Screen
-class MyOrdersScreen extends StatefulWidget {
+class MyOrdersScreen extends StatelessWidget {
   const MyOrdersScreen({super.key});
-
-  @override
-  State<MyOrdersScreen> createState() => _MyOrdersScreenState();
-}
-
-class _MyOrdersScreenState extends State<MyOrdersScreen> {
-  OrderFilterType _selectedFilter = OrderFilterType.all;
 
   @override
   Widget build(BuildContext context) {
@@ -37,9 +30,8 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
         body: BlocBuilder<OrderCubit, OrderState>(
           builder: (context, state) {
             final allOrders = state.orders;
-            final filteredOrders = allOrders
-                .where(_selectedFilter.matches)
-                .toList();
+            final filteredOrders = state.filteredOrders;
+            final cubit = context.read<OrderCubit>();
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -47,23 +39,25 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                 // Filter Chips
                 Container(
                   color: AppColors.background,
-                  padding: const EdgeInsets.symmetric(
-                    vertical: AppSizes.xs + 2,
-                  ),
+                  padding: const EdgeInsets.symmetric(vertical: AppSizes.sm),
                   child: OrderFilterChips(
-                    selectedFilter: _selectedFilter,
-                    onSelected: (filter) {
-                      setState(() => _selectedFilter = filter);
-                    },
+                    selectedFilter: state.selectedFilter,
+                    onSelected: cubit.setFilter,
                     allOrders: allOrders,
                   ),
                 ),
                 const Divider(height: 1, color: AppColors.divider),
 
-                // Orders List or Empty State
+                // Orders List, Loading, or Empty State
                 Expanded(
-                  child: filteredOrders.isEmpty
-                      ? OrderEmptyState(filter: _selectedFilter)
+                  child: state.isLoading && allOrders.isEmpty
+                      ? const Center(
+                          child: CircularProgressIndicator(
+                            color: AppColors.primary,
+                          ),
+                        )
+                      : filteredOrders.isEmpty
+                      ? OrderEmptyState(filter: state.selectedFilter)
                       : ListView.separated(
                           padding: const EdgeInsets.all(AppSizes.screenPadding),
                           itemCount: filteredOrders.length,

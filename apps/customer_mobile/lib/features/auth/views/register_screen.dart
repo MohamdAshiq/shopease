@@ -47,13 +47,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
     final redirectPath = widget.redirect;
     if (redirectPath != null && redirectPath.isNotEmpty) {
-      if (Navigator.of(context).canPop()) {
-        context.pushReplacement(redirectPath);
-      } else {
-        context.go(redirectPath);
-      }
-    } else if (Navigator.of(context).canPop()) {
-      Navigator.of(context).pop();
+      context.go(redirectPath);
     } else {
       context.go(RoutePaths.home);
     }
@@ -98,7 +92,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
         if (state.hasError && state.errorMessage != null) {
-          AppSnackBar.showError(context, state.errorMessage!);
+          AppSnackBar.showAuthFeedback(context, state.errorMessage!);
         }
       },
       builder: (context, state) {
@@ -116,7 +110,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ? AppBar(
                     backgroundColor: Colors.transparent,
                     elevation: 0,
-                    toolbarHeight: 44.0,
+                    toolbarHeight: AppSizes.appBarHeight,
                     leading: IconButton(
                       icon: const Icon(
                         Icons.close_rounded,
@@ -151,8 +145,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         const SizedBox(height: AppSizes.sm),
                         Text(
                           _subtitle,
-                          style: AppTextStyles.bodyLarge.copyWith(
-                            fontSize: 13,
+                          style: AppTextStyles.bodyMedium.copyWith(
                             color: AppColors.textSecondary,
                           ),
                           textAlign: TextAlign.center,
@@ -252,7 +245,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   text: TextSpan(
                                     style: AppTextStyles.bodyMedium.copyWith(
                                       color: AppColors.textSecondary,
-                                      fontSize: 13,
                                     ),
                                     children: [
                                       const TextSpan(text: 'I agree to the '),
@@ -262,7 +254,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                             .copyWith(
                                               fontWeight: FontWeight.w600,
                                               color: AppColors.primary,
-                                              fontSize: 13,
                                             ),
                                       ),
                                     ],
@@ -280,7 +271,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           isFullWidth: true,
                           height: AppSizes.inputHeight,
                           borderRadius: AppSizes.radiusMd,
-                          isLoading: state.isLoading,
+                          isLoading: state.isEmailLoading,
                           onPressed: state.isLoading ? null : _submitRegister,
                         ),
                         const SizedBox(height: AppSizes.lg),

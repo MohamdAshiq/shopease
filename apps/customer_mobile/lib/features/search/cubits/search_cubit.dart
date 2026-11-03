@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:shopease_core/shopease_core.dart';
 
 import 'search_state.dart';
@@ -6,23 +8,44 @@ import 'search_state.dart';
 class SearchCubit extends Cubit<SearchState> {
   SearchCubit({
     SearchHistoryService? historyService,
+    ProductRepository? productRepository,
     List<ProductModel>? initialProducts,
     String initialQuery = '',
   }) : _historyService = historyService ?? SearchHistoryService(),
+       _productRepository = productRepository ?? FirestoreProductRepository(),
        super(
          SearchState(
-           allProducts: initialProducts ?? List.unmodifiable(mockProducts),
+           allProducts: initialProducts ?? const [],
            searchResults: const [],
            searchQuery: initialQuery,
          ),
        ) {
     _loadRecentSearches();
-    if (initialQuery.isNotEmpty) {
-      updateQuery(initialQuery);
+    if (initialProducts != null && initialProducts.isNotEmpty) {
+      if (initialQuery.isNotEmpty) {
+        updateQuery(initialQuery);
+      }
+    } else {
+      _subscribeToProducts();
     }
   }
 
   final SearchHistoryService _historyService;
+  final ProductRepository _productRepository;
+  StreamSubscription<List<ProductModel>>? _productsSubscription;
+
+  void _subscribeToProducts() {
+    _productsSubscription = _productRepository.streamProducts().listen((
+      products,
+    ) {
+      if (!isClosed) {
+        emit(state.copyWith(allProducts: products));
+        if (state.searchQuery.isNotEmpty) {
+          updateQuery(state.searchQuery);
+        }
+      }
+    });
+  }
 
   // Load recent searches
   Future<void> _loadRecentSearches() async {
@@ -80,5 +103,11 @@ class SearchCubit extends Cubit<SearchState> {
     if (!isClosed) {
       emit(state.copyWith(recentSearches: const []));
     }
+  }
+
+  @override
+  Future<void> close() {
+    _productsSubscription?.cancel();
+    return super.close();
   }
 }

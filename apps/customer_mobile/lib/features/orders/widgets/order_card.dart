@@ -13,7 +13,6 @@ class OrderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final status = order.orderStatus;
-    final statusColor = status.statusColor;
 
     // Preview items (up to 2 pictures, 3rd card shows remaining count)
     final previewItems = order.items.take(2).toList();
@@ -24,11 +23,11 @@ class OrderCard extends StatelessWidget {
         color: AppColors.background,
         borderRadius: BorderRadius.circular(AppSizes.radiusMd),
         border: Border.all(color: AppColors.divider.withValues(alpha: 0.6)),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
+            color: AppColors.shadow,
             blurRadius: 8,
-            offset: const Offset(0, 2),
+            offset: Offset(0, 2),
           ),
         ],
       ),
@@ -77,40 +76,7 @@ class OrderCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: AppSizes.sm),
-                    // Status badge
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSizes.sm + 2,
-                        vertical: AppSizes.xs,
-                      ),
-                      decoration: BoxDecoration(
-                        color: statusColor.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(
-                          AppSizes.radiusFull,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: AppSizes.sm - 2,
-                            height: AppSizes.sm - 2,
-                            decoration: BoxDecoration(
-                              color: statusColor,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          const SizedBox(width: AppSizes.xs + 2),
-                          Text(
-                            status.displayName,
-                            style: AppTextStyles.labelSmall.copyWith(
-                              color: statusColor,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    OrderStatusBadge(status: status, showDot: true),
                   ],
                 ),
               ),
@@ -126,8 +92,8 @@ class OrderCard extends StatelessWidget {
                       children: [
                         for (int i = 0; i < previewItems.length; i++) ...[
                           Container(
-                            width: AppSizes.inputHeight,
-                            height: AppSizes.inputHeight,
+                            width: AppSizes.itemThumbnailSize,
+                            height: AppSizes.itemThumbnailSize,
                             decoration: BoxDecoration(
                               color: AppColors.surface,
                               borderRadius: BorderRadius.circular(
@@ -147,8 +113,8 @@ class OrderCard extends StatelessWidget {
                         if (remainingCount > 0) ...[
                           const SizedBox(width: AppSizes.xs + 2),
                           Container(
-                            width: AppSizes.inputHeight,
-                            height: AppSizes.inputHeight,
+                            width: AppSizes.itemThumbnailSize,
+                            height: AppSizes.itemThumbnailSize,
                             decoration: BoxDecoration(
                               color: AppColors.surface,
                               borderRadius: BorderRadius.circular(

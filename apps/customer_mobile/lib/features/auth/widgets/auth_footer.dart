@@ -41,7 +41,6 @@ class AuthFooter extends StatelessWidget {
               promptText,
               style: AppTextStyles.bodyMedium.copyWith(
                 color: AppColors.textSecondary,
-                fontSize: 13,
               ),
             ),
             GestureDetector(
@@ -54,7 +53,6 @@ class AuthFooter extends StatelessWidget {
                 actionText,
                 style: AppTextStyles.bodyMedium.copyWith(
                   fontWeight: FontWeight.w600,
-                  fontSize: 13,
                   color: AppColors.primary,
                 ),
               ),

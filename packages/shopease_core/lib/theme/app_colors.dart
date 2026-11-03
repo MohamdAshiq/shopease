@@ -45,6 +45,7 @@ abstract final class AppColors {
   // Misc visual effects
   static const Color shadow = Color(0x1A000000);
   static const Color overlay = Color(0x80000000);
-  static const Color shimmerBase = Color(0xFFE0E0E0);
-  static const Color shimmerHighlight = Color(0xFFF5F5F5);
+  static const Color shimmerBase = Color(0xFFE2E8F0);
+  static const Color shimmerHighlight = Color(0xFFF8FAFC);
+  static const Color shimmerContainer = Color(0xFFF1F5F9);
 }

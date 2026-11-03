@@ -85,14 +85,13 @@ class CheckoutBillCard extends StatelessWidget {
                   ? Row(
                       children: [
                         Text(
-                          '₹49.00',
-                          style: AppTextStyles.bodySmall.copyWith(
-                            fontSize: 11,
+                          CartState.standardDeliveryFee.inr,
+                          style: AppTextStyles.labelSmall.copyWith(
                             color: AppColors.textSecondary,
                             decoration: TextDecoration.lineThrough,
                           ),
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: AppSizes.xs),
                         Text(
                           'FREE',
                           style: AppTextStyles.labelMedium.copyWith(

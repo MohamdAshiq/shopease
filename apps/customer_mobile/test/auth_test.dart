@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:customer_mobile/features/auth/cubits/auth_cubit.dart';
 import 'package:customer_mobile/features/auth/cubits/auth_state.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -10,7 +12,7 @@ void main() {
     late AuthCubit authCubit;
 
     setUp(() {
-      authCubit = AuthCubit();
+      authCubit = AuthCubit(authRepository: _FakeAuthRepository());
     });
 
     tearDown(() {
@@ -70,29 +72,6 @@ void main() {
       },
     );
 
-    test(
-      'signIn with mock customer email returns mockCustomer entity',
-      () async {
-        final success = await authCubit.signIn(
-          email: mockCustomer.email,
-          password: 'securePassword123',
-        );
-
-        expect(success, isTrue);
-        expect(authCubit.state.isAuthenticated, isTrue);
-        expect(authCubit.state.user?.uid, mockCustomer.uid);
-        expect(authCubit.state.user?.displayName, mockCustomer.displayName);
-      },
-    );
-
-    test('signInWithMock immediately authenticates mock customer', () async {
-      await authCubit.signInWithMock();
-
-      expect(authCubit.state.isAuthenticated, isTrue);
-      expect(authCubit.state.user?.uid, mockCustomer.uid);
-      expect(authCubit.state.user?.displayName, mockCustomer.displayName);
-    });
-
     test('signInWithGoogle authenticates user with Google account', () async {
       final success = await authCubit.signInWithGoogle();
 
@@ -143,7 +122,10 @@ void main() {
     });
 
     test('signOut resets authenticated user back to guest mode', () async {
-      await authCubit.signInWithMock();
+      await authCubit.signIn(
+        email: 'test@example.com',
+        password: 'password123',
+      );
       expect(authCubit.state.isAuthenticated, isTrue);
 
       await authCubit.signOut();
@@ -163,7 +145,10 @@ void main() {
     });
 
     test('updateUser modifies active user details', () async {
-      await authCubit.signInWithMock();
+      await authCubit.signIn(
+        email: 'test@example.com',
+        password: 'password123',
+      );
       final updated = authCubit.state.user!.copyWith(
         displayName: 'Alex Updated',
       );
@@ -181,4 +166,76 @@ void main() {
       expect(authCubit.state.errorMessage, isNull);
     });
   });
+}
+
+class _FakeAuthRepository implements AuthRepository {
+  UserModel? _user;
+  final _controller = StreamController<UserModel?>.broadcast();
+
+  @override
+  Stream<UserModel?> authStateChanges() => _controller.stream;
+
+  @override
+  UserModel? get currentUser => _user;
+
+  @override
+  Future<UserModel> signInWithEmail({
+    required String email,
+    required String password,
+  }) async {
+    final user = UserModel(
+      uid: 'test_uid',
+      email: email,
+      displayName: email.split('@').first.replaceAll('.', ' ').capitalizeWords,
+    );
+    _user = user;
+    _controller.add(user);
+    return user;
+  }
+
+  @override
+  Future<UserModel> registerWithEmail({
+    required String name,
+    required String email,
+    required String password,
+    String phone = '',
+  }) async {
+    final user = UserModel(
+      uid: 'test_reg_uid',
+      email: email,
+      displayName: name,
+      phone: phone,
+    );
+    _user = user;
+    _controller.add(user);
+    return user;
+  }
+
+  @override
+  Future<UserModel> signInWithGoogle() async {
+    final user = const UserModel(
+      uid: 'usr_google_123',
+      email: 'alex.google@example.com',
+      displayName: 'Alex Morgan',
+    );
+    _user = user;
+    _controller.add(user);
+    return user;
+  }
+
+  @override
+  Future<void> sendPasswordResetEmail(String email) async {}
+
+  @override
+  Future<void> signOut() async {
+    _user = null;
+    _controller.add(null);
+  }
+
+  @override
+  Future<UserModel> updateUserProfile(UserModel user) async {
+    _user = user;
+    _controller.add(user);
+    return user;
+  }
 }

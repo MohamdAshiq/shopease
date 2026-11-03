@@ -9,7 +9,7 @@ class ProductModel extends Equatable {
     required this.price,
     required this.stock,
     required this.category,
-    this.imageUrls = const [],
+    this.imageUrl = '',
     this.sizes = const [],
     this.isAvailable = true,
     this.createdAt,
@@ -22,7 +22,7 @@ class ProductModel extends Equatable {
   final double price;
   final int stock;
   final String category;
-  final List<String> imageUrls;
+  final String imageUrl;
   final List<String> sizes;
   final bool isAvailable;
   final DateTime? createdAt;
@@ -31,8 +31,14 @@ class ProductModel extends Equatable {
   // Stock availability check
   bool get isInStock => isAvailable && stock > 0;
 
-  // Main thumbnail image
-  String get primaryImageUrl => imageUrls.isNotEmpty ? imageUrls.first : '';
+  // Parses comma-separated size text into trimmed non-empty tokens
+  static List<String> parseSizes(String text) {
+    return text
+        .split(',')
+        .map((s) => s.trim())
+        .where((s) => s.isNotEmpty)
+        .toList();
+  }
 
   // Original price before discount (mocked at 25% markup)
   double get originalPrice => price * 1.25;
@@ -49,7 +55,7 @@ class ProductModel extends Equatable {
     double? price,
     int? stock,
     String? category,
-    List<String>? imageUrls,
+    String? imageUrl,
     List<String>? sizes,
     bool? isAvailable,
     DateTime? createdAt,
@@ -62,7 +68,7 @@ class ProductModel extends Equatable {
       price: price ?? this.price,
       stock: stock ?? this.stock,
       category: category ?? this.category,
-      imageUrls: imageUrls ?? this.imageUrls,
+      imageUrl: imageUrl ?? this.imageUrl,
       sizes: sizes ?? this.sizes,
       isAvailable: isAvailable ?? this.isAvailable,
       createdAt: createdAt ?? this.createdAt,
@@ -78,7 +84,7 @@ class ProductModel extends Equatable {
       'price': price,
       'stock': stock,
       'category': category,
-      'imageUrls': imageUrls,
+      'imageUrl': imageUrl,
       'sizes': sizes,
       'isAvailable': isAvailable,
       'createdAt': createdAt?.toIso8601String(),
@@ -106,11 +112,7 @@ class ProductModel extends Equatable {
       price: (map['price'] as num?)?.toDouble() ?? 0.0,
       stock: (map['stock'] as num?)?.toInt() ?? 0,
       category: map['category'] as String? ?? 'General',
-      imageUrls:
-          (map['imageUrls'] as List<dynamic>?)
-              ?.map((e) => e.toString())
-              .toList() ??
-          const [],
+      imageUrl: map['imageUrl'] as String? ?? '',
       sizes:
           (map['sizes'] as List<dynamic>?)?.map((e) => e.toString()).toList() ??
           const [],
@@ -128,98 +130,10 @@ class ProductModel extends Equatable {
     price,
     stock,
     category,
-    imageUrls,
+    imageUrl,
     sizes,
     isAvailable,
     createdAt,
     updatedAt,
   ];
 }
-
-// Mock Products List
-final List<ProductModel> mockProducts = [
-  ProductModel(
-    id: 'prod_001',
-    title: 'Sony WH-1000XM5 Wireless Headphones',
-    description: 'Industry-leading noise canceling with two processors and 8 microphones. Up to 30-hour battery life with quick charging.',
-    price: 349.99,
-    stock: 25,
-    category: 'Electronics',
-    imageUrls: const [
-      'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80',
-    ],
-    sizes: const [],
-    isAvailable: true,
-    createdAt: DateTime(2026, 1, 15),
-  ),
-  ProductModel(
-    id: 'prod_002',
-    title: 'Nike Air Max Pulse Sneakers',
-    description: 'Point-loaded cushioning with vacuum-sealed plastic accent for responsive bounce. Breathable textile upper with leather overlays.',
-    price: 149.99,
-    stock: 18,
-    category: 'Footwear',
-    imageUrls: const [
-      'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=80',
-    ],
-    sizes: const ['7', '8', '9', '10', '11'],
-    isAvailable: true,
-    createdAt: DateTime(2026, 1, 20),
-  ),
-  ProductModel(
-    id: 'prod_003',
-    title: 'Minimalist Chronograph Leather Watch',
-    description: 'Sleek matte stainless steel case with genuine Italian leather strap. Water-resistant up to 50 meters with sapphire crystal glass.',
-    price: 189.50,
-    stock: 12,
-    category: 'Accessories',
-    imageUrls: const [
-      'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80',
-    ],
-    sizes: const [],
-    isAvailable: true,
-    createdAt: DateTime(2026, 2, 5),
-  ),
-  ProductModel(
-    id: 'prod_004',
-    title: 'Ergonomic Mechanical Keyboard',
-    description: 'Hot-swappable tactile mechanical switches with per-key RGB backlighting and aircraft-grade aluminum frame.',
-    price: 129.00,
-    stock: 30,
-    category: 'Electronics',
-    imageUrls: const [
-      'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=800&q=80',
-    ],
-    sizes: const [],
-    isAvailable: true,
-    createdAt: DateTime(2026, 2, 10),
-  ),
-  ProductModel(
-    id: 'prod_005',
-    title: 'Heritage Canvas Travel Backpack',
-    description: 'Durable water-resistant waxed canvas with padded laptop compartment (up to 16 inch) and quick-access magnetic closures.',
-    price: 89.95,
-    stock: 15,
-    category: 'Accessories',
-    imageUrls: const [
-      'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&q=80',
-    ],
-    sizes: const [],
-    isAvailable: true,
-    createdAt: DateTime(2026, 2, 15),
-  ),
-  ProductModel(
-    id: 'prod_006',
-    title: 'Smart Fitness Tracker Band',
-    description: 'Continuous heart-rate monitoring with SpO2 sensor, sleep analytics, and 14-day battery life with 5ATM water resistance.',
-    price: 59.99,
-    stock: 0,
-    category: 'Electronics',
-    imageUrls: const [
-      'https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=800&q=80',
-    ],
-    sizes: const [],
-    isAvailable: false,
-    createdAt: DateTime(2026, 2, 18),
-  ),
-];

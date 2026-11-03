@@ -86,7 +86,7 @@ abstract final class ProductTableRowBuilder {
                 ),
                 clipBehavior: Clip.antiAlias,
                 child: AppNetworkImage(
-                  imageUrl: product.primaryImageUrl,
+                  imageUrl: product.imageUrl,
                   fit: BoxFit.cover,
                   iconSize: AppSizes.iconSm,
                 ),
@@ -107,7 +107,9 @@ abstract final class ProductTableRowBuilder {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '#${product.id}',
+                      product.sizes.isNotEmpty
+                          ? '#${product.id} • Sizes: ${product.sizes.join(", ")}'
+                          : '#${product.id}',
                       style: AppTextStyles.bodySmall.copyWith(
                         color: AppColors.textSecondary,
                         fontSize: 10.0,

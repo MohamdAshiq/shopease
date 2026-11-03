@@ -108,12 +108,14 @@ class OrderDetailScreen extends StatelessWidget {
                         HapticFeedback.lightImpact();
                         CancelOrderDialog.show(
                           context,
-                          onConfirmCancel: () {
-                            orderCubit.cancelOrder(orderId);
-                            AppSnackBar.show(
-                              context,
-                              message: 'Order #$orderId has been cancelled',
-                            );
+                          onConfirmCancel: () async {
+                            await orderCubit.cancelOrder(orderId);
+                            if (context.mounted) {
+                              AppSnackBar.show(
+                                context,
+                                message: 'Order #$orderId has been cancelled',
+                              );
+                            }
                           },
                         );
                       },

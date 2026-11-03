@@ -43,8 +43,50 @@ class CustomersDataTable extends StatelessWidget {
 
               const Divider(height: 1, thickness: 1, color: AppColors.divider),
 
-              // Table Body (Empty or Data Rows)
-              if (paginated.isEmpty)
+              // Table Body (Loading, Error, Empty, or Data Rows)
+              if (state.isLoading && state.customers.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.all(AppSizes.xxl),
+                  child: Center(child: CircularProgressIndicator()),
+                )
+              else if (state.errorMessage != null && state.customers.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.all(AppSizes.xxl),
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          IconsaxPlusLinear.warning_2,
+                          size: AppSizes.iconLg,
+                          color: AppColors.error,
+                        ),
+                        const SizedBox(height: AppSizes.md),
+                        Text(
+                          'Failed to load customers',
+                          style: AppTextStyles.h3.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: AppSizes.xs),
+                        Text(
+                          state.errorMessage!,
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: AppSizes.lg),
+                        AppButton.compact(
+                          onPressed: cubit.loadCustomers,
+                          label: 'Retry',
+                          icon: IconsaxPlusLinear.refresh,
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              else if (paginated.isEmpty)
                 CustomerTableEmptyState(
                   isStoreEmpty: state.customers.isEmpty,
                   onResetFilters: cubit.resetFilters,

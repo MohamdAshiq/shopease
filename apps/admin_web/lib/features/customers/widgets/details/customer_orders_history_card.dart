@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:shopease_core/shopease_core.dart';
 
 import '../../../../app/routing/admin_route_constants.dart';
-import '../../../dashboard/widgets/components/order_status_badge.dart';
 import '../../models/customer_view_model.dart';
 
 // Order history list for customer profile drawer

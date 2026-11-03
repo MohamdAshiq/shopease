@@ -67,4 +67,13 @@ abstract final class AppSnackBar {
       duration: duration,
     );
   }
+
+  // Auth feedback helper
+  static void showAuthFeedback(BuildContext context, String message) {
+    if (message.toLowerCase().contains('cancel')) {
+      show(context, message: message, duration: const Duration(seconds: 2));
+    } else {
+      showError(context, message);
+    }
+  }
 }

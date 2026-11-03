@@ -41,11 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
     AppSnackBar.showSuccess(context, 'Signed in successfully');
     final redirectPath = widget.redirect;
     if (redirectPath != null && redirectPath.isNotEmpty) {
-      if (Navigator.of(context).canPop()) {
-        context.pushReplacement(redirectPath);
-      } else {
-        context.go(redirectPath);
-      }
+      context.go(redirectPath);
     } else if (Navigator.of(context).canPop()) {
       Navigator.of(context).pop();
     } else {
@@ -87,7 +83,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
         if (state.hasError && state.errorMessage != null) {
-          AppSnackBar.showError(context, state.errorMessage!);
+          AppSnackBar.showAuthFeedback(context, state.errorMessage!);
         }
       },
       builder: (context, state) {
@@ -105,7 +101,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ? AppBar(
                     backgroundColor: Colors.transparent,
                     elevation: 0,
-                    toolbarHeight: 44.0,
+                    toolbarHeight: AppSizes.appBarHeight,
                     leading: IconButton(
                       icon: const Icon(
                         Icons.close_rounded,
@@ -140,8 +136,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         const SizedBox(height: AppSizes.sm),
                         Text(
                           _subtitle,
-                          style: AppTextStyles.bodyLarge.copyWith(
-                            fontSize: 13,
+                          style: AppTextStyles.bodyMedium.copyWith(
                             color: AppColors.textSecondary,
                           ),
                           textAlign: TextAlign.center,
@@ -223,7 +218,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                     'Remember me',
                                     style: AppTextStyles.bodyMedium.copyWith(
                                       color: AppColors.textSecondary,
-                                      fontSize: 12,
                                     ),
                                   ),
                                 ],
@@ -240,7 +234,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                 style: AppTextStyles.labelMedium.copyWith(
                                   fontWeight: FontWeight.w600,
                                   color: AppColors.primary,
-                                  fontSize: 12,
                                 ),
                               ),
                             ),
@@ -254,7 +247,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           isFullWidth: true,
                           height: AppSizes.inputHeight,
                           borderRadius: AppSizes.radiusMd,
-                          isLoading: state.isLoading,
+                          isLoading: state.isEmailLoading,
                           onPressed: state.isLoading ? null : _submitLogin,
                         ),
                         const SizedBox(height: AppSizes.lg),

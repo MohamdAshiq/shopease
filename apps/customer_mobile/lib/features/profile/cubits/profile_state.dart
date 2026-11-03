@@ -26,21 +26,6 @@ class ProfileState extends Equatable {
     return addresses.first;
   }
 
-  // Starter Addresses
-  static final List<CustomerAddressModel> defaultStarterAddresses = [
-    if (mockCustomer.address != null) mockCustomer.address!,
-    const CustomerAddressModel(
-      recipientName: 'Alex Morgan',
-      phone: '+91 98765 43211',
-      street: '100 Market St, Suite 400',
-      city: 'San Francisco',
-      state: 'CA',
-      postalCode: '94105',
-      country: 'India',
-      label: 'Work',
-    ),
-  ];
-
   ProfileState copyWith({
     UserModel? user,
     bool clearUser = false,

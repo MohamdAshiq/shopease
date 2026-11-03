@@ -88,9 +88,9 @@ class InventoryAlertsCard extends StatelessWidget {
                             width: DashboardConstants.productThumbnailSize,
                             height: DashboardConstants.productThumbnailSize,
                             color: AppColors.divider,
-                            child: product.primaryImageUrl.isNotEmpty
+                            child: product.imageUrl.isNotEmpty
                                 ? Image.network(
-                                    product.primaryImageUrl,
+                                    product.imageUrl,
                                     fit: BoxFit.cover,
                                     errorBuilder:
                                         (context, error, stackTrace) =>

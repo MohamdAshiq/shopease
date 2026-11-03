@@ -43,8 +43,52 @@ class OrdersDataTable extends StatelessWidget {
 
               const Divider(height: 1, thickness: 1, color: AppColors.divider),
 
-              // Table Body (Empty or Data Rows)
-              if (paginated.isEmpty)
+              // Table Body (Loading, Error, Empty or Data Rows)
+              if (state.isLoading && state.orders.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.all(AppSizes.xxl),
+                  child: Center(
+                    child: CircularProgressIndicator(color: AppColors.primary),
+                  ),
+                )
+              else if (state.errorMessage != null && state.orders.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.all(AppSizes.xxl),
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          IconsaxPlusLinear.warning_2,
+                          size: AppSizes.iconLg,
+                          color: AppColors.error,
+                        ),
+                        const SizedBox(height: AppSizes.md),
+                        Text(
+                          'Failed to load orders',
+                          style: AppTextStyles.h3.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: AppSizes.xs),
+                        Text(
+                          state.errorMessage!,
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: AppSizes.lg),
+                        AppButton.compact(
+                          onPressed: cubit.loadOrders,
+                          label: 'Retry',
+                          icon: IconsaxPlusLinear.refresh,
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              else if (paginated.isEmpty)
                 OrdersTableEmptyState(
                   isStoreEmpty: state.orders.isEmpty,
                   onResetFilters: cubit.resetFilters,

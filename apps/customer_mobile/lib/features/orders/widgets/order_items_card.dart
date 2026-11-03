@@ -35,8 +35,8 @@ class OrderItemsCard extends StatelessWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(AppSizes.radiusMd),
                   child: SizedBox(
-                    width: 50,
-                    height: 50,
+                    width: AppSizes.itemThumbnailSize,
+                    height: AppSizes.itemThumbnailSize,
                     child: AppNetworkImage(
                       imageUrl: order.items[index].imageUrl,
                     ),
