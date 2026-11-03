@@ -1,17 +1,76 @@
-# customer_mobile
+# 📱 ShopEase — Customer Mobile Application
 
-A new Flutter project.
+[![Platform](https://img.shields.io/badge/Platform-iOS%20%7C%20Android-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
+[![State Management](https://img.shields.io/badge/State-BLoC%20%2F%20Cubit-blueviolet)](https://bloclibrary.dev)
+[![Firebase](https://img.shields.io/badge/Backend-Firebase%20Firestore-FFCA28?logo=firebase&logoColor=black)](https://firebase.google.com)
 
-## Getting Started
+The customer-facing mobile shopping client for the **ShopEase Monorepo**. Built with Flutter, Clean Architecture, and reactive BLoC state management.
 
-This project is a starting point for a Flutter application.
+---
 
-A few resources to get you started if this is your first Flutter project:
+## 🌟 Features
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+* **Authentication**: Google Sign-In & Email/Password registration with automated Firestore profile synchronization.
+* **Store Discovery**: Real-time catalog search, category filter chips, and multi-criteria sorting (price, popularity).
+* **Product Details**: Variant sizing selector with inventory-bound stock validation.
+* **Persistent Cart & Wishlist**: Cloud-synced cart and wishlist scoped to authenticated user accounts.
+* **Streamlined Checkout**: Multiple payment options, shipping address selection, and auto-saving of checkout addresses.
+* **Order Tracking**: Real-time status updates (`pending` → `processing` → `shipped` → `delivered`) with cancellation workflows.
+* **Native Platform Integration**: Adaptive launcher icons, Android 12+ Splash API, and iOS launch screen storyboard.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+---
+
+## 📂 Project Architecture
+
+```text
+apps/customer_mobile/
+├── android/            # Android Gradle configs, adaptive icons, and ProGuard rules
+├── ios/                # iOS Runner workspace, storyboards, and AppIcon assets
+└── lib/
+    ├── app/            # App routing (GoRouter) & theme configuration
+    ├── features/       # Feature modules:
+    │   ├── auth/       # Login, registration, Google auth cubits & views
+    │   ├── cart/       # Cart management & bill calculation
+    │   ├── checkout/   # Shipping address selector & order placement
+    │   ├── home/       # Hero carousel & category highlights
+    │   ├── orders/     # Order tracking & timeline history
+    │   ├── profile/    # Customer profile & saved addresses
+    │   ├── search/     # Live debounced search & filter toolbar
+    │   ├── splash/     # In-app animated branded splash transition
+    │   ├── store/      # Catalog browsing & sorting
+    │   └── wishlist/   # Saved favorites management
+    └── widgets/        # Mobile-specific layout components
+```
+
+---
+
+## 🚀 Running the App
+
+### 1. Prerequisites
+Ensure you have the Flutter SDK installed and an Android emulator or iOS simulator running.
+
+### 2. Install Dependencies
+```bash
+flutter pub get
+```
+
+### 3. Run the App
+```bash
+# Debug mode
+flutter run
+
+# Release mode
+flutter run --release
+```
+
+### 4. Run Tests
+```bash
+flutter test
+```
+
+---
+
+## 🔗 Related Workspaces
+* [**Main Monorepo Documentation**](../../README.md)
+* [**Admin Web Dashboard**](../admin_web/README.md)
+* [**ShopEase Core Library**](../../packages/shopease_core/README.md)
