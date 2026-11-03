@@ -4,7 +4,7 @@ abstract final class AppAssets {
   static const String package = 'shopease_core';
 
   // Brand Logo
-  static const String appLogo = 'assets/images/app_logo.webp';
+  static const String appLogo = 'assets/images/app_logo.png';
 
   // Google Icon
   static const String googleIcon = 'assets/images/google.webp';

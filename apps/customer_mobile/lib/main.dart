@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shopease_core/shopease_core.dart';
 
 import 'app/routing/app_router.dart';
@@ -12,12 +13,26 @@ import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Lock orientation to portrait
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+
+  // Initialize Firebase backend
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // Error Builder
+  ErrorWidget.builder = (details) => AppErrorFallback(details: details);
+
   runApp(const CustomerApp());
 }
 
 class CustomerApp extends StatelessWidget {
-  const CustomerApp({super.key});
+  const CustomerApp({super.key, this.authRepository});
+
+  final AuthRepository? authRepository;
 
   @override
   Widget build(BuildContext context) {
@@ -28,8 +43,9 @@ class CustomerApp extends StatelessWidget {
         BlocProvider(create: (context) => OrderCubit()),
         BlocProvider(create: (context) => WishlistCubit()),
         BlocProvider(
-          create: (context) =>
-              ProfileCubit(authRepository: FirebaseAuthRepository()),
+          create: (context) => ProfileCubit(
+            authRepository: authRepository ?? FirebaseAuthRepository(),
+          ),
         ),
       ],
       child: BlocListener<AuthCubit, AuthState>(

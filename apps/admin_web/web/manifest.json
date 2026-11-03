@@ -1,12 +1,12 @@
 {
-    "name": "admin_web",
-    "short_name": "admin_web",
+    "name": "ShopEase Admin Dashboard",
+    "short_name": "ShopEase Admin",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
-    "orientation": "portrait-primary",
+    "background_color": "#160D2E",
+    "theme_color": "#6366F1",
+    "description": "ShopEase executive store management, inventory control, and order analytics portal.",
+    "orientation": "any",
     "prefer_related_applications": false,
     "icons": [
         {

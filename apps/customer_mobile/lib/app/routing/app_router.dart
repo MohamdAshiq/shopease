@@ -16,6 +16,7 @@ import '../../features/product/views/product_detail_screen.dart';
 import '../../features/profile/views/profile_screen.dart';
 import '../../features/profile/views/shipping_addresses_screen.dart';
 import '../../features/search/views/search_screen.dart';
+import '../../features/splash/views/splash_screen.dart';
 import '../../features/store/views/store_screen.dart';
 import '../../features/wishlist/views/wishlist_screen.dart';
 import 'route_constants.dart';
@@ -27,8 +28,16 @@ final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 // Application routing configuration
 final GoRouter appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
-  initialLocation: RoutePaths.home,
+  initialLocation: RoutePaths.splash,
   routes: [
+    // Splash Screen
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: RoutePaths.splash,
+      name: RouteNames.splash,
+      builder: (context, state) => const SplashScreen(),
+    ),
+
     // Bottom navigation shell
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
