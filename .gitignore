@@ -19,7 +19,6 @@ migrate_working_dir/
 **/google-services.json
 **/GoogleService-Info.plist
 **/firebase_options.dart
-**/firebase.json
 *-firebase-adminsdk-*.json
 
 # IDE / Editor specific

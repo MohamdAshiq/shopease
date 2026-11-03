@@ -60,6 +60,7 @@ export 'widgets/app_brand_logo.dart';
 export 'widgets/app_button.dart';
 export 'widgets/app_circle_button.dart';
 export 'widgets/app_empty_state.dart';
+export 'widgets/app_error_fallback.dart';
 export 'widgets/app_network_image.dart';
 export 'widgets/app_search_bar.dart';
 export 'widgets/app_text_field.dart';

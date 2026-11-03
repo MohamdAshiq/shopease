@@ -14,9 +14,30 @@ dependencies:
     path: ../../packages/shopease_core
 
 dev_dependencies:
+  flutter_launcher_icons: ^0.14.3
+  flutter_native_splash: ^2.4.4
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
 
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/app_logo.png"
+  min_sdk_android: 21
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/images/app_logo.png"
+
+flutter_native_splash:
+  color: "#FFFFFF"
+  image: "assets/images/splash_logo.png"
+  android_12:
+    color: "#FFFFFF"
+    image: "assets/images/splash_logo.png"
+  ios: true
+  android: true
+
 flutter:
   uses-material-design: true
+  assets:
+    - assets/images/

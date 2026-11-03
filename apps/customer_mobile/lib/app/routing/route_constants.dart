@@ -1,5 +1,6 @@
 // App Route paths
 abstract final class RoutePaths {
+  static const splash = '/splash';
   static const home = '/';
   static const popularProducts = '/popular-products';
   static const store = '/store';
@@ -26,6 +27,7 @@ abstract final class RoutePaths {
 
 // App Route Names
 abstract final class RouteNames {
+  static const splash = 'splash';
   static const home = 'home';
   static const popularProducts = 'popularProducts';
   static const store = 'store';
