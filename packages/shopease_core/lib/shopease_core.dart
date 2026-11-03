@@ -64,5 +64,6 @@ export 'widgets/app_network_image.dart';
 export 'widgets/app_search_bar.dart';
 export 'widgets/app_text_field.dart';
 export 'widgets/discount_badge.dart';
+export 'widgets/order_status_badge.dart';
 export 'widgets/responsive_layout.dart';
 export 'widgets/section_card_header.dart';

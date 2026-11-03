@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shopease_core/shopease_core.dart';
 
-import 'order_status_badge.dart';
-
 // Header Card for Order Detail Screen
 class OrderHeaderCard extends StatelessWidget {
   const OrderHeaderCard({super.key, required this.order});

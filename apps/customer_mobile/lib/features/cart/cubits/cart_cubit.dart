@@ -21,6 +21,8 @@ class CartCubit extends Cubit<CartState> {
     }
   }
 
+  static const int defaultMaxStock = 99;
+
   final CartStorageService _storageService;
   final FirebaseFirestore? _customFirestore;
   UserModel? _currentUser;
@@ -101,7 +103,9 @@ class CartCubit extends Cubit<CartState> {
       final index = result.indexWhere((item) => item.id == inc.id);
       if (index != -1) {
         final existing = result[index];
-        final maxStock = inc.product.stock > 0 ? inc.product.stock : 99;
+        final maxStock = inc.product.stock > 0
+            ? inc.product.stock
+            : defaultMaxStock;
         final combinedQty = (existing.quantity + inc.quantity).clamp(
           1,
           maxStock,
@@ -206,20 +210,20 @@ class CartCubit extends Cubit<CartState> {
 
   // Increment item quantity
   void incrementQuantity(String productId, String selectedSize) {
-    final item = state.items.firstWhere(
+    final index = state.items.indexWhere(
       (i) => i.product.id == productId && i.selectedSize == selectedSize,
-      orElse: () => throw Exception('Item not found in cart'),
     );
-    updateQuantity(productId, selectedSize, item.quantity + 1);
+    if (index == -1) return;
+    updateQuantity(productId, selectedSize, state.items[index].quantity + 1);
   }
 
   // Decrement item quantity
   void decrementQuantity(String productId, String selectedSize) {
-    final item = state.items.firstWhere(
+    final index = state.items.indexWhere(
       (i) => i.product.id == productId && i.selectedSize == selectedSize,
-      orElse: () => throw Exception('Item not found in cart'),
     );
-    updateQuantity(productId, selectedSize, item.quantity - 1);
+    if (index == -1) return;
+    updateQuantity(productId, selectedSize, state.items[index].quantity - 1);
   }
 
   // Remove a specific line item

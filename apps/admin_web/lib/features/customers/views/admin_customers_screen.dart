@@ -16,7 +16,7 @@ class AdminCustomersScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => AdminCustomersCubit(),
+      create: (context) => AdminCustomersCubit()..loadCustomers(),
       child: const _CustomersContent(),
     );
   }

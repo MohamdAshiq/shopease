@@ -55,7 +55,6 @@ class _CategorySalesBreakdownCardState
                       style: AppTextStyles.labelSmall.copyWith(
                         color: AppColors.primary,
                         fontWeight: FontWeight.bold,
-                        fontSize: 10,
                       ),
                     ),
                   ),
@@ -63,61 +62,94 @@ class _CategorySalesBreakdownCardState
               ),
               const SizedBox(height: AppSizes.xl),
 
-              // Donut Chart Centered
-              Center(
-                child: SizedBox(
-                  height: DashboardConstants.donutChartHeight,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      PieChart(
-                        PieChartData(
-                          pieTouchData: PieTouchData(
-                            touchCallback:
-                                (FlTouchEvent event, pieTouchResponse) {
-                                  setState(() {
-                                    if (!event.isInterestedForInteractions ||
-                                        pieTouchResponse == null ||
-                                        pieTouchResponse.touchedSection ==
-                                            null) {
-                                      _touchedIndex = -1;
-                                      return;
-                                    }
-                                    _touchedIndex = pieTouchResponse
-                                        .touchedSection!
-                                        .touchedSectionIndex;
-                                  });
-                                },
-                          ),
-                          sectionsSpace: 3,
-                          centerSpaceRadius: 90,
-                          startDegreeOffset: -90,
-                          sections: List.generate(categories.length, (index) {
-                            final item = categories[index];
-                            final isTouched = index == _touchedIndex;
-                            final radius = isTouched ? 36.0 : 30.0;
-
-                            return PieChartSectionData(
-                              color: item.color,
-                              value: item.percentage.toDouble(),
-                              title: '',
-                              radius: radius,
-                            );
-                          }),
+              // Empty State or Donut Chart Centered
+              if (categories.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: AppSizes.xxl),
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          IconsaxPlusLinear.chart_2,
+                          size: AppSizes.iconLg,
+                          color: AppColors.textSecondary,
                         ),
-                      ),
+                        const SizedBox(height: AppSizes.md),
+                        Text(
+                          'No category sales data yet',
+                          style: AppTextStyles.bodyLarge.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                        const SizedBox(height: AppSizes.xs),
+                        Text(
+                          'Category distributions calculate automatically when orders are placed.',
+                          style: AppTextStyles.bodySmall.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              else
+                Center(
+                  child: SizedBox(
+                    height: DashboardConstants.donutChartHeight,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        PieChart(
+                          PieChartData(
+                            pieTouchData: PieTouchData(
+                              touchCallback:
+                                  (FlTouchEvent event, pieTouchResponse) {
+                                    setState(() {
+                                      if (!event.isInterestedForInteractions ||
+                                          pieTouchResponse == null ||
+                                          pieTouchResponse.touchedSection ==
+                                              null) {
+                                        _touchedIndex = -1;
+                                        return;
+                                      }
+                                      _touchedIndex = pieTouchResponse
+                                          .touchedSection!
+                                          .touchedSectionIndex;
+                                    });
+                                  },
+                            ),
+                            sectionsSpace: 3,
+                            centerSpaceRadius: 90,
+                            startDegreeOffset: -90,
+                            sections: List.generate(categories.length, (index) {
+                              final item = categories[index];
+                              final isTouched = index == _touchedIndex;
+                              final radius = isTouched ? 36.0 : 30.0;
 
-                      // Center Display
-                      _DonutCenterHub(
-                        percentageText: _getCenterPercentage(categories),
-                        labelText: _getCenterLabel(categories),
-                        subText: _getCenterSubText(categories),
-                        accentColor: _getCenterColor(categories),
-                      ),
-                    ],
+                              return PieChartSectionData(
+                                color: item.color,
+                                value: item.percentage.toDouble(),
+                                title: '',
+                                radius: radius,
+                              );
+                            }),
+                          ),
+                        ),
+
+                        // Center Display
+                        _DonutCenterHub(
+                          percentageText: _getCenterPercentage(categories),
+                          labelText: _getCenterLabel(categories),
+                          subText: _getCenterSubText(categories),
+                          accentColor: _getCenterColor(categories),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
             ],
           ),
         );
@@ -176,7 +208,6 @@ class _DonutCenterHub extends StatelessWidget {
         Text(
           percentageText,
           style: AppTextStyles.h2.copyWith(
-            fontSize: 24,
             fontWeight: FontWeight.w600,
             color: accentColor,
             height: 1.0,
@@ -186,7 +217,6 @@ class _DonutCenterHub extends StatelessWidget {
         Text(
           labelText,
           style: AppTextStyles.bodyMedium.copyWith(
-            fontSize: 12,
             fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
           ),
@@ -198,7 +228,6 @@ class _DonutCenterHub extends StatelessWidget {
           subText,
           style: AppTextStyles.labelSmall.copyWith(
             color: AppColors.textSecondary,
-            fontSize: 11,
             fontWeight: FontWeight.w500,
           ),
         ),

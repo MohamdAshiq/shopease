@@ -16,7 +16,7 @@ class AdminOrdersScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => AdminOrdersCubit(),
+      create: (context) => AdminOrdersCubit()..loadOrders(),
       child: const _OrdersContent(),
     );
   }

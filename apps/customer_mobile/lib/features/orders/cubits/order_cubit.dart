@@ -98,10 +98,10 @@ class OrderCubit extends Cubit<OrderState> {
       deliveryFee: deliveryFee,
       total: total,
       paymentMethod: paymentMethod,
-      status: 'pending',
+      status: OrderStatus.pending.value,
       statusHistory: [
         OrderStatusHistory(
-          status: 'pending',
+          status: OrderStatus.pending.value,
           timestamp: now,
           note: 'Order placed successfully with $paymentTitle',
         ),
@@ -138,13 +138,13 @@ class OrderCubit extends Cubit<OrderState> {
         final newHistory = [
           ...order.statusHistory,
           OrderStatusHistory(
-            status: 'cancelled',
+            status: OrderStatus.cancelled.value,
             timestamp: DateTime.now(),
             note: 'Order cancelled by customer',
           ),
         ];
         return order.copyWith(
-          status: 'cancelled',
+          status: OrderStatus.cancelled.value,
           statusHistory: newHistory,
           updatedAt: DateTime.now(),
         );

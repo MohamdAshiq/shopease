@@ -1,15 +1,38 @@
+import 'dart:async';
+
 import 'package:shopease_core/shopease_core.dart';
 
 import 'admin_orders_state.dart';
 
 // Cubit managing admin orders operations
 class AdminOrdersCubit extends Cubit<AdminOrdersState> {
-  AdminOrdersCubit({List<OrderModel>? initialOrders})
-    : super(
-        AdminOrdersState(
-          orders: initialOrders ?? List<OrderModel>.from(mockOrders),
-        ),
-      );
+  AdminOrdersCubit({
+    List<OrderModel>? initialOrders,
+    OrderRepository? orderRepository,
+  }) : _orderRepository = orderRepository ?? FirestoreOrderRepository(),
+       super(AdminOrdersState(orders: initialOrders ?? const []));
+
+  final OrderRepository _orderRepository;
+  StreamSubscription<List<OrderModel>>? _ordersSubscription;
+
+  // Stream live orders from Firestore
+  void loadOrders() {
+    emit(state.copyWith(isLoading: state.orders.isEmpty, errorMessage: null));
+    _ordersSubscription?.cancel();
+
+    _ordersSubscription = _orderRepository.watchAllOrders().listen(
+      (orders) {
+        if (!isClosed) {
+          emit(state.copyWith(orders: orders, isLoading: false));
+        }
+      },
+      onError: (e) {
+        if (!isClosed) {
+          emit(state.copyWith(isLoading: false, errorMessage: e.toString()));
+        }
+      },
+    );
+  }
 
   // Search filter
   void search(String query) {
@@ -52,30 +75,33 @@ class AdminOrdersCubit extends Cubit<AdminOrdersState> {
     emit(state.copyWith(clearSelectedOrder: true));
   }
 
-  // Transition order fulfillment status
-  void updateOrderStatus(
+  // Transition order fulfillment status in Firestore & state
+  Future<void> updateOrderStatus(
     String orderId,
     OrderStatus newStatus, {
     String? note,
-  }) {
+  }) async {
     final now = DateTime.now();
+    final defaultNote = switch (newStatus) {
+      OrderStatus.pending => 'Marked as Pending',
+      OrderStatus.processing => 'Payment verified and packing started',
+      OrderStatus.shipped => 'Dispatched with logistics carrier',
+      OrderStatus.delivered => 'Delivered to recipient',
+      OrderStatus.cancelled => note ?? 'Order cancelled by administrator',
+    };
+
+    final finalNote = note ?? defaultNote;
+
+    // Optimistic local update
     final updatedOrders = state.orders.map((order) {
       if (order.id != orderId) return order;
-
-      final defaultNote = switch (newStatus) {
-        OrderStatus.pending => 'Marked as Pending',
-        OrderStatus.processing => 'Payment verified and packing started',
-        OrderStatus.shipped => 'Dispatched with logistics carrier',
-        OrderStatus.delivered => 'Delivered to recipient',
-        OrderStatus.cancelled => note ?? 'Order cancelled by administrator',
-      };
 
       final newHistory = [
         ...order.statusHistory,
         OrderStatusHistory(
           status: newStatus.value,
           timestamp: now,
-          note: note ?? defaultNote,
+          note: finalNote,
         ),
       ];
 
@@ -87,6 +113,21 @@ class AdminOrdersCubit extends Cubit<AdminOrdersState> {
     }).toList();
 
     emit(state.copyWith(orders: updatedOrders));
+
+    // Persist to Cloud Firestore
+    try {
+      await _orderRepository.updateOrderStatus(
+        orderId: orderId,
+        status: newStatus.value,
+        note: finalNote,
+      );
+    } catch (e) {
+      if (!isClosed) {
+        emit(
+          state.copyWith(errorMessage: 'Failed to update order #$orderId: $e'),
+        );
+      }
+    }
   }
 
   // Reset all search and filter parameters
@@ -100,5 +141,11 @@ class AdminOrdersCubit extends Cubit<AdminOrdersState> {
         currentPage: 1,
       ),
     );
+  }
+
+  @override
+  Future<void> close() {
+    _ordersSubscription?.cancel();
+    return super.close();
   }
 }

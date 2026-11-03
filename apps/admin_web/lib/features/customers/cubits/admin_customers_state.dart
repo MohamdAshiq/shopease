@@ -37,6 +37,8 @@ class AdminCustomersState extends Equatable {
     this.currentPage = 1,
     this.itemsPerPage = DashboardConstants.defaultCustomersPerPage,
     this.selectedCustomerId,
+    this.isLoading = false,
+    this.errorMessage,
   });
 
   final List<CustomerViewModel> customers;
@@ -46,6 +48,8 @@ class AdminCustomersState extends Equatable {
   final int currentPage;
   final int itemsPerPage;
   final String? selectedCustomerId;
+  final bool isLoading;
+  final String? errorMessage;
 
   // Currently selected customer for the slide-over inspector
   CustomerViewModel? get selectedCustomer {
@@ -160,6 +164,9 @@ class AdminCustomersState extends Equatable {
     int? itemsPerPage,
     String? selectedCustomerId,
     bool clearSelectedCustomer = false,
+    bool? isLoading,
+    String? errorMessage,
+    bool clearErrorMessage = false,
   }) {
     return AdminCustomersState(
       customers: customers ?? this.customers,
@@ -171,6 +178,10 @@ class AdminCustomersState extends Equatable {
       selectedCustomerId: clearSelectedCustomer
           ? null
           : (selectedCustomerId ?? this.selectedCustomerId),
+      isLoading: isLoading ?? this.isLoading,
+      errorMessage: clearErrorMessage
+          ? null
+          : (errorMessage ?? this.errorMessage),
     );
   }
 
@@ -183,5 +194,7 @@ class AdminCustomersState extends Equatable {
     currentPage,
     itemsPerPage,
     selectedCustomerId,
+    isLoading,
+    errorMessage,
   ];
 }
