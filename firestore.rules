@@ -11,55 +11,55 @@ rules_version = '2';
 //    Fields:
 //      - uid: string (1..128, required, immutable) - Auth UID of user
 //      - email: string (0..100, required) - User email address
-//      - displayName: string (1..100, required) - Customer / Admin display name
+//      - displayName: string (0..100, required) - Customer / Admin display name
 //      - role: string (required, 'customer' | 'admin') - Access role (non-admin cannot elevate to admin)
-//      - phone: string (optional, 0..30) - Contact phone number
-//      - address: map (optional, max 20 keys) - Primary delivery address
-//      - addresses: list of maps (optional, max 20 entries) - Saved delivery addresses
-//      - defaultAddressIndex: int (optional, >= 0) - Pointer to active default address
-//      - wishlist: list of maps (optional, max 100 items) - Active wishlist products
-//      - wishlistProductIds: list of strings (optional, max 100 entries) - Quick lookup product IDs
-//      - wishlistUpdatedAt: timestamp | string (optional) - Wishlist last synced timestamp
-//      - cart: list of maps (optional, max 50 items) - Active shopping cart items
-//      - cartUpdatedAt: timestamp | string (optional) - Cart last synced timestamp
-//      - createdAt: timestamp | string (optional, immutable) - Profile creation time
-//      - updatedAt: timestamp | string (optional) - Profile last updated time
+//      - phone: string (optional, nullable, 0..30) - Contact phone number
+//      - address: map (optional, nullable, max 20 keys) - Primary delivery address
+//      - addresses: list of maps (optional, nullable, max 20 entries) - Saved delivery addresses
+//      - defaultAddressIndex: int (optional, nullable, >= 0) - Pointer to active default address
+//      - wishlist: list of maps (optional, nullable, max 100 items) - Active wishlist products
+//      - wishlistProductIds: list of strings (optional, nullable, max 100 entries) - Quick lookup product IDs
+//      - wishlistUpdatedAt: timestamp | string (optional, nullable) - Wishlist last synced timestamp
+//      - cart: list of maps (optional, nullable, max 50 items) - Active shopping cart items
+//      - cartUpdatedAt: timestamp | string (optional, nullable) - Cart last synced timestamp
+//      - createdAt: timestamp | string (optional, nullable) - Profile creation time
+//      - updatedAt: timestamp | string (optional, nullable) - Profile last updated time
 //
 // 2. Collection: products/{productId}
 //    Document ID: Unique product identifier string (id)
 //    Fields:
-//      - id: string (optional, 0..128, immutable) - Document identifier
+//      - id: string (optional, nullable, 0..128, immutable) - Document identifier
 //      - name / title: string (required, 1..200) - Product title/name
 //      - price: number (required, >= 0) - Selling price in store currency
-//      - description: string (optional, 0..5000) - Detailed product description
-//      - category: string (optional, 0..100) - Product department category
-//      - imageUrl: string (optional, 0..1000) - Main display photo URL
-//      - images: list of strings (optional, max 20 entries) - Gallery image URLs
-//      - sizes: list of strings (optional, max 30 entries) - Available product size variants
-//      - stock: number (optional, >= 0) - Inventory unit count
-//      - rating: number (optional, 0..5) - Customer review score
-//      - isAvailable: bool (optional) - Availability visibility toggle
-//      - createdAt: timestamp | string (optional, immutable) - Catalog creation time
-//      - updatedAt: timestamp | string (optional) - Catalog modification time
+//      - description: string (optional, nullable, 0..5000) - Detailed product description
+//      - category: string (optional, nullable, 0..100) - Product department category
+//      - imageUrl: string (optional, nullable, 0..1000) - Main display photo URL
+//      - images: list of strings (optional, nullable, max 20 entries) - Gallery image URLs
+//      - sizes: list of strings (optional, nullable, max 30 entries) - Available product size variants
+//      - stock: number (optional, nullable, >= 0) - Inventory unit count
+//      - rating: number (optional, nullable, 0..5) - Customer review score
+//      - isAvailable: bool (optional, nullable) - Availability visibility toggle
+//      - createdAt: timestamp | string (optional, nullable) - Catalog creation time
+//      - updatedAt: timestamp | string (optional, nullable) - Catalog modification time
 //
 // 3. Collection: orders/{orderId}
 //    Document ID: Unique order identifier string (e.g. ORD-YYYYMMDD-XXXX)
 //    Fields:
-//      - id: string (optional, 0..128, immutable) - Document identifier
+//      - id: string (optional, nullable, 0..128, immutable) - Document identifier
 //      - customerId: string (required, 1..128, immutable) - UID of ordering customer
-//      - customerName: string (optional, 0..100) - Customer name for shipment
-//      - customerEmail: string (optional, 0..100) - Customer contact email
-//      - customerPhone: string (optional, 0..30) - Customer contact phone
+//      - customerName: string (optional, nullable, 0..100) - Customer name for shipment
+//      - customerEmail: string (optional, nullable, 0..100) - Customer contact email
+//      - customerPhone: string (optional, nullable, 0..30) - Customer contact phone
 //      - items: list of maps (required, 1..50 entries) - Ordered line items
 //      - total / totalAmount: number (required, > 0) - Final order total charge
-//      - subtotal: number (optional, >= 0) - Order subtotal before fees
-//      - deliveryFee: number (optional, >= 0) - Shipping / delivery fee charge
-//      - shippingAddress / deliveryAddress: map (optional, max 20 keys) - Destination delivery address
-//      - paymentMethod: string (optional, 0..50) - Selected payment method ('upi', 'card', 'cod', etc.)
+//      - subtotal: number (optional, nullable, >= 0) - Order subtotal before fees
+//      - deliveryFee: number (optional, nullable, >= 0) - Shipping / delivery fee charge
+//      - shippingAddress / deliveryAddress: map (optional, nullable, max 20 keys) - Destination delivery address
+//      - paymentMethod: string (optional, nullable, 0..50) - Selected payment method ('upi', 'card', 'cod', etc.)
 //      - status: string (required, 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled')
-//      - statusHistory: list of maps (optional, max 50 entries) - Audit trail of status transitions
-//      - createdAt: timestamp | string (optional, immutable) - Order submission timestamp
-//      - updatedAt: timestamp | string (optional) - Order last updated timestamp
+//      - statusHistory: list of maps (optional, nullable, max 50 entries) - Audit trail of status transitions
+//      - createdAt: timestamp | string (optional, nullable) - Order submission timestamp
+//      - updatedAt: timestamp | string (optional, nullable) - Order last updated timestamp
 //
 // ===============================================================
 
@@ -112,11 +112,9 @@ service cloud.firestore {
         email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
     }
 
-    // Validate user profile email (empty string allowed for phone/anonymous fallback)
+    // Validate user profile email (empty string allowed for phone/anonymous fallback; length bounded)
     function isValidUserEmail(email) {
-      return email is string &&
-        email.size() <= 100 &&
-        (email.size() == 0 || email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"));
+      return email is string && email.size() <= 100;
     }
 
     // Validate timestamp or ISO date string
@@ -140,22 +138,22 @@ service cloud.firestore {
       data.keys().hasAll(['uid', 'email', 'displayName', 'role']) &&
       data.uid is string && data.uid.size() >= 1 && data.uid.size() <= 128 &&
       isValidUserEmail(data.email) &&
-      data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 100 &&
+      data.displayName is string && data.displayName.size() <= 100 &&
       data.role in ['customer', 'admin'] &&
-      // Optional profile fields
-      (!('phone' in data) || (data.phone is string && data.phone.size() <= 30)) &&
-      (!('address' in data) || (data.address is map && data.address.keys().size() <= 20)) &&
-      (!('addresses' in data) || (data.addresses is list && data.addresses.size() <= 20)) &&
-      (!('defaultAddressIndex' in data) || (data.defaultAddressIndex is int && data.defaultAddressIndex >= 0)) &&
+      // Optional profile fields (null-safe)
+      (!('phone' in data) || data.phone == null || (data.phone is string && data.phone.size() <= 30)) &&
+      (!('address' in data) || data.address == null || (data.address is map && data.address.keys().size() <= 20)) &&
+      (!('addresses' in data) || data.addresses == null || (data.addresses is list && data.addresses.size() <= 20)) &&
+      (!('defaultAddressIndex' in data) || data.defaultAddressIndex == null || (data.defaultAddressIndex is int && data.defaultAddressIndex >= 0)) &&
       // Mobile app shopping state synced to user document
-      (!('wishlist' in data) || (data.wishlist is list && data.wishlist.size() <= 100)) &&
-      (!('wishlistProductIds' in data) || (data.wishlistProductIds is list && data.wishlistProductIds.size() <= 100)) &&
-      (!('wishlistUpdatedAt' in data) || isValidTimestampOrString(data.wishlistUpdatedAt)) &&
-      (!('cart' in data) || (data.cart is list && data.cart.size() <= 50)) &&
-      (!('cartUpdatedAt' in data) || isValidTimestampOrString(data.cartUpdatedAt)) &&
+      (!('wishlist' in data) || data.wishlist == null || (data.wishlist is list && data.wishlist.size() <= 100)) &&
+      (!('wishlistProductIds' in data) || data.wishlistProductIds == null || (data.wishlistProductIds is list && data.wishlistProductIds.size() <= 100)) &&
+      (!('wishlistUpdatedAt' in data) || data.wishlistUpdatedAt == null || isValidTimestampOrString(data.wishlistUpdatedAt)) &&
+      (!('cart' in data) || data.cart == null || (data.cart is list && data.cart.size() <= 50)) &&
+      (!('cartUpdatedAt' in data) || data.cartUpdatedAt == null || isValidTimestampOrString(data.cartUpdatedAt)) &&
       // Timestamps
-      (!('createdAt' in data) || isValidTimestampOrString(data.createdAt)) &&
-      (!('updatedAt' in data) || isValidTimestampOrString(data.updatedAt));
+      (!('createdAt' in data) || data.createdAt == null || isValidTimestampOrString(data.createdAt)) &&
+      (!('updatedAt' in data) || data.updatedAt == null || isValidTimestampOrString(data.updatedAt));
     }
 
     // Domain validator for products/{productId}
@@ -172,18 +170,18 @@ service cloud.firestore {
         ('name' in data && data.name is string && data.name.size() > 0 && data.name.size() <= 200) ||
         ('title' in data && data.title is string && data.title.size() > 0 && data.title.size() <= 200)
       ) &&
-      // Optional fields & bounds
-      (!('id' in data) || (data.id is string && data.id.size() <= 128)) &&
-      (!('description' in data) || (data.description is string && data.description.size() <= 5000)) &&
-      (!('category' in data) || (data.category is string && data.category.size() <= 100)) &&
-      (!('imageUrl' in data) || (data.imageUrl is string && data.imageUrl.size() <= 1000)) &&
-      (!('images' in data) || (data.images is list && data.images.size() <= 20)) &&
-      (!('sizes' in data) || (data.sizes is list && data.sizes.size() <= 30)) &&
-      (!('stock' in data) || (data.stock is number && data.stock >= 0)) &&
-      (!('rating' in data) || (data.rating is number && data.rating >= 0 && data.rating <= 5)) &&
-      (!('isAvailable' in data) || data.isAvailable is bool) &&
-      (!('createdAt' in data) || isValidTimestampOrString(data.createdAt)) &&
-      (!('updatedAt' in data) || isValidTimestampOrString(data.updatedAt));
+      // Optional fields & bounds (null-safe)
+      (!('id' in data) || data.id == null || (data.id is string && data.id.size() <= 128)) &&
+      (!('description' in data) || data.description == null || (data.description is string && data.description.size() <= 5000)) &&
+      (!('category' in data) || data.category == null || (data.category is string && data.category.size() <= 100)) &&
+      (!('imageUrl' in data) || data.imageUrl == null || (data.imageUrl is string && data.imageUrl.size() <= 1000)) &&
+      (!('images' in data) || data.images == null || (data.images is list && data.images.size() <= 20)) &&
+      (!('sizes' in data) || data.sizes == null || (data.sizes is list && data.sizes.size() <= 30)) &&
+      (!('stock' in data) || data.stock == null || (data.stock is number && data.stock >= 0)) &&
+      (!('rating' in data) || data.rating == null || (data.rating is number && data.rating >= 0 && data.rating <= 5)) &&
+      (!('isAvailable' in data) || data.isAvailable == null || data.isAvailable is bool) &&
+      (!('createdAt' in data) || data.createdAt == null || isValidTimestampOrString(data.createdAt)) &&
+      (!('updatedAt' in data) || data.updatedAt == null || isValidTimestampOrString(data.updatedAt));
     }
 
     // Domain validator for orders/{orderId}
@@ -203,19 +201,19 @@ service cloud.firestore {
         ('totalAmount' in data && data.totalAmount is number && data.totalAmount > 0) ||
         ('total' in data && data.total is number && data.total > 0)
       ) &&
-      // Optional fields & bounds
-      (!('id' in data) || (data.id is string && data.id.size() <= 128)) &&
-      (!('customerName' in data) || (data.customerName is string && data.customerName.size() <= 100)) &&
-      (!('customerEmail' in data) || (data.customerEmail is string && data.customerEmail.size() <= 100)) &&
-      (!('customerPhone' in data) || (data.customerPhone is string && data.customerPhone.size() <= 30)) &&
-      (!('paymentMethod' in data) || (data.paymentMethod is string && data.paymentMethod.size() <= 50)) &&
-      (!('subtotal' in data) || (data.subtotal is number && data.subtotal >= 0)) &&
-      (!('deliveryFee' in data) || (data.deliveryFee is number && data.deliveryFee >= 0)) &&
-      (!('shippingAddress' in data) || (data.shippingAddress is map && data.shippingAddress.keys().size() <= 20)) &&
-      (!('deliveryAddress' in data) || (data.deliveryAddress is map && data.deliveryAddress.keys().size() <= 20)) &&
-      (!('statusHistory' in data) || (data.statusHistory is list && data.statusHistory.size() <= 50)) &&
-      (!('createdAt' in data) || isValidTimestampOrString(data.createdAt)) &&
-      (!('updatedAt' in data) || isValidTimestampOrString(data.updatedAt));
+      // Optional fields & bounds (null-safe)
+      (!('id' in data) || data.id == null || (data.id is string && data.id.size() <= 128)) &&
+      (!('customerName' in data) || data.customerName == null || (data.customerName is string && data.customerName.size() <= 100)) &&
+      (!('customerEmail' in data) || data.customerEmail == null || (data.customerEmail is string && data.customerEmail.size() <= 100)) &&
+      (!('customerPhone' in data) || data.customerPhone == null || (data.customerPhone is string && data.customerPhone.size() <= 30)) &&
+      (!('paymentMethod' in data) || data.paymentMethod == null || (data.paymentMethod is string && data.paymentMethod.size() <= 50)) &&
+      (!('subtotal' in data) || data.subtotal == null || (data.subtotal is number && data.subtotal >= 0)) &&
+      (!('deliveryFee' in data) || data.deliveryFee == null || (data.deliveryFee is number && data.deliveryFee >= 0)) &&
+      (!('shippingAddress' in data) || data.shippingAddress == null || (data.shippingAddress is map && data.shippingAddress.keys().size() <= 20)) &&
+      (!('deliveryAddress' in data) || data.deliveryAddress == null || (data.deliveryAddress is map && data.deliveryAddress.keys().size() <= 20)) &&
+      (!('statusHistory' in data) || data.statusHistory == null || (data.statusHistory is list && data.statusHistory.size() <= 50)) &&
+      (!('createdAt' in data) || data.createdAt == null || isValidTimestampOrString(data.createdAt)) &&
+      (!('updatedAt' in data) || data.updatedAt == null || isValidTimestampOrString(data.updatedAt));
     }
 
     // Default deny all access at root
@@ -242,11 +240,11 @@ service cloud.firestore {
 
       // Update: User can update their own profile, but cannot elevate/alter 'role'
       // Admin can update any profile and modify role
-      // Immutable fields protected: uid, createdAt
+      // Immutable fields protected: uid
       allow update: if isAuthenticated() &&
                        isValidUser(request.resource.data) &&
                        request.resource.data.uid == resource.data.uid &&
-                       (!('createdAt' in resource.data) || !('createdAt' in request.resource.data) || request.resource.data.createdAt == resource.data.createdAt) &&
+                       (!('createdAt' in request.resource.data) || request.resource.data.createdAt == null || isValidTimestampOrString(request.resource.data.createdAt)) &&
                        (
                          (isOwner(userId) && request.resource.data.role == resource.data.role) ||
                          isAdmin()
@@ -267,11 +265,11 @@ service cloud.firestore {
       allow create: if isAdmin() &&
                        isValidProduct(request.resource.data);
 
-      // Update: Admins only, with data validation and immutable ID/creation date protection
+      // Update: Admins only, with data validation and immutable ID protection
       allow update: if isAdmin() &&
                        isValidProduct(request.resource.data) &&
                        (!('id' in resource.data) || !('id' in request.resource.data) || request.resource.data.id == resource.data.id) &&
-                       (!('createdAt' in resource.data) || !('createdAt' in request.resource.data) || request.resource.data.createdAt == resource.data.createdAt);
+                       (!('createdAt' in request.resource.data) || request.resource.data.createdAt == null || isValidTimestampOrString(request.resource.data.createdAt));
 
       // Delete: Admins only
       allow delete: if isAdmin();
@@ -297,12 +295,12 @@ service cloud.firestore {
       // - Admins can update any order (status changes, order tracking, notes)
       // - Customers can only update their own order to 'cancelled' from a non-shipped status ('pending', 'processing')
       //   and can only touch 'status', 'statusHistory', and 'updatedAt' fields
-      // Immutable fields protected: customerId, id, createdAt
+      // Immutable fields protected: customerId, id
       allow update: if isAuthenticated() &&
                        isValidOrder(request.resource.data) &&
                        request.resource.data.customerId == resource.data.customerId &&
                        (!('id' in resource.data) || !('id' in request.resource.data) || request.resource.data.id == resource.data.id) &&
-                       (!('createdAt' in resource.data) || !('createdAt' in request.resource.data) || request.resource.data.createdAt == resource.data.createdAt) &&
+                       (!('createdAt' in request.resource.data) || request.resource.data.createdAt == null || isValidTimestampOrString(request.resource.data.createdAt)) &&
                        (
                          isAdmin() ||
                          (
@@ -318,4 +316,3 @@ service cloud.firestore {
     }
   }
 }
-

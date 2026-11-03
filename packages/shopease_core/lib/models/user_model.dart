@@ -68,17 +68,24 @@ class UserModel extends Equatable {
 
   Map<String, dynamic> toMap() {
     final activeAddress = defaultAddress;
-    return {
+    final map = <String, dynamic>{
       'uid': uid,
       'email': email,
       'displayName': displayName,
       'role': role,
       'phone': phone,
-      'address': activeAddress?.toMap(),
-      'addresses': addresses.map((a) => a.toMap()).toList(),
       'defaultAddressIndex': defaultAddressIndex,
-      'createdAt': createdAt?.toIso8601String(),
     };
+    if (activeAddress != null) {
+      map['address'] = activeAddress.toMap();
+    }
+    if (addresses.isNotEmpty) {
+      map['addresses'] = addresses.map((a) => a.toMap()).toList();
+    }
+    if (createdAt != null) {
+      map['createdAt'] = createdAt!.toIso8601String();
+    }
+    return map;
   }
 
   factory UserModel.fromMap(Map<String, dynamic> map, {String? documentId}) {
@@ -177,7 +184,7 @@ final mockCustomer = UserModel(
 final mockAdmin = UserModel(
   uid: 'usr_admin_001',
   email: 'admin@shopease.com',
-  displayName: 'Store Manager',
+  displayName: 'ShopEase Admin',
   role: 'admin',
   phone: '+91 98765 43201',
   createdAt: DateTime(2026, 1, 1),

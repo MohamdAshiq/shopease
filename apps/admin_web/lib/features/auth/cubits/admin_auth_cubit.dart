@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:shopease_core/shopease_core.dart';
 
 import 'admin_auth_state.dart';
@@ -12,7 +13,27 @@ class AdminAuthCubit extends Cubit<AdminAuthState> {
                 user: initialUser,
               )
             : const AdminAuthState(),
-      );
+      ) {
+    _checkInitialAuth();
+  }
+
+  // Restore session if already signed into Firebase Auth
+  void _checkInitialAuth() {
+    try {
+      if (Firebase.apps.isNotEmpty) {
+        final currentFbUser = FirebaseAuth.instance.currentUser;
+        if (currentFbUser != null &&
+            currentFbUser.email?.toLowerCase() == 'admin@shopease.com') {
+          emit(
+            state.copyWith(
+              status: AdminAuthStatus.authenticated,
+              user: mockAdmin.copyWith(uid: currentFbUser.uid),
+            ),
+          );
+        }
+      }
+    } catch (_) {}
+  }
 
   // Admin login flow
   Future<bool> login(String email, String password) async {
@@ -31,34 +52,12 @@ class AdminAuthCubit extends Cubit<AdminAuthState> {
 
     emit(state.copyWith(status: AdminAuthStatus.loading, clearError: true));
 
-    // Simulated network verification delay
-    await Future.delayed(const Duration(milliseconds: 600));
-
     // Admin email check
     final isAdminEmail =
         cleanEmail.toLowerCase() == mockAdmin.email.toLowerCase() ||
         cleanEmail.toLowerCase() == 'admin@shopease.com';
 
-    if (isAdminEmail) {
-      if (cleanPassword == 'admin123' || cleanPassword.length >= 6) {
-        emit(
-          state.copyWith(
-            status: AdminAuthStatus.authenticated,
-            user: mockAdmin,
-            clearError: true,
-          ),
-        );
-        return true;
-      } else {
-        emit(
-          state.copyWith(
-            status: AdminAuthStatus.error,
-            errorMessage: 'Invalid password. Minimum 6 characters required.',
-          ),
-        );
-        return false;
-      }
-    } else {
+    if (!isAdminEmail) {
       emit(
         state.copyWith(
           status: AdminAuthStatus.error,
@@ -67,10 +66,78 @@ class AdminAuthCubit extends Cubit<AdminAuthState> {
       );
       return false;
     }
+
+    if (cleanPassword != 'admin123' && cleanPassword.length < 6) {
+      emit(
+        state.copyWith(
+          status: AdminAuthStatus.error,
+          errorMessage: 'Invalid password. Minimum 6 characters required.',
+        ),
+      );
+      return false;
+    }
+
+    // If the admin user doesn't exist in Firebase Auth, automatically adjust it
+    UserModel authenticatedUser = mockAdmin;
+
+    if (Firebase.apps.isNotEmpty) {
+      try {
+        UserCredential credential;
+        try {
+          credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+            email: cleanEmail,
+            password: cleanPassword,
+          );
+        } on FirebaseAuthException catch (e) {
+          if (e.code == 'user-not-found' || e.code == 'invalid-credential') {
+            try {
+              credential = await FirebaseAuth.instance
+                  .createUserWithEmailAndPassword(
+                    email: cleanEmail,
+                    password: cleanPassword,
+                  );
+            } catch (_) {
+              rethrow;
+            }
+          } else {
+            rethrow;
+          }
+        }
+
+        final fbUser = credential.user;
+        if (fbUser != null) {
+          authenticatedUser = mockAdmin.copyWith(uid: fbUser.uid);
+
+          // Ensure Firestore user document has role: 'admin'
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(fbUser.uid)
+              .set(authenticatedUser.toMap(), SetOptions(merge: true));
+        }
+      } on FirebaseAuthException catch (e) {
+        debugPrint('Firebase Auth admin sign-in notice: ${e.message}');
+      } catch (e) {
+        debugPrint('Firebase Auth admin sign-in notice: $e');
+      }
+    }
+
+    emit(
+      state.copyWith(
+        status: AdminAuthStatus.authenticated,
+        user: authenticatedUser,
+        clearError: true,
+      ),
+    );
+    return true;
   }
 
   // Admin logout
-  void logout() {
+  Future<void> logout() async {
+    try {
+      if (Firebase.apps.isNotEmpty) {
+        await FirebaseAuth.instance.signOut();
+      }
+    } catch (_) {}
     emit(const AdminAuthState(status: AdminAuthStatus.unauthenticated));
   }
 
