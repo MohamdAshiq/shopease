@@ -33,8 +33,8 @@ class GoogleSignInButton extends StatelessWidget {
           customIcon: Image.asset(
             AppAssets.googleIcon,
             package: AppAssets.package,
-            width: AppSizes.iconMd,
-            height: AppSizes.iconMd,
+            width: 50,
+            height: 50,
             fit: BoxFit.contain,
             errorBuilder: (context, error, stackTrace) => const Icon(
               IconsaxPlusBold.global,

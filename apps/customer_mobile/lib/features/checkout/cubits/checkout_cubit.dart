@@ -2,6 +2,7 @@ import 'package:shopease_core/shopease_core.dart';
 
 import '../../cart/cubits/cart_cubit.dart';
 import '../../orders/cubits/order_cubit.dart';
+import '../../profile/cubits/profile_cubit.dart';
 import 'checkout_state.dart';
 
 // Cubit handling product checkouts
@@ -32,6 +33,7 @@ class CheckoutCubit extends Cubit<CheckoutState> {
   Future<OrderModel?> placeOrder({
     required OrderCubit orderCubit,
     required CartCubit cartCubit,
+    ProfileCubit? profileCubit,
     UserModel? customer,
   }) async {
     final cartState = cartCubit.state;
@@ -61,6 +63,22 @@ class CheckoutCubit extends Cubit<CheckoutState> {
         paymentMethod: state.paymentMethod,
         customer: customer,
       );
+
+      // Auto-save the delivery address to the customer's profile if not already saved
+      if (profileCubit != null) {
+        final alreadySaved = profileCubit.state.addresses.any(
+          (a) =>
+              a.street.trim().toLowerCase() ==
+                  state.address.street.trim().toLowerCase() &&
+              a.postalCode.trim() == state.address.postalCode.trim(),
+        );
+        if (!alreadySaved) {
+          profileCubit.addAddress(
+            state.address,
+            makeDefault: profileCubit.state.addresses.isEmpty,
+          );
+        }
+      }
 
       // Clear shopping cart on successful checkout
       cartCubit.clearCart();

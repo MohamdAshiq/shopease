@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:shopease_core/shopease_core.dart';
 
 import 'profile_state.dart';
@@ -66,13 +67,15 @@ class ProfileCubit extends Cubit<ProfileState> {
 
   // Update profile basic info
   void updateProfile({String? displayName, String? email, String? phone}) {
-    if (state.user == null) return;
-    final updatedUser = state.user!.copyWith(
-      displayName: displayName ?? state.user!.displayName,
-      email: email ?? state.user!.email,
-      phone: phone ?? state.user!.phone,
+    final currentUser = state.user ?? authRepository?.currentUser;
+    if (currentUser == null) return;
+    final updatedUser = currentUser.copyWith(
+      displayName: displayName ?? currentUser.displayName,
+      email: email ?? currentUser.email,
+      phone: phone ?? currentUser.phone,
     );
     emit(state.copyWith(user: updatedUser));
+    _syncAddressesToFirestore(state.addresses, state.defaultAddressIndex);
   }
 
   // Add new delivery address
@@ -153,7 +156,7 @@ class ProfileCubit extends Cubit<ProfileState> {
     List<CustomerAddressModel> updatedList,
     int defaultIndex,
   ) async {
-    final currentUser = state.user;
+    final currentUser = state.user ?? authRepository?.currentUser;
     if (authRepository == null || currentUser == null) return;
 
     try {
@@ -168,7 +171,12 @@ class ProfileCubit extends Cubit<ProfileState> {
         address: activeAddress,
         clearAddress: activeAddress == null,
       );
-      await authRepository!.updateUserProfile(updatedUser);
-    } catch (_) {}
+      final savedUser = await authRepository!.updateUserProfile(updatedUser);
+      if (!isClosed) {
+        emit(state.copyWith(user: savedUser));
+      }
+    } catch (e) {
+      debugPrint('Address sync error: $e');
+    }
   }
 }

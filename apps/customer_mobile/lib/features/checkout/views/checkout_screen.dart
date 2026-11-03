@@ -172,6 +172,7 @@ class _CheckoutView extends StatelessWidget {
                               checkoutCubit.placeOrder(
                                 orderCubit: context.read<OrderCubit>(),
                                 cartCubit: context.read<CartCubit>(),
+                                profileCubit: context.read<ProfileCubit>(),
                                 customer: authUser,
                               );
                             },
